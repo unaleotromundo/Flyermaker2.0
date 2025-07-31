@@ -406,8 +406,10 @@
         let currentImageUploadAreaId;
 
         // --- Configuración del backend ---
-        // CAMBIA esta URL por la de tu servidor de backend cuando lo despliegues
-        const BACKEND_URL = 'http://tucatalogo.vercel.app'; // Usa localhost para desarrollo
+        // Se cambió de `http://localhost:3000` a una ruta relativa (`/api`)
+        // para que funcione correctamente en Vercel, ya que el backend se
+        // despliega junto con el frontend.
+        const BACKEND_URL = '/api';
 
         // Message box functions
         function showMessageBox(message) {
@@ -1140,7 +1142,7 @@
 
         // Función para llamar al backend para generar texto
         async function callBackendTextApi(prompt) {
-            const response = await fetch(`${BACKEND_URL}/api/generate-text`, {
+            const response = await fetch(`${BACKEND_URL}/generate-text`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: prompt })
@@ -1161,7 +1163,7 @@
 
         // Función para llamar al backend para generar imagen
         async function callBackendImageApi(prompt) {
-            const response = await fetch(`${BACKEND_URL}/api/generate-image`, {
+            const response = await fetch(`${BACKEND_URL}/generate-image`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: prompt })
