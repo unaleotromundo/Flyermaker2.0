@@ -1,4 +1,3 @@
-// api/index.js
 import express from 'express';
 import 'dotenv/config'; 
 
@@ -6,9 +5,15 @@ const app = express();
 
 app.use(express.json());
 
-const geminiApiKey = process.env.GEMINI_API_KEY;
+// Middleware CORS flexible para todos los deploys de Vercel
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://tucatalogo-fuyv3hlpm-agradecidos-projects.vercel.app');
+  const origin = req.headers.origin;
+  if (
+    origin &&
+    origin.endsWith('.vercel.app')
+  ) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') {
@@ -16,6 +21,9 @@ app.use((req, res, next) => {
   }
   next();
 });
+
+const geminiApiKey = process.env.GEMINI_API_KEY;
+
 // Endpoint para el chat de Gemini
 app.post('/api/chat', async (req, res) => {
     const userMessage = req.body.message;
