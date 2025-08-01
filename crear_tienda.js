@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // URL del servidor para la generación de imágenes
-    const IMAGE_GEN_URL = "https://tucatalogo.vercel.app/api/generate-image";
+    const IMAGE_GEN_URL = "http://localhost:3000/api/generate-image";
 
     // Manejar la generación de contenido con IA
     const handleAIButtonClick = async (targetElement, action) => {
@@ -53,8 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 1500);
 
             } else if (action === 'logo' || action === 'banner') {
-                const prompt = prompt("Ingresa una descripción para tu imagen:");
-                if (!prompt) {
+                // Se ha cambiado el nombre de la variable para evitar el error
+                const userPrompt = prompt("Ingresa una descripción para tu imagen:");
+                if (!userPrompt) {
                     targetElement.textContent = 'Generar con IA';
                     return;
                 }
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ prompt: prompt })
+                    body: JSON.stringify({ prompt: userPrompt }) // Usamos la nueva variable aquí
                 });
 
                 const result = await response.json();
