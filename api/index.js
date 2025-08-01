@@ -6,10 +6,9 @@ const app = express();
 
 app.use(express.json());
 
-// Middleware CORS profesional para subdominios Vercel
+// CORS para subdominios de Vercel, solo desde backend
 app.use(cors({
   origin: (origin, callback) => {
-    // Permite todos los subdominios de vercel.app o sin origin (server-to-server)
     if (!origin || /\.vercel\.app$/.test(origin.replace(/^https?:\/\//, ''))) {
       callback(null, true);
     } else {
@@ -18,12 +17,12 @@ app.use(cors({
   },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
-  optionsSuccessStatus: 200, // ¡Esto arregla tu error!
+  optionsSuccessStatus: 200,
 }));
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
 
-// Endpoint para el chat de Gemini
+// Endpoint chat Gemini
 app.post('/api/chat', async (req, res) => {
   const userMessage = req.body.message;
 
@@ -59,7 +58,7 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// Endpoint para generar imágenes
+// Endpoint para imágenes Gemini
 app.post('/api/generate-image', async (req, res) => {
   const { prompt } = req.body;
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${geminiApiKey}`;
@@ -93,5 +92,4 @@ app.post('/api/generate-image', async (req, res) => {
   }
 });
 
-// Exporta la aplicación Express para Vercel
 export default app;
