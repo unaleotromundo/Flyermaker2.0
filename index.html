@@ -1,754 +1,1397 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creador de Catálogos</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Cropper.js CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-        }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #e2e8f0;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-        /* Style for the + icon on logo upload */
-        .logo-upload-area {
-            position: relative;
-            cursor: pointer;
-            border: 2px dashed #cbd5e1;
-        }
-        .logo-upload-area::after {
-            content: '+';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 3rem;
-            color: #94a3b8;
-            pointer-events: none;
-            opacity: 0.7;
-            z-index: 10;
-        }
-        .logo-upload-area.has-image::after {
-            content: '';
-        }
-        .logo-upload-area img {
-            position: relative;
-            z-index: 5;
-        }
-        .logo-upload-area.has-image img {
-            z-index: 15;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creador de Catálogos</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Cropper.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        /* Style for the + icon on logo upload */
+        .logo-upload-area {
+            position: relative;
+            cursor: pointer;
+            border: 2px dashed #cbd5e1;
+        }
+        .logo-upload-area::after {
+            content: '+';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            color: #94a3b8;
+            pointer-events: none;
+            opacity: 0.7;
+            z-index: 10;
+        }
+        .logo-upload-area.has-image::after {
+            content: '';
+        }
+        .logo-upload-area img {
+            position: relative;
+            z-index: 5;
+        }
+        .logo-upload-area.has-image img {
+            z-index: 15;
+        }
 
-        /* Enhanced Catalog Preview Styles */
-        #catalogPreview {
-            background-color: #ffffff;
-            padding: 2.5rem; /* Increased padding */
-            border-radius: 1.5rem; /* More rounded corners */
-            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1), 0 6px 15px -3px rgba(0, 0, 0, 0.05); /* Stronger shadow */
-            min-height: 500px; /* Ensure enough space */
-            display: flex; /* Use flexbox for main layout */
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
+        /* Enhanced Catalog Preview Styles */
+        #catalogPreview {
+            background-color: #ffffff;
+            padding: 2.5rem; /* Increased padding */
+            border-radius: 1.5rem; /* More rounded corners */
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1), 0 6px 15px -3px rgba(0, 0, 0, 0.05); /* Stronger shadow */
+            min-height: 500px; /* Ensure enough space */
+            display: flex; /* Use flexbox for main layout */
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
 
-        #previewStoreName {
-            font-size: 3.5rem; /* Larger font for store name */
-            font-weight: 800; /* Extra bold */
-            color: #1a202c; /* Darker text */
-            margin-bottom: 0.5rem;
-            line-height: 1.1;
-        }
+        #previewStoreName {
+            font-size: 3.5rem; /* Larger font for store name */
+            font-weight: 800; /* Extra bold */
+            color: #1a202c; /* Darker text */
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
 
-        #previewSlogan {
-            font-size: 1.25rem;
-            color: #4a5568;
-            margin-top: 0.5rem;
-            font-style: italic;
-        }
+        #previewSlogan {
+            font-size: 1.25rem;
+            color: #4a5568;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
 
-        #previewPhoneNumber,
-        #previewEmail,
-        #previewWebsite {
-            color: #4a5568; /* Slightly darker gray for contact info */
-            font-size: 0.95rem; /* Slightly larger font */
-            margin-top: 0.25rem;
-        }
-        #previewWebsite {
-            color: #3b82f6; /* Blue for links */
-        }
+        #previewPhoneNumber,
+        #previewEmail,
+        #previewWebsite {
+            color: #4a5568; /* Slightly darker gray for contact info */
+            font-size: 0.95rem; /* Slightly larger font */
+            margin-top: 0.25rem;
+        }
+        #previewWebsite {
+            color: #3b82f6; /* Blue for links */
+        }
 
-        #previewProducts {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
-            gap: 2rem; /* More space between product cards */
-            width: 100%;
-            margin-top: 2rem;
-        }
+        #previewProducts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+            gap: 2rem; /* More space between product cards */
+            width: 100%;
+            margin-top: 2rem;
+        }
 
-        .product-card-preview {
-            background-color: #f8fafc; /* Lighter background for product cards */
-            padding: 1.5rem; /* More padding */
-            border-radius: 1rem; /* Rounded corners */
-            box-shadow: 0 5px 10px -2px rgba(0, 0, 0, 0.05), 0 2px 5px -1px rgba(0, 0, 0, 0.02); /* Subtle shadow */
-            border: 1px solid #e2e8f0; /* Light border */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
+        .product-card-preview {
+            background-color: #f8fafc; /* Lighter background for product cards */
+            padding: 1.5rem; /* More padding */
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 5px 10px -2px rgba(0, 0, 0, 0.05), 0 2px 5px -1px rgba(0, 0, 0, 0.02); /* Subtle shadow */
+            border: 1px solid #e2e8f0; /* Light border */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
 
-        .product-card-preview img {
-            width: 100%;
-            height: 200px; /* Fixed height for consistency */
-            object-contain; /* Ensure image is not distorted */
-            border-radius: 0.75rem; /* Rounded image corners */
-            margin-bottom: 1rem;
-            background-color: #ffffff; /* White background for images */
-            padding: 0.5rem; /* Small padding inside image container */
-            border: 1px solid #edf2f7; /* Light border for image */
-        }
+        .product-card-preview img {
+            width: 100%;
+            height: 200px; /* Fixed height for consistency */
+            object-contain; /* Ensure image is not distorted */
+            border-radius: 0.75rem; /* Rounded image corners */
+            margin-bottom: 1rem;
+            background-color: #ffffff; /* White background for images */
+            padding: 0.5rem; /* Small padding inside image container */
+            border: 1px solid #edf2f7; /* Light border for image */
+        }
 
-        .product-card-preview h4 {
-            font-size: 1.5rem; /* Larger product name */
-            font-weight: 700; /* Bold */
-            color: #2d3748; /* Darker text */
-            margin-bottom: 0.5rem;
-        }
+        .product-card-preview h4 {
+            font-size: 1.5rem; /* Larger product name */
+            font-weight: 700; /* Bold */
+            color: #2d3748; /* Darker text */
+            margin-bottom: 0.5rem;
+        }
 
-        .product-card-preview p:nth-of-type(1) { /* Price */
-            font-size: 1.75rem; /* Larger price */
-            font-weight: 800; /* Extra bold */
-            color: #2563eb; /* Stronger blue for price */
-            margin-bottom: 0.75rem;
-        }
+        .product-card-preview p:nth-of-type(1) { /* Price */
+            font-size: 1.75rem; /* Larger price */
+            font-weight: 800; /* Extra bold */
+            color: #2563eb; /* Stronger blue for price */
+            margin-bottom: 0.75rem;
+        }
 
-        .product-card-preview p:nth-of-type(2) { /* Description */
-            color: #4a5568; /* Darker gray for description */
-            font-size: 1rem; /* Standard font size */
-            line-height: 1.5;
-        }
-        .product-card-preview .tags {
-            font-size: 0.85rem;
-            color: #6b7280;
-            margin-top: 0.5rem;
-            font-style: italic;
-        }
-    </style>
+        .product-card-preview p:nth-of-type(2) { /* Description */
+            color: #4a5568; /* Darker gray for description */
+            font-size: 1rem; /* Standard font size */
+            line-height: 1.5;
+        }
+        .product-card-preview .tags {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center py-8 px-4">
 
-    <!-- Main Container -->
-    <div class="bg-white rounded-xl shadow-lg p-8 max-w-4xl w-full mb-8">
-        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Crea tu Catálogo Promocional</h1>
+    <!-- Main Container -->
+    <div class="bg-white rounded-xl shadow-lg p-8 max-w-4xl w-full mb-8">
+        <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Crea tu Catálogo Promocional</h1>
 
-        <!-- Loading Indicator -->
-        <div id="loading-spinner" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-blue-500"></div>
-            <p class="text-white text-lg ml-4">Generando...</p>
-        </div>
+        <!-- Loading Indicator -->
+        <div id="loading-spinner" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-blue-500"></div>
+            <p class="text-white text-lg ml-4">Generando...</p>
+        </div>
 
-        <!-- Catalog Form -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="space-y-6">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Detalles de la Tienda</h2>
-                <div>
-                    <label for="storeName" class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Tienda</label>
-                    <input type="text" id="storeName" placeholder="Ej. Mi Tienda Online"
-                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                           oninput="updatePreview()">
-                </div>
-                <div>
-                    <label for="storeSlogan" class="block text-sm font-medium text-gray-700 mb-1">Eslogan de la Tienda</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="storeSlogan" placeholder="Ej. Tu estilo, tu esencia."
-                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                               oninput="updatePreview()">
-                        <button type="button" onclick="generateStoreSlogan()"
-                                class="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-150 ease-in-out text-sm">
-                            Generar Eslogan ✨
-                        </button>
-                    </div>
-                </div>
-                <div>
-                    <label for="logoUpload" class="block text-sm font-medium text-gray-700 mb-1">Logo de la Empresa</label>
-                    <input type="file" id="logoUpload" accept="image/*" class="hidden"
-                           onchange="handleImageUpload(event, 'logoPreview', 'logoUploadArea')">
-                    <div id="logoUploadArea" class="mt-2 w-24 h-24 border border-gray-300 rounded-md flex items-center justify-center overflow-hidden logo-upload-area"
-                         onclick="document.getElementById('logoUpload').click()">
-                        <img id="logoPreview" src="https://placehold.co/96x96/e0e7ff/4338ca?text=Logo" alt="Vista previa del logo" class="max-w-full max-h-full object-contain">
-                    </div>
-                    <button type="button" onclick="showGenerateLogoModal()"
-                            class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out mt-2">
-                        Generar Logo con IA ✨
-                    </button>
-                </div>
-                
-                <!-- New Contact Info Fields -->
-                <div>
-                    <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">Número de Teléfono</label>
-                    <div class="flex gap-2">
-                        <input type="tel" id="phoneNumber" placeholder="Ej. +598 99 123 456"
-                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                               oninput="updatePreview()">
-                        <button type="button" onclick="generatePhoneNumberQR()"
-                                class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out text-sm">
-                            Generar QR WhatsApp 💬
-                        </button>
-                    </div>
-                </div>
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                    <input type="email" id="email" placeholder="Ej. info@mitienda.com"
-                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                           oninput="updatePreview()">
-                </div>
-                <div>
-                    <label for="website" class="block text-sm font-medium text-gray-700 mb-1">Sitio Web / Red Social</label>
-                    <input type="url" id="website" placeholder="Ej. www.mitienda.com o facebook.com/mitienda"
-                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                           oninput="updatePreview()">
-                </div>
+        <!-- Catalog Form -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Detalles de la Tienda</h2>
+                <div>
+                    <label for="storeName" class="block text-sm font-medium text-gray-700 mb-1">Nombre de la Tienda</label>
+                    <input type="text" id="storeName" placeholder="Ej. Mi Tienda Online"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                           oninput="updatePreview()">
+                </div>
+                <div>
+                    <label for="storeSlogan" class="block text-sm font-medium text-gray-700 mb-1">Eslogan de la Tienda</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="storeSlogan" placeholder="Ej. Tu estilo, tu esencia."
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                               oninput="updatePreview()">
+                        <button type="button" onclick="generateStoreSlogan()"
+                                class="bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-150 ease-in-out text-sm">
+                            Generar Eslogan ✨
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label for="logoUpload" class="block text-sm font-medium text-gray-700 mb-1">Logo de la Empresa</label>
+                    <input type="file" id="logoUpload" accept="image/*" class="hidden"
+                           onchange="handleImageUpload(event, 'logoPreview', 'logoUploadArea')">
+                    <div id="logoUploadArea" class="mt-2 w-24 h-24 border border-gray-300 rounded-md flex items-center justify-center overflow-hidden logo-upload-area"
+                         onclick="document.getElementById('logoUpload').click()">
+                        <img id="logoPreview" src="https://placehold.co/96x96/e0e7ff/4338ca?text=Logo" alt="Vista previa del logo" class="max-w-full max-h-full object-contain">
+                    </div>
+                    <button type="button" onclick="showGenerateLogoModal()"
+                            class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out mt-2">
+                        Generar Logo con IA ✨
+                    </button>
+                </div>
+                
+                <!-- New Contact Info Fields -->
+                <div>
+                    <label for="phoneNumber" class="block text-sm font-medium text-gray-700 mb-1">Número de Teléfono</label>
+                    <div class="flex gap-2">
+                        <input type="tel" id="phoneNumber" placeholder="Ej. +598 99 123 456"
+                               class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                               oninput="updatePreview()">
+                        <button type="button" onclick="generatePhoneNumberQR()"
+                                class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out text-sm">
+                            Generar QR WhatsApp 💬
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                    <input type="email" id="email" placeholder="Ej. info@mitienda.com"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                           oninput="updatePreview()">
+                </div>
+                <div>
+                    <label for="website" class="block text-sm font-medium text-gray-700 mb-1">Sitio Web / Red Social</label>
+                    <input type="url" id="website" placeholder="Ej. www.mitienda.com o facebook.com/mitienda"
+                           class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                           oninput="updatePreview()">
+                </div>
 
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4 mt-8">Productos</h2>
-                <div id="productsContainer" class="space-y-6">
-                    <!-- Product input fields will be added here dynamically -->
-                </div>
-                <button type="button" onclick="addProduct()"
-                        class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out">
-                    + Añadir Producto
-                </button>
-            </div>
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4 mt-8">Productos</h2>
+                <div id="productsContainer" class="space-y-6">
+                    <!-- Product input fields will be added here dynamically -->
+                </div>
+                <button type="button" onclick="addProduct()"
+                        class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out">
+                    + Añadir Producto
+                </button>
+            </div>
 
-            <!-- Catalog Preview -->
-            <div class="bg-gray-50 rounded-lg p-6 shadow-inner border border-gray-200">
-                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Vista Previa del Catálogo</h2>
-                <div id="catalogPreview" class="bg-white p-6 rounded-lg shadow-md border border-gray-100 min-h-[400px]">
-                    <!-- Header Section -->
-                    <div class="flex flex-col items-center justify-center mb-8">
-                        <img id="previewLogo" src="https://placehold.co/120x120/e0e7ff/4338ca?text=Logo" alt="Logo de la tienda" class="w-32 h-32 object-contain rounded-full border-4 border-blue-200 p-1 mb-4">
-                        <h3 id="previewStoreName" class="text-4xl font-extrabold text-gray-900 mb-2">Nombre de la Tienda</h3>
-                        <p id="previewSlogan" class="text-gray-700 text-lg mt-1"></p>
-                        <p id="previewPhoneNumber" class="text-gray-700 text-base mt-1"></p>
-                        <p id="previewEmail" class="text-gray-700 text-base"></p>
-                        <a id="previewWebsite" href="#" target="_blank" class="text-blue-600 text-base hover:underline mt-1"></a>
-                    </div>
-                    <!-- Products Grid -->
-                    <div id="previewProducts" class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                        <!-- Product previews will be added here -->
-                    </div>
-                </div>
-            </div>
-        </div>
+            <!-- Catalog Preview -->
+            <div class="bg-gray-50 rounded-lg p-6 shadow-inner border border-gray-200">
+                <h2 class="text-2xl font-semibold text-gray-700 mb-4">Vista Previa del Catálogo</h2>
+                <div id="catalogPreview" class="bg-white p-6 rounded-lg shadow-md border border-gray-100 min-h-[400px]">
+                    <!-- Header Section -->
+                    <div class="flex flex-col items-center justify-center mb-8">
+                        <img id="previewLogo" src="https://placehold.co/120x120/e0e7ff/4338ca?text=Logo" alt="Logo de la tienda" class="w-32 h-32 object-contain rounded-full border-4 border-blue-200 p-1 mb-4">
+                        <h3 id="previewStoreName" class="text-4xl font-extrabold text-gray-900 mb-2">Nombre de la Tienda</h3>
+                        <p id="previewSlogan" class="text-gray-700 text-lg mt-1"></p>
+                        <p id="previewPhoneNumber" class="text-gray-700 text-base mt-1"></p>
+                        <p id="previewEmail" class="text-gray-700 text-base"></p>
+                        <a id="previewWebsite" href="#" target="_blank" class="text-blue-600 text-base hover:underline mt-1"></a>
+                    </div>
+                    <!-- Products Grid -->
+                    <div id="previewProducts" class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        <!-- Product previews will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Action Buttons -->
-        <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-            <button id="saveCatalogBtn"
-                    class="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out font-semibold text-lg">
-                Guardar Catálogo
-            </button>
-            <button id="generatePdfBtn"
-                    class="bg-red-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out font-semibold text-lg">
-                Generar PDF
-            </button>
-            <button id="generateImageBtn"
-                    class="bg-purple-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out font-semibold text-lg">
-                Generar Imagen
-            </button>
-            <button type="button" onclick="summarizeCatalog()"
-                    class="bg-orange-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition duration-150 ease-in-out font-semibold text-lg">
-                Resumir Catálogo ✨
-            </button>
-        </div>
+        <!-- Action Buttons -->
+        <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+            <button id="saveCatalogBtn"
+                    class="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out font-semibold text-lg">
+                Guardar Catálogo
+            </button>
+            <button id="generatePdfBtn"
+                    class="bg-red-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out font-semibold text-lg">
+                Generar PDF
+            </button>
+            <button id="generateImageBtn"
+                    class="bg-purple-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out font-semibold text-lg">
+                Generar Imagen
+            </button>
+            <button type="button" onclick="summarizeCatalog()"
+                    class="bg-orange-500 text-white py-3 px-6 rounded-lg shadow-md hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition duration-150 ease-in-out font-semibold text-lg">
+                Resumir Catálogo ✨
+            </button>
+        </div>
 
-        <!-- Message Box -->
-        <div id="messageBox" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 shadow-xl max-w-sm w-full text-center">
-                <p id="messageText" class="text-lg font-semibold text-gray-800 mb-6"></p>
-                <button onclick="hideMessageBox()" class="bg-blue-500 text-white py-2 px-6 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    Aceptar
-                </button>
-            </div>
-        </div>
+        <!-- Message Box -->
+        <div id="messageBox" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 shadow-xl max-w-sm w-full text-center">
+                <p id="messageText" class="text-lg font-semibold text-gray-800 mb-6"></p>
+                <button onclick="hideMessageBox()" class="bg-blue-500 text-white py-2 px-6 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Aceptar
+                </button>
+            </div>
+        </div>
 
-        <!-- Social Media Post Modal -->
-        <div id="socialMediaPostModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 shadow-xl max-w-lg w-full">
-                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Publicación para Redes Sociales</h3>
-                <textarea id="socialMediaPostContent" rows="8" class="w-full p-3 border border-gray-300 rounded-md mb-4 text-gray-700" readonly></textarea>
-                <div class="flex justify-end gap-3">
-                    <button onclick="copySocialMediaPost()" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                        Copiar
-                    </button>
-                    <button onclick="hideSocialMediaPostModal()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- Social Media Post Modal -->
+        <div id="socialMediaPostModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 shadow-xl max-w-lg w-full">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Publicación para Redes Sociales</h3>
+                <textarea id="socialMediaPostContent" rows="8" class="w-full p-3 border border-gray-300 rounded-md mb-4 text-gray-700" readonly></textarea>
+                <div class="flex justify-end gap-3">
+                    <button onclick="copySocialMediaPost()" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                        Copiar
+                    </button>
+                    <button onclick="hideSocialMediaPostModal()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
 
-        <!-- QR Code Modal -->
-        <div id="qrCodeModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 shadow-xl max-w-sm w-full text-center">
-                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Código QR para WhatsApp</h3>
-                <div id="qrCodeContainer" class="flex justify-center mb-6">
-                    <!-- QR code will be rendered here -->
-                </div>
-                <p class="text-gray-600 text-sm mb-4">Escanea para iniciar un chat de WhatsApp con la tienda.</p>
-                <div class="flex flex-col gap-3">
-                    <button onclick="copyQrCodeImage()" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                        Copiar Imagen QR
-                    </button>
-                    <button onclick="downloadQrCodeImage()" class="bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
-                        Descargar Imagen QR
-                    </button>
-                    <button onclick="hideQrCodeModal()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- QR Code Modal -->
+        <div id="qrCodeModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 shadow-xl max-w-sm w-full text-center">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Código QR para WhatsApp</h3>
+                <div id="qrCodeContainer" class="flex justify-center mb-6">
+                    <!-- QR code will be rendered here -->
+                </div>
+                <p class="text-gray-600 text-sm mb-4">Escanea para iniciar un chat de WhatsApp con la tienda.</p>
+                <div class="flex flex-col gap-3">
+                    <button onclick="copyQrCodeImage()" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                        Copiar Imagen QR
+                    </button>
+                    <button onclick="downloadQrCodeImage()" class="bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                        Descargar Imagen QR
+                    </button>
+                    <button onclick="hideQrCodeModal()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
 
-        <!-- Catalog Summary Modal -->
-        <div id="catalogSummaryModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 shadow-xl max-w-lg w-full">
-                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Resumen del Catálogo</h3>
-                <textarea id="catalogSummaryContent" rows="8" class="w-full p-3 border border-gray-300 rounded-md mb-4 text-gray-700" readonly></textarea>
-                <div class="flex justify-end gap-3">
-                    <button onclick="copyCatalogSummary()" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                        Copiar
-                    </button>
-                    <button onclick="hideCatalogSummaryModal()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        Cerrar
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- Catalog Summary Modal -->
+        <div id="catalogSummaryModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 shadow-xl max-w-lg w-full">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Resumen del Catálogo</h3>
+                <textarea id="catalogSummaryContent" rows="8" class="w-full p-3 border border-gray-300 rounded-md mb-4 text-gray-700" readonly></textarea>
+                <div class="flex justify-end gap-3">
+                    <button onclick="copyCatalogSummary()" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                        Copiar
+                    </button>
+                    <button onclick="hideCatalogSummaryModal()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
 
-        <!-- Generate Logo Modal -->
-        <div id="generateLogoModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 shadow-xl max-w-sm w-full">
-                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Generar Logo con IA</h3>
-                <div class="mb-4">
-                    <label for="logoDescription" class="block text-sm font-medium text-gray-700 mb-1">Describe el logo deseado:</label>
-                    <textarea id="logoDescription" rows="3" placeholder="Ej. Un logo minimalista con un árbol y colores verdes."
-                              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
-                </div>
-                <div class="flex justify-end gap-3">
-                    <button onclick="generateAILogo()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                        Generar
-                    </button>
-                    <button onclick="hideGenerateLogoModal()" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- Generate Logo Modal -->
+        <div id="generateLogoModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 shadow-xl max-w-sm w-full">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Generar Logo con IA</h3>
+                <div class="mb-4">
+                    <label for="logoDescription" class="block text-sm font-medium text-gray-700 mb-1">Describe el logo deseado:</label>
+                    <textarea id="logoDescription" rows="3" placeholder="Ej. Un logo minimalista con un árbol y colores verdes."
+                              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="generateAILogo()" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Generar
+                    </button>
+                    <button onclick="hideGenerateLogoModal()" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
 
-        <!-- Image Cropping Modal -->
-        <div id="imageCropModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 shadow-xl max-w-2xl w-full">
-                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Recortar Imagen</h3>
-                <div class="w-full h-96 flex items-center justify-center bg-gray-100 overflow-hidden mb-4">
-                    <img id="imageToCrop" src="" alt="Imagen a recortar" class="max-w-full max-h-full block">
-                </div>
-                <div class="flex justify-end gap-3">
-                    <button onclick="cropAndApplyImage()" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                        Recortar y Aplicar
-                    </button>
-                    <button onclick="cancelImageCrop()" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- Image Cropping Modal -->
+        <div id="imageCropModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 shadow-xl max-w-2xl w-full">
+                <h3 class="text-2xl font-semibold text-gray-800 mb-4">Recortar Imagen</h3>
+                <div class="w-full h-96 flex items-center justify-center bg-gray-100 overflow-hidden mb-4">
+                    <img id="imageToCrop" src="" alt="Imagen a recortar" class="max-w-full max-h-full block">
+                </div>
+                <div class="flex justify-end gap-3">
+                    <button onclick="cropAndApplyImage()" class="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                        Recortar y Aplicar
+                    </button>
+                    <button onclick="cancelImageCrop()" class="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
 
-    </div>
+    </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, collection, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Cropper.js library is loaded via script tag, not module import
+        // import Cropper from 'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js';
 
 
-        // Global variables for Firebase
-        let app;
-        let db;
-        let auth;
-        let userId;
-        let isAuthReady = false;
+        // Global variables for Firebase
+        let app;
+        let db;
+        let auth;
+        let userId;
 
-        // Cropper.js instance and related variables
-        let cropper;
-        let currentImagePreviewId;
-        let currentImageUploadAreaId;
+        // Cropper.js instance and related variables
+        let cropper;
+        let currentImagePreviewId;
+        let currentImageUploadAreaId;
 
-        // --- Configuración del backend ---
-        // CORRECCIÓN: Se cambió la ruta relativa a la URL absoluta de Vercel.
-        const BACKEND_URL = 'https://tucatalogo.vercel.app/api';
+        // --- Configuración del backend ---
+        // Se cambió de `http://localhost:3000` a una ruta relativa (`/api`)
+        // para que funcione correctamente en Vercel, ya que el backend se
+        // despliega junto con el frontend.
+        const BACKEND_URL = '/api';
 
-        // Message box functions
-        function showMessageBox(message) {
-            document.getElementById('messageText').innerText = message;
-            document.getElementById('messageBox').classList.remove('hidden');
-        }
+        // Message box functions
+        function showMessageBox(message) {
+            document.getElementById('messageText').innerText = message;
+            document.getElementById('messageBox').classList.remove('hidden');
+        }
 
-        window.hideMessageBox = function() { // Expose to window for onclick
-            document.getElementById('messageBox').classList.add('hidden');
-        }
+        window.hideMessageBox = function() { // Expose to window for onclick
+            document.getElementById('messageBox').classList.add('hidden');
+        }
 
-        function showSocialMediaPostModal(content) {
-            document.getElementById('socialMediaPostContent').value = content;
-            document.getElementById('socialMediaPostModal').classList.remove('hidden');
-        }
+        function showSocialMediaPostModal(content) {
+            document.getElementById('socialMediaPostContent').value = content;
+            document.getElementById('socialMediaPostModal').classList.remove('hidden');
+        }
 
-        window.hideSocialMediaPostModal = function() { // Expose to window for onclick
-            document.getElementById('socialMediaPostModal').classList.add('hidden');
-        }
+        window.hideSocialMediaPostModal = function() { // Expose to window for onclick
+            document.getElementById('socialMediaPostModal').classList.add('hidden');
+        }
 
-        window.copySocialMediaPost = function() {
-            const textarea = document.getElementById('socialMediaPostContent');
-            textarea.select();
-            document.execCommand('copy');
-            showMessageBox('¡Publicación copiada al portapapeles!');
-        }
+        window.copySocialMediaPost = function() {
+            const textarea = document.getElementById('socialMediaPostContent');
+            textarea.select();
+            document.execCommand('copy');
+            showMessageBox('¡Publicación copiada al portapapeles!');
+        }
 
-        // QR Code Modal Functions
-        function showQrCodeModal() {
-            document.getElementById('qrCodeModal').classList.remove('hidden');
-        }
+        // QR Code Modal Functions
+        function showQrCodeModal() {
+            document.getElementById('qrCodeModal').classList.remove('hidden');
+        }
 
-        window.hideQrCodeModal = function() {
-            document.getElementById('qrCodeModal').classList.add('hidden');
-        }
+        window.hideQrCodeModal = function() {
+            document.getElementById('qrCodeModal').classList.add('hidden');
+        }
 
-        window.copyQrCodeImage = function() {
-            const qrCanvas = document.querySelector('#qrCodeContainer canvas');
-            if (qrCanvas) {
-                qrCanvas.toBlob(function(blob) {
-                    const item = new ClipboardItem({ "image/png": blob });
-                    navigator.clipboard.write([item]).then(function() {
-                        showMessageBox('¡Imagen QR copiada al portapapeles!');
-                    }, function(error) {
-                        console.error('Error al copiar imagen QR:', error);
-                        showMessageBox('Error al copiar imagen QR. Asegúrese de que su navegador lo permita.');
-                    });
-                });
-            } else {
-                showMessageBox('No se encontró el código QR para copiar.');
-            }
-        }
+        window.copyQrCodeImage = function() {
+            const qrCanvas = document.querySelector('#qrCodeContainer canvas');
+            if (qrCanvas) {
+                qrCanvas.toBlob(function(blob) {
+                    const item = new ClipboardItem({ "image/png": blob });
+                    navigator.clipboard.write([item]).then(function() {
+                        showMessageBox('¡Imagen QR copiada al portapapeles!');
+                    }, function(error) {
+                        console.error('Error al copiar imagen QR:', error);
+                        showMessageBox('Error al copiar imagen QR. Asegúrese de que su navegador lo permita.');
+                    });
+                });
+            } else {
+                showMessageBox('No se encontró el código QR para copiar.');
+            }
+        }
 
-        window.downloadQrCodeImage = function() {
-            const qrCanvas = document.querySelector('#qrCodeContainer canvas');
-            if (qrCanvas) {
-                const link = document.createElement('a');
-                link.href = qrCanvas.toDataURL('image/png');
-                link.download = 'qr_whatsapp.png'; // Changed download name
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showMessageBox('¡Imagen QR descargada con éxito!');
-            } else {
-                showMessageBox('No se encontró el código QR para descargar.');
-            }
-        }
+        window.downloadQrCodeImage = function() {
+            const qrCanvas = document.querySelector('#qrCodeContainer canvas');
+            if (qrCanvas) {
+                const link = document.createElement('a');
+                link.href = qrCanvas.toDataURL('image/png');
+                link.download = 'qr_whatsapp.png'; // Changed download name
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showMessageBox('¡Imagen QR descargada con éxito!');
+            } else {
+                showMessageBox('No se encontró el código QR para descargar.');
+            }
+        }
 
-        // Catalog Summary Modal Functions
-        function showCatalogSummaryModal(content) {
-            document.getElementById('catalogSummaryContent').value = content;
-            document.getElementById('catalogSummaryModal').classList.remove('hidden');
-        }
+        // Catalog Summary Modal Functions
+        function showCatalogSummaryModal(content) {
+            document.getElementById('catalogSummaryContent').value = content;
+            document.getElementById('catalogSummaryModal').classList.remove('hidden');
+        }
 
-        window.hideCatalogSummaryModal = function() {
-            document.getElementById('catalogSummaryModal').classList.add('hidden');
-        }
+        window.hideCatalogSummaryModal = function() {
+            document.getElementById('catalogSummaryModal').classList.add('hidden');
+        }
 
-        window.copyCatalogSummary = function() {
-            const textarea = document.getElementById('catalogSummaryContent');
-            textarea.select();
-            document.execCommand('copy');
-            showMessageBox('¡Resumen copiado al portapapeles!');
-        }
+        window.copyCatalogSummary = function() {
+            const textarea = document.getElementById('catalogSummaryContent');
+            textarea.select();
+            document.execCommand('copy');
+            showMessageBox('¡Resumen copiado al portapapeles!');
+        }
 
-        // Generate Logo Modal Functions
-        window.showGenerateLogoModal = function() {
-            document.getElementById('generateLogoModal').classList.remove('hidden');
-        }
+        // Generate Logo Modal Functions
+        window.showGenerateLogoModal = function() {
+            document.getElementById('generateLogoModal').classList.remove('hidden');
+        }
 
-        window.hideGenerateLogoModal = function() {
-            document.getElementById('generateLogoModal').classList.add('hidden');
-        }
+        window.hideGenerateLogoModal = function() {
+            document.getElementById('generateLogoModal').classList.add('hidden');
+        }
 
-        // Image Cropping Modal Functions
-        function showImageCropModal() {
-            document.getElementById('imageCropModal').classList.remove('hidden');
-        }
+        // Image Cropping Modal Functions
+        function showImageCropModal() {
+            document.getElementById('imageCropModal').classList.remove('hidden');
+        }
 
-        window.hideImageCropModal = function() {
-            document.getElementById('imageCropModal').classList.add('hidden');
-            if (cropper) {
-                cropper.destroy(); // Destroy cropper instance when hiding modal
-                cropper = null;
-            }
-        }
+        window.hideImageCropModal = function() {
+            document.getElementById('imageCropModal').classList.add('hidden');
+            if (cropper) {
+                cropper.destroy(); // Destroy cropper instance when hiding modal
+                cropper = null;
+            }
+        }
 
-        window.cropAndApplyImage = function() {
-            if (cropper) {
-                // Get cropped image data as base64
-                const croppedCanvas = cropper.getCroppedCanvas({
-                    width: 400, // Desired output width
-                    height: 400, // Desired output height (1:1 aspect ratio)
-                });
-                const croppedImageDataURL = croppedCanvas.toDataURL('image/png');
+        window.cropAndApplyImage = function() {
+            if (cropper) {
+                // Get cropped image data as base64
+                const croppedCanvas = cropper.getCroppedCanvas({
+                    width: 400, // Desired output width
+                    height: 400, // Desired output height (1:1 aspect ratio)
+                });
+                const croppedImageDataURL = croppedCanvas.toDataURL('image/png');
 
-                // Apply to the correct preview element
-                const previewElement = document.getElementById(currentImagePreviewId);
-                const uploadArea = currentImageUploadAreaId ? document.getElementById(currentImageUploadAreaId) : null;
+                // Apply to the correct preview element
+                const previewElement = document.getElementById(currentImagePreviewId);
+                const uploadArea = currentImageUploadAreaId ? document.getElementById(currentImageUploadAreaId) : null;
 
-                if (previewElement) {
-                    previewElement.src = croppedImageDataURL;
-                    if (uploadArea) {
-                        uploadArea.classList.add('has-image');
-                    }
-                    updatePreview();
-                }
-            }
-            hideImageCropModal();
-        }
+                if (previewElement) {
+                    previewElement.src = croppedImageDataURL;
+                    if (uploadArea) {
+                        uploadArea.classList.add('has-image');
+                    }
+                    updatePreview();
+                }
+            }
+            hideImageCropModal();
+        }
 
-        window.cancelImageCrop = function() {
-            hideImageCropModal();
-            // Optionally reset the input file field if the user cancels
-            // This might be tricky if they want to re-select the same file after cancelling.
-            // For now, we just close the modal.
-        }
-
-
-        // Initialize Firebase and authenticate
-        window.onload = async function() {
-            // Get Firebase config and app ID from the environment
-            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-            // En un entorno de GitHub Pages, esta configuración no existe.
-            if (Object.keys(firebaseConfig).length === 0) {
-                 console.warn("Firebase config is missing. Assuming a non-Canvas environment. Save functionality will not work.");
-                 // Establecer un ID de usuario anónimo para que otras funciones no rompan.
-                 userId = 'github-user';
-                 // Añadir producto inicial y actualizar vista previa
-                 addProduct();
-                 updatePreview();
-            } else {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Sign in using custom token or anonymously
-                try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            isAuthReady = true;
-                            console.log("Usuario autenticado:", userId);
-                            // Add initial product field and update preview
-                            addProduct();
-                            updatePreview();
-                        } else {
-                            console.log("No hay usuario autenticado.");
-                            showMessageBox("No se pudo autenticar al usuario. Algunas funciones pueden no estar disponibles.");
-                        }
-                    });
-                } catch (error) {
-                    console.error("Error de autenticación de Firebase:", error);
-                    showMessageBox(`Error de autenticación: ${error.message}. La función de guardar no estará disponible.`);
-                }
-            }
+        window.cancelImageCrop = function() {
+            hideImageCropModal();
+            // Optionally reset the input file field if the user cancels
+            // This might be tricky if they want to re-select the same file after cancelling.
+            // For now, we just close the modal.
+        }
 
 
-            // Event listeners for buttons
-            document.getElementById('saveCatalogBtn').addEventListener('click', saveCatalog);
-            document.getElementById('generatePdfBtn').addEventListener('click', generatePDF);
-            document.getElementById('generateImageBtn').addEventListener('click', generateImage);
-            // Initial call to check logo presence for '+' icon
-            const logoPreview = document.getElementById('logoPreview');
-            const logoUploadArea = document.getElementById('logoUploadArea');
-            if (logoPreview.src && !logoPreview.src.includes('placehold.co')) {
-                logoUploadArea.classList.add('has-image');
-            } else {
-                logoUploadArea.classList.remove('has-image');
-            }
-        };
+        // Initialize Firebase and authenticate
+        window.onload = async function() {
+            // Get Firebase config and app ID from the environment
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // Function to handle image uploads and display previews
-        window.handleImageUpload = async function(event, previewId, uploadAreaId) { // Made async
-            const file = event.target.files[0];
+            // En un entorno de GitHub Pages, esta configuración no existe.
+            if (Object.keys(firebaseConfig).length === 0) {
+                 console.warn("Firebase config is missing. Assuming a non-Canvas environment. Save functionality will not work.");
+                 // Establecer un ID de usuario anónimo para que otras funciones no rompan.
+                 userId = 'github-user';
+                 // Añadir producto inicial y actualizar vista previa
+                 addProduct();
+                 updatePreview();
+            } else {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Sign in using custom token or anonymously
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            console.log("Usuario autenticado:", userId);
+                            // Add initial product field and update preview
+                            addProduct();
+                            updatePreview();
+                        } else {
+                            console.log("No hay usuario autenticado.");
+                            showMessageBox("No se pudo autenticar al usuario. Algunas funciones pueden no estar disponibles.");
+                        }
+                    });
+                } catch (error) {
+                    console.error("Error de autenticación de Firebase:", error);
+                    showMessageBox(`Error de autenticación: ${error.message}. La función de guardar no estará disponible.`);
+                }
+            }
+
+
+            // Event listeners for buttons
+            document.getElementById('saveCatalogBtn').addEventListener('click', saveCatalog);
+            document.getElementById('generatePdfBtn').addEventListener('click', generatePDF);
+            document.getElementById('generateImageBtn').addEventListener('click', generateImage);
+            // Initial call to check logo presence for '+' icon
+            const logoPreview = document.getElementById('logoPreview');
+            const logoUploadArea = document.getElementById('logoUploadArea');
+            if (logoPreview.src && !logoPreview.src.includes('placehold.co')) {
+                logoUploadArea.classList.add('has-image');
+            } else {
+                logoUploadArea.classList.remove('has-image');
+            }
+        };
+
+        // Function to handle image uploads and display previews
+        window.handleImageUpload = async function(event, previewId, uploadAreaId) { // Made async
+            await ensureLibrariesLoaded(); // Ensure libraries are loaded before proceeding
+            const file = event.target.files[0];
+            const imageToCropElement = document.getElementById('imageToCrop');
+
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const imgToCrop = document.getElementById('imageToCrop');
-                    imgToCrop.src = e.target.result;
-                    currentImagePreviewId = previewId;
-                    currentImageUploadAreaId = uploadAreaId;
-                    showImageCropModal();
+                    imageToCropElement.src = e.target.result;
+                    currentImagePreviewId = previewId; // Store target preview ID
+                    currentImageUploadAreaId = uploadAreaId; // Store target upload area ID
 
-                    setTimeout(() => {
+                    // Add an onload listener to the image element itself
+                    imageToCropElement.onload = function() {
+                        showImageCropModal();
+
+                        // Initialize Cropper.js after image loads and modal is visible
                         if (cropper) {
-                            cropper.destroy();
+                            cropper.destroy(); // Destroy previous instance if exists
                         }
-                        cropper = new Cropper(imgToCrop, {
-                            aspectRatio: 1, // 1:1 aspect ratio for square logos/products
+                        // Access Cropper from the global window object
+                        cropper = new window.Cropper(imageToCropElement, {
+                            aspectRatio: 1 / 1, // Enforce square aspect ratio
                             viewMode: 1, // Restrict the crop box to not exceed the canvas
+                            autoCropArea: 0.8, // Initial crop area
+                            responsive: true,
+                            background: false, // Hide the grid background
                         });
-                    }, 100);
+                    };
                 };
                 reader.readAsDataURL(file);
-            }
-        };
-
-        // Functions for generating content
-        async function generateStoreSlogan() {
-            // ... (implementación de la función)
-            console.log("Generando eslogan...");
-        }
-
-        async function generatePhoneNumberQR() {
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            if (!phoneNumber) {
-                showMessageBox("Por favor, ingresa un número de teléfono.");
-                return;
-            }
-            // Elimina caracteres no numéricos excepto el '+'
-            const cleanedNumber = phoneNumber.replace(/[^0-9+]/g, '');
-            const whatsappUrl = `https://wa.me/${cleanedNumber}`;
-            
-            const qrCodeContainer = document.getElementById('qrCodeContainer');
-            qrCodeContainer.innerHTML = ''; // Limpiar cualquier QR anterior
-            
-            new QRious({
-                element: qrCodeContainer,
-                value: whatsappUrl,
-                size: 200,
-                padding: 10
-            });
-            showQrCodeModal();
-        }
-        
-        async function generateAILogo() {
-            const logoDescription = document.getElementById('logoDescription').value;
-            const storeName = document.getElementById('storeName').value;
-            if (!logoDescription) {
-                showMessageBox("Por favor, describe el logo que deseas.");
-                return;
-            }
-            
-            const fullPrompt = `${logoDescription}. Para una tienda llamada ${storeName}. El logo debe ser minimalista y moderno, sin texto.`;
-            
-            hideGenerateLogoModal();
-            showLoadingSpinner();
-            
-            try {
-                const response = await fetch(`${BACKEND_URL}/generate-image`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: fullPrompt }),
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
-                }
-
-                const result = await response.json();
-                const base64Image = result?.predictions?.[0]?.bytesBase64Encoded;
-
-                if (base64Image) {
-                    const logoPreview = document.getElementById('logoPreview');
-                    const imageUrl = `data:image/png;base64,${base64Image}`;
-                    logoPreview.src = imageUrl;
-                    document.getElementById('logoUploadArea').classList.add('has-image');
-                    updatePreview();
-                    showMessageBox('¡Logo generado con éxito!');
+            } else {
+                // If no file, reset to placeholder
+                const previewElement = document.getElementById(previewId);
+                const uploadArea = uploadAreaId ? document.getElementById(uploadAreaId) : null;
+                if (previewId === 'logoPreview') {
+                    previewElement.src = "https://placehold.co/96x96/e0e7ff/4338ca?text=Logo";
+                    if (uploadArea) {
+                        uploadArea.classList.remove('has-image');
+                    }
                 } else {
-                    throw new Error('No se pudo generar la imagen o la respuesta no es válida.');
+                    previewElement.src = "https://placehold.co/96x96/e0e7ff/4338ca?text=Producto";
                 }
+                updatePreview();
+            }
+        };
 
-            } catch (error) {
-                console.error('Error al generar logo con IA:', error);
-                showMessageBox(`Error al generar el logo: ${error.message}.`);
-            } finally {
-                hideLoadingSpinner();
+        // Counter for unique product IDs
+        let productIdCounter = 0;
+
+        // Function to add a new product input section
+        window.addProduct = function() {
+            productIdCounter++;
+            const productId = `product-${productIdCounter}`;
+            const productsContainer = document.getElementById('productsContainer');
+
+            const productDiv = document.createElement('div');
+            productDiv.id = productId;
+            productDiv.classList.add('p-4', 'border', 'border-gray-200', 'rounded-md', 'bg-white', 'shadow-sm', 'relative');
+            productDiv.innerHTML = `
+                <button type="button" onclick="removeProduct('${productId}')"
+                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold hover:bg-red-600 transition duration-150 ease-in-out">
+                    &times;
+                </button>
+                <h3 class="text-lg font-medium text-gray-700 mb-3">Producto ${productIdCounter}</h3>
+                <div class="mb-3">
+                    <label for="${productId}-name" class="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto</label>
+                    <input type="text" id="${productId}-name" placeholder="Ej. Camiseta de Algodón"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                           oninput="updatePreview()">
+                </div>
+                <div class="mb-3">
+                    <label for="${productId}-image" class="block text-sm font-medium text-gray-700 mb-1">Imagen del Producto</label>
+                    <input type="file" id="${productId}-image" accept="image/*"
+                           class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                           onchange="handleImageUpload(event, '${productId}-preview', '')">
+                    <div class="mt-2 w-24 h-24 border border-gray-300 rounded-md flex items-center justify-center overflow-hidden">
+                        <img id="${productId}-preview" src="https://placehold.co/96x96/e0e7ff/4338ca?text=Producto" alt="Vista previa del producto" class="max-w-full max-h-full object-contain">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="${productId}-price" class="block text-sm font-medium text-gray-700 mb-1">Precio</label>
+                    <input type="text" id="${productId}-price" placeholder="Ej. $25.00"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                           oninput="updatePreview()">
+                </div>
+                <div>
+                    <label for="${productId}-description" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    <textarea id="${productId}-description" rows="3" placeholder="Ej. 100% algodón, disponible en varios colores."
+                              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                              oninput="updatePreview()"></textarea>
+                    <div class="flex flex-col sm:flex-row gap-2 mt-2">
+                        <button type="button" onclick="generateProductDescription('${productId}')"
+                                class="flex-1 bg-yellow-500 text-white py-1 px-3 rounded-md hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition duration-150 ease-in-out text-sm">
+                            Generar Descripción ✨
+                        </button>
+                        <button type="button" onclick="generateSocialMediaPost('${productId}')"
+                                class="flex-1 bg-teal-500 text-white py-1 px-3 rounded-md hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition duration-150 ease-in-out text-sm">
+                            Generar Post para Redes Sociales ✨
+                        </button>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="${productId}-categories" class="block text-sm font-medium text-gray-700 mb-1">Categorías/Etiquetas (separadas por coma)</label>
+                    <input type="text" id="${productId}-categories" placeholder="Ej. Ropa, Hombre, Casual"
+                           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                           oninput="updatePreview()">
+                    <button type="button" onclick="suggestProductCategories('${productId}')"
+                            class="mt-2 bg-indigo-500 text-white py-1 px-3 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-150 ease-in-out text-sm">
+                        Sugerir Categorías ✨
+                    </button>
+                </div>
+            `;
+            productsContainer.appendChild(productDiv);
+            updatePreview(); // Update preview when a new product is added
+        };
+
+        // Function to remove a product input section
+        window.removeProduct = function(productId) {
+            const productDiv = document.getElementById(productId);
+            if (productDiv) {
+                productDiv.remove();
+                updatePreview(); // Update preview when a product is removed
+            }
+        };
+
+        // Function to update the catalog preview section
+        window.updatePreview = function() {
+            const storeName = document.getElementById('storeName').value || 'Nombre de la Tienda';
+            const storeSlogan = document.getElementById('storeSlogan').value || '';
+            const logoSrc = document.getElementById('logoPreview').src;
+            const phoneNumber = document.getElementById('phoneNumber').value || '';
+            const email = document.getElementById('email').value || '';
+            const website = document.getElementById('website').value || '';
+
+            document.getElementById('previewStoreName').innerText = storeName;
+            document.getElementById('previewLogo').src = logoSrc;
+            
+            // Update slogan in preview
+            const previewSlogan = document.getElementById('previewSlogan');
+            if (storeSlogan) {
+                previewSlogan.innerText = storeSlogan;
+            } else {
+                previewSlogan.innerText = '';
+            }
+
+            // Update contact info in preview
+            const previewPhoneNumber = document.getElementById('previewPhoneNumber');
+            const previewEmail = document.getElementById('previewEmail');
+            const previewWebsite = document.getElementById('previewWebsite');
+
+            if (phoneNumber) {
+                previewPhoneNumber.innerText = `Tel: ${phoneNumber}`;
+            } else {
+                previewPhoneNumber.innerText = '';
+            }
+
+            if (email) {
+                previewEmail.innerText = `Email: ${email}`;
+            } else {
+                previewEmail.innerText = '';
+            }
+
+            if (website) {
+                previewWebsite.innerText = website;
+                previewWebsite.href = website.startsWith('http') ? website : `https://${website}`;
+            } else {
+                previewWebsite.innerText = '';
+                previewWebsite.href = '#';
+            }
+
+
+            const previewProductsContainer = document.getElementById('previewProducts');
+            previewProductsContainer.innerHTML = ''; // Clear existing products
+
+            const productsContainer = document.getElementById('productsContainer');
+            const productDivs = productsContainer.children;
+
+            for (let i = 0; i < productDivs.length; i++) {
+                const productId = productDivs[i].id;
+                const productName = document.getElementById(`${productId}-name`).value || 'Nombre del Producto';
+                const productImageSrc = document.getElementById(`${productId}-preview`).src;
+                const productPrice = document.getElementById(`${productId}-price`).value || 'Precio';
+                const productDescription = document.getElementById(`${productId}-description`).value || 'Descripción del producto.';
+                const productCategories = document.getElementById(`${productId}-categories`).value || '';
+
+                const productPreviewHtml = `
+                    <div class="product-card-preview">
+                        <img src="${productImageSrc}" alt="${productName}">
+                        <h4>${productName}</h4>
+                        <p>${productPrice}</p>
+                        <p>${productDescription}</p>
+                        ${productCategories ? `<p class="tags">Categorías: ${productCategories}</p>` : ''}
+                    </div>
+                `;
+                previewProductsContainer.insertAdjacentHTML('beforeend', productPreviewHtml);
+            }
+        };
+
+        // Load html2canvas and jspdf libraries
+        const loadScript = (src) => {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        };
+
+        let html2canvasLoaded = false;
+        let jspdfLoaded = false;
+        let qrCodeLoaded = false; // Flag for QRCode.js
+        let cropperLoaded = false; // Flag for Cropper.js
+
+        async function ensureLibrariesLoaded() {
+            if (!html2canvasLoaded) {
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+                html2canvasLoaded = true;
+            }
+            if (!jspdfLoaded) {
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+                jspdfLoaded = true;
+            }
+            if (!qrCodeLoaded) {
+                await loadScript('https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js');
+                qrCodeLoaded = true;
+            }
+            if (!cropperLoaded) {
+                await loadScript('https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js');
+                cropperLoaded = true;
             }
         }
-        
-        async function summarizeCatalog() {
-             // ... (implementación de la función)
-             console.log("Resumiendo catálogo...");
-        }
 
-        async function updatePreview() {
-            // ... (implementación de la función)
-            console.log("Actualizando vista previa...");
-        }
-
-        async function addProduct() {
-             // ... (implementación de la función)
-             console.log("Añadiendo producto...");
-        }
-
-        async function saveCatalog() {
-            // ... (implementación de la función)
-            console.log("Guardando catálogo...");
-        }
-        
-        async function generatePDF() {
-            // ... (implementación de la función)
-            console.log("Generando PDF...");
-        }
-
-        async function generateImage() {
-            // ... (implementación de la función)
-            console.log("Generando imagen del catálogo...");
-        }
-        
+        // Function to show loading spinner
         function showLoadingSpinner() {
             document.getElementById('loading-spinner').classList.remove('hidden');
         }
 
+        // Function to hide loading spinner
         function hideLoadingSpinner() {
             document.getElementById('loading-spinner').classList.add('hidden');
         }
 
-    </script>
+        // Function to generate PDF
+        window.generatePDF = async function() {
+            showLoadingSpinner();
+            await ensureLibrariesLoaded(); // Ensure jsPDF and QRCode.js are loaded
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4'); // Portrait, millimeters, A4 size
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const margin = 15; // mm
+
+            // --- Get Catalog Data ---
+            const storeName = document.getElementById('storeName').value || 'Tu Tienda';
+            const storeSlogan = document.getElementById('storeSlogan').value || 'Descubre la calidad y el estilo que te mereces.';
+            const logoSrc = document.getElementById('logoPreview').src;
+            const phoneNumber = document.getElementById('phoneNumber').value || '';
+            const email = document.getElementById('email').value || '';
+            const website = document.getElementById('website').value || '';
+
+            const products = [];
+            const productsContainer = document.getElementById('productsContainer');
+            const productDivs = productsContainer.children;
+            for (let i = 0; i < productDivs.length; i++) {
+                const productId = productDivs[i].id;
+                const productName = document.getElementById(`${productId}-name`).value || 'Producto sin nombre';
+                const productImageSrc = document.getElementById(`${productId}-preview`).src;
+                const productPrice = document.getElementById(`${productId}-price`).value || 'Precio no disponible';
+                const productDescription = document.getElementById(`${productId}-description`).value || 'Sin descripción.';
+                const productCategories = document.getElementById(`${productId}-categories`).value || '';
+                products.push({
+                    name: productName,
+                    image: productImageSrc,
+                    price: productPrice,
+                    description: productDescription,
+                    categories: productCategories
+                });
+            }
+
+            // --- Cover Page ---
+            pdf.setFillColor(248, 250, 252); // Light gray background
+            pdf.rect(0, 0, pageWidth, pageHeight, 'F'); // Fill entire page
+
+            // Add Logo
+            if (logoSrc && !logoSrc.includes('placehold.co')) {
+                const logoImg = new Image();
+                logoImg.src = logoSrc;
+                await new Promise(resolve => logoImg.onload = resolve); // Ensure image is loaded
+
+                const logoWidth = 60; // mm
+                const logoHeight = logoImg.height * (logoWidth / logoImg.width);
+                const logoX = (pageWidth - logoWidth) / 2;
+                const logoY = pageHeight * 0.2; // 20% down the page
+                pdf.addImage(logoImg, 'PNG', logoX, logoY, logoWidth, logoHeight);
+            } else {
+                // Placeholder text for logo if not uploaded
+                pdf.setFontSize(24);
+                pdf.setTextColor(148, 163, 184);
+                pdf.text('LOGO', pageWidth / 2, pageHeight * 0.25, { align: 'center' });
+            }
+
+            // Store Name
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(48);
+            pdf.setTextColor(26, 32, 44);
+            pdf.text(storeName, pageWidth / 2, pageHeight * 0.45, { align: 'center' });
+
+            // Slogan
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(18);
+            pdf.setTextColor(74, 85, 104);
+            pdf.text(storeSlogan, pageWidth / 2, pageHeight * 0.55, { align: 'center' });
+
+            // --- Product Pages ---
+            let currentY = margin;
+            const productCardHeight = 120; // Estimated height for a product card
+            const productsPerPage = 2; // Aim for 2 products per page
+            let productsOnCurrentPage = 0;
+
+            for (let i = 0; i < products.length; i++) {
+                const product = products[i];
+
+                if (productsOnCurrentPage >= productsPerPage || (currentY + productCardHeight + margin) > pageHeight) {
+                    pdf.addPage();
+                    currentY = margin;
+                    productsOnCurrentPage = 0;
+                }
+
+                // Product Card Background
+                pdf.setFillColor(248, 250, 252); // Light gray for product card background
+                pdf.setDrawColor(226, 232, 240); // Light border
+                pdf.setLineWidth(0.5);
+                pdf.roundedRect(margin, currentY, pageWidth - (2 * margin), productCardHeight, 5, 5, 'FD'); // Rounded rectangle
+
+                // Product Image
+                if (product.image && !product.image.includes('placehold.co')) {
+                    const prodImg = new Image();
+                    prodImg.src = product.image;
+                    await new Promise(resolve => prodImg.onload = resolve);
+
+                    const imgSize = 50; // mm
+                    const imgX = margin + 10;
+                    const imgY = currentY + 10;
+                    pdf.addImage(prodImg, 'PNG', imgX, imgY, imgSize, imgSize, undefined, 'FAST'); // Use FAST compression
+                } else {
+                    pdf.setFontSize(14);
+                    pdf.setTextColor(148, 163, 184);
+                    pdf.text('Imagen', margin + 10 + 25, currentY + 10 + 25, { align: 'center' });
+                }
+
+                // Product Name
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(18);
+                pdf.setTextColor(45, 55, 72);
+                pdf.text(product.name, margin + 10 + 60, currentY + 15);
+
+                // Product Price
+                pdf.setFont('helvetica', 'bold');
+                pdf.setFontSize(16);
+                pdf.setTextColor(37, 99, 235); // Stronger blue
+                pdf.text(product.price, margin + 10 + 60, currentY + 25);
+
+                // Product Description
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(10);
+                pdf.setTextColor(74, 85, 104);
+                // Use autoPrint for multi-line text
+                const splitDescription = pdf.splitTextToSize(product.description, pageWidth - (2 * margin) - 70); // Adjust width
+                pdf.text(splitDescription, margin + 10 + 60, currentY + 35);
+
+                // Product Categories
+                if (product.categories) {
+                    pdf.setFont('helvetica', 'italic');
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(107, 114, 128);
+                    pdf.text(`Categorías: ${product.categories}`, margin + 10 + 60, currentY + 35 + (splitDescription.length * 4)); // Position below description
+                }
+
+                currentY += productCardHeight + 10; // Move Y for next product, add some spacing
+                productsOnCurrentPage++;
+            }
+
+            // --- Back Page / Footer ---
+            pdf.addPage();
+            pdf.setFillColor(248, 250, 252); // Light gray background
+            pdf.rect(0, 0, pageWidth, pageHeight, 'F'); // Fill entire page
+
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(24);
+            pdf.setTextColor(26, 32, 44);
+            pdf.text('Contáctanos', pageWidth / 2, pageHeight * 0.2, { align: 'center' });
+
+            pdf.setFont('helvetica', 'normal');
+            pdf.setFontSize(12);
+            pdf.setTextColor(74, 85, 104);
+            let contactY = pageHeight * 0.3;
+            if (phoneNumber) {
+                pdf.text(`Teléfono: ${phoneNumber}`, pageWidth / 2, contactY, { align: 'center' });
+                contactY += 8;
+            }
+            if (email) {
+                pdf.text(`Email: ${email}`, pageWidth / 2, contactY, { align: 'center' });
+                contactY += 8;
+            }
+            if (website) {
+                pdf.text(`Web: ${website}`, pageWidth / 2, contactY, { align: 'center' });
+                contactY += 8;
+            }
+
+            // WhatsApp QR Code on back page
+            if (phoneNumber && qrCodeLoaded && window.QRCode) {
+                const formattedPhoneNumber = phoneNumber.replace(/\D/g, '');
+                const prefilledMessage = encodeURIComponent(`Hola ${storeName}`);
+                const whatsappUrl = `https://wa.me/${formattedPhoneNumber}?text=${prefilledMessage}`;
+
+                const qrCodeCanvas = document.createElement('canvas');
+                new QRCode(qrCodeCanvas, {
+                    text: whatsappUrl,
+                    width: 150,
+                    height: 150,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                const qrDataUrl = qrCodeCanvas.toDataURL('image/png');
+                const qrSize = 50; // mm
+                const qrX = (pageWidth - qrSize) / 2;
+                const qrY = pageHeight * 0.55;
+                pdf.addImage(qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+
+                pdf.setFontSize(10);
+                pdf.setTextColor(74, 85, 104);
+                pdf.text('Escanea para chatear por WhatsApp', pageWidth / 2, qrY + qrSize + 5, { align: 'center' });
+            }
+
+            pdf.save('catalogo_profesional.pdf');
+            showMessageBox('¡PDF profesional generado con éxito!');
+            hideLoadingSpinner();
+        };
+
+        // Function to generate Image
+        window.generateImage = async function() {
+            showLoadingSpinner();
+            await ensureLibrariesLoaded();
+            const input = document.getElementById('catalogPreview');
+            try {
+                const canvas = await html2canvas(input, { scale: 3, useCORS: true, allowTaint: true }); // Increased scale, added CORS options
+                const imgData = canvas.toDataURL('image/png'); // PNG for transparency and quality
+                const link = document.createElement('a');
+                link.href = imgData;
+                link.download = 'catalogo.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showMessageBox('¡Imagen generada con éxito!');
+            } catch (error) {
+                console.error('Error al generar imagen:', error);
+                showMessageBox('Error al generar la imagen. Inténtelo de nuevo.');
+            } finally {
+                hideLoadingSpinner();
+            }
+        };
+
+        // Function to save catalog data to Firestore
+        window.saveCatalog = async function() {
+            if (!userId) {
+                showMessageBox("No se pudo guardar el catálogo. Usuario no autenticado.");
+                return;
+            }
+
+            const storeName = document.getElementById('storeName').value;
+            const storeSlogan = document.getElementById('storeSlogan').value;
+            const logoSrc = document.getElementById('logoPreview').src;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const email = document.getElementById('email').value;
+            const website = document.getElementById('website').value;
+
+
+            const products = [];
+            const productsContainer = document.getElementById('productsContainer');
+            const productDivs = productsContainer.children;
+
+            for (let i = 0; i < productDivs.length; i++) {
+                const productId = productDivs[i].id;
+                const productName = document.getElementById(`${productId}-name`).value;
+                const productImageSrc = document.getElementById(`${productId}-preview`).src;
+                const productPrice = document.getElementById(`${productId}-price`).value;
+                const productDescription = document.getElementById(`${productId}-description`).value;
+                const productCategories = document.getElementById(`${productId}-categories`).value;
+
+
+                products.push({
+                    name: productName,
+                    image: productImageSrc, // Store base64 image data or URL
+                    price: productPrice,
+                    description: productDescription,
+                    categories: productCategories
+                });
+            }
+
+            const catalogData = {
+                storeName: storeName,
+                storeSlogan: storeSlogan,
+                logo: logoSrc, // Store base64 image data or URL
+                phoneNumber: phoneNumber,
+                email: email,
+                website: website,
+                products: products,
+                createdAt: new Date().toISOString(),
+                userId: userId // Associate catalog with the user
+            };
+
+            try {
+                // Save to a private collection for the user
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const userCatalogsCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/catalogs`);
+                // Use a unique ID for each catalog document
+                const newCatalogRef = doc(userCatalogsCollectionRef);
+                await setDoc(newCatalogRef, catalogData);
+                showMessageBox('¡Catálogo guardado con éxito en la nube!');
+                console.log("Catálogo guardado:", catalogData);
+            } catch (error) {
+                console.error("Error al guardar el catálogo:", error);
+                showMessageBox(`Error al guardar el catálogo: ${error.message}`);
+            }
+        };
+
+        // Función para llamar al backend para generar texto
+        async function callBackendTextApi(prompt) {
+            const response = await fetch(`${BACKEND_URL}/generate-text`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Error del servidor: ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (result.candidates && result.candidates.length > 0 && result.candidates[0].content && result.candidates[0].content.parts && result.candidates[0].content.parts.length > 0) {
+                return result.candidates[0].content.parts[0].text;
+            } else {
+                throw new Error("Respuesta inesperada del backend.");
+            }
+        }
+
+        // Función para llamar al backend para generar imagen
+        async function callBackendImageApi(prompt) {
+            const response = await fetch(`${BACKEND_URL}/generate-image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Error del servidor: ${response.status}`);
+            }
+
+            const result = await response.json();
+            if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                return `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+            } else {
+                throw new Error("Respuesta inesperada del backend para generación de imagen.");
+            }
+        }
+
+
+        // Function to generate product description using Gemini API (via backend)
+        window.generateProductDescription = async function(productId) {
+            const productNameInput = document.getElementById(`${productId}-name`);
+            const productDescriptionTextarea = document.getElementById(`${productId}-description`);
+            const productName = productNameInput.value.trim();
+
+            if (!productName) {
+                showMessageBox("Por favor, introduce el nombre del producto antes de generar una descripción.");
+                return;
+            }
+
+            showLoadingSpinner();
+            try {
+                const prompt = `Genera una descripción concisa y atractiva para un producto llamado "${productName}". La descripción debe ser de 2-3 oraciones y resaltar sus características principales y beneficios.`;
+                const text = await callBackendTextApi(prompt);
+                productDescriptionTextarea.value = text;
+                updatePreview();
+            } catch (error) {
+                console.error("Error al generar la descripción:", error);
+                showMessageBox(`Error al generar la descripción: ${error.message}. Inténtelo de nuevo.`);
+            } finally {
+                hideLoadingSpinner();
+            }
+        };
+
+        // Function to generate social media post using Gemini API (via backend)
+        window.generateSocialMediaPost = async function(productId) {
+            const productName = document.getElementById(`${productId}-name`).value.trim();
+            const productDescription = document.getElementById(`${productId}-description`).value.trim();
+            const productPrice = document.getElementById(`${productId}-price`).value.trim();
+
+            if (!productName) {
+                showMessageBox("Por favor, introduce el nombre del producto antes de generar una publicación.");
+                return;
+            }
+
+            showLoadingSpinner();
+            try {
+                const prompt = `Crea una publicación corta y atractiva para redes sociales (ej. Instagram) para un producto llamado "${productName}" con la descripción "${productDescription}" y el precio "${productPrice}". Incluye 2-3 emojis, 3-5 hashtags relevantes y un llamado a la acción. Formato: Texto del post, luego una línea con hashtags.`;
+                const text = await callBackendTextApi(prompt);
+                showSocialMediaPostModal(text);
+            } catch (error) {
+                console.error("Error al generar la publicación:", error);
+                showMessageBox(`Error al generar la publicación para redes sociales: ${error.message}. Inténtelo de nuevo.`);
+            } finally {
+                hideLoadingSpinner();
+            }
+        };
+
+        // Function to generate store slogan using Gemini API (via backend)
+        window.generateStoreSlogan = async function() {
+            const storeName = document.getElementById('storeName').value.trim();
+            const storeSloganInput = document.getElementById('storeSlogan');
+            const productsContainer = document.getElementById('productsContainer');
+            const productDivs = productsContainer.children;
+            let productNames = [];
+
+            for (let i = 0; i < productDivs.length; i++) {
+                const productId = productDivs[i].id;
+                const productName = document.getElementById(`${productId}-name`).value.trim();
+                if (productName) {
+                    productNames.push(productName);
+                }
+            }
+
+            if (!storeName) {
+                showMessageBox("Por favor, introduce el nombre de la tienda antes de generar un eslogan.");
+                return;
+            }
+
+            showLoadingSpinner();
+            try {
+                const prompt = `Genera un eslogan de marketing corto y pegadizo para una tienda llamada "${storeName}". Si hay productos listados, considéralos: ${productNames.join(', ')}. El eslogan debe ser de una sola frase y muy atractivo.`;
+                const text = await callBackendTextApi(prompt);
+                storeSloganInput.value = text.replace(/"/g, '');
+                updatePreview();
+            } catch (error) {
+                console.error("Error al generar el eslogan:", error);
+                showMessageBox(`Error al generar el eslogan: ${error.message}. Inténtelo de nuevo.`);
+            } finally {
+                hideLoadingSpinner();
+            }
+        };
+
+        // Function to suggest product categories using Gemini API (via backend)
+        window.suggestProductCategories = async function(productId) {
+            const productName = document.getElementById(`${productId}-name`).value.trim();
+            const productDescription = document.getElementById(`${productId}-description`).value.trim();
+            const productCategoriesInput = document.getElementById(`${productId}-categories`);
+
+            if (!productName && !productDescription) {
+                showMessageBox("Por favor, introduce el nombre o la descripción del producto para sugerir categorías.");
+                return;
+            }
+
+            showLoadingSpinner();
+            try {
+                const prompt = `Sugiere 3-5 categorías o etiquetas relevantes para un producto con el nombre "${productName}" y la descripción "${productDescription}". Separa las categorías con comas.`;
+                const text = await callBackendTextApi(prompt);
+                productCategoriesInput.value = text;
+                updatePreview();
+            } catch (error) {
+                console.error("Error al sugerir categorías:", error);
+                showMessageBox(`Error al sugerir categorías: ${error.message}. Inténtelo de nuevo.`);
+            } finally {
+                hideLoadingSpinner();
+            }
+        };
+
+        // Function to summarize the entire catalog using Gemini API (via backend)
+        window.summarizeCatalog = async function() {
+            const storeName = document.getElementById('storeName').value.trim();
+            const productsContainer = document.getElementById('productsContainer');
+            const productDivs = productsContainer.children;
+            let productInfo = [];
+
+            for (let i = 0; i < productDivs.length; i++) {
+                const productId = productDivs[i].id;
+                const productName = document.getElementById(`${productId}-name`).value.trim();
+                const productDescription = document.getElementById(`${productId}-description`).value.trim();
+                if (productName) {
+                    productInfo.push(`${productName}: ${productDescription}`);
+                }
+            }
+
+            if (!storeName && productInfo.length === 0) {
+                showMessageBox("Por favor, introduce el nombre de la tienda o añade algunos productos para generar un resumen.");
+                return;
+            }
+
+            showLoadingSpinner();
+            try {
+                const prompt = `Genera un resumen conciso y atractivo (2-4 oraciones) del catálogo de la tienda "${storeName}". Considera los siguientes productos: ${productInfo.join('; ')}. El resumen debe destacar lo que la tienda ofrece y su propuesta de valor.`;
+                const text = await callBackendTextApi(prompt);
+                showCatalogSummaryModal(text);
+            } catch (error) {
+                console.error("Error al generar el resumen del catálogo:", error);
+                showMessageBox(`Error al generar el resumen del catálogo: ${error.message}. Inténtelo de nuevo.`);
+            } finally {
+                hideLoadingSpinner();
+            }
+        };
+
+        // Function to generate AI Logo (via backend)
+        window.generateAILogo = async function() {
+            const storeName = document.getElementById('storeName').value.trim();
+            const logoDescription = document.getElementById('logoDescription').value.trim();
+            const logoPreviewElement = document.getElementById('logoPreview');
+            const logoUploadArea = document.getElementById('logoUploadArea');
+
+            if (!storeName && !logoDescription) {
+                showMessageBox("Por favor, introduce el nombre de la tienda y una descripción para generar un logo.");
+                return;
+            }
+
+            hideGenerateLogoModal();
+            showLoadingSpinner();
+
+            const prompt = `Un logo para una tienda llamada "${storeName}". Descripción: "${logoDescription}". Estilo: minimalista, moderno, profesional.`;
+
+            try {
+                const imageUrl = await callBackendImageApi(prompt);
+                logoPreviewElement.src = imageUrl;
+                logoUploadArea.classList.add('has-image');
+                updatePreview();
+                showMessageBox('¡Logo generado con éxito!');
+            } catch (error) {
+                console.error("Error al generar el logo:", error);
+                showMessageBox(`Error al generar el logo: ${error.message}. Inténtelo de nuevo.`);
+            } finally {
+                hideLoadingSpinner();
+            }
+        };
+
+        // Function to generate QR code for WhatsApp
+        window.generatePhoneNumberQR = async function() {
+            await ensureLibrariesLoaded();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const storeName = document.getElementById('storeName').value.trim() || 'la tienda';
+
+            if (!phoneNumber) {
+                showMessageBox("Por favor, introduce un número de teléfono para generar el código QR.");
+                return;
+            }
+
+            // Remove any non-digit characters from the phone number
+            const formattedPhoneNumber = phoneNumber.replace(/\D/g, '');
+            const prefilledMessage = encodeURIComponent(`Hola ${storeName}, me gustaría recibir más información.`);
+            const whatsappUrl = `https://wa.me/${formattedPhoneNumber}?text=${prefilledMessage}`;
+
+            // Clear previous QR code if any
+            const qrCodeContainer = document.getElementById('qrCodeContainer');
+            qrCodeContainer.innerHTML = '';
+
+            try {
+                new QRCode(qrCodeContainer, {
+                    text: whatsappUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                showQrCodeModal();
+            } catch (error) {
+                console.error("Error al generar el código QR:", error);
+                showMessageBox("Error al generar el código QR. Verifique el número de teléfono.");
+            }
+        };
+    </script>
 </body>
 </html>
