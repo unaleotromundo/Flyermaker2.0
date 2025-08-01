@@ -6,19 +6,19 @@ const app = express();
 
 app.use(express.json());
 
-// Usa el paquete cors, configurado para Vercel
+// Middleware CORS profesional para subdominios Vercel
 app.use(cors({
   origin: (origin, callback) => {
-    // Permite cualquier subdominio de vercel.app
+    // Permite todos los subdominios de vercel.app o sin origin (server-to-server)
     if (!origin || /\.vercel\.app$/.test(origin.replace(/^https?:\/\//, ''))) {
       callback(null, true);
     } else {
-      callback(new Error('CORS not allowed'), false);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
-  optionsSuccessStatus: 200,
+  optionsSuccessStatus: 200, // ¡Esto arregla tu error!
 }));
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
