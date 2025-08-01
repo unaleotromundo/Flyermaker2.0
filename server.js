@@ -1,54 +1,4 @@
-// server.js
-
-// Importa las librerías necesarias
-import express from 'express';
-import cors from 'cors';
-import fetch from 'node-fetch'; 
-import 'dotenv/config'; 
-
-// Configuración del servidor
-const app = express();
-const port = process.env.PORT || 3000; 
-const geminiApiKey = process.env.GEMINI_API_KEY; 
-
-// Middlewares
-app.use(cors()); 
-app.use(express.json()); 
-
-// Valida que la clave de API exista
-if (!geminiApiKey) {
-  console.error("Error: La variable de entorno GEMINI_API_KEY no está configurada.");
-  process.exit(1); 
-}
-
-// Endpoint para generar texto (resumen, eslogan, descripciones)
-app.post('/api/generate-text', async (req, res) => {
-  const { prompt } = req.body;
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${geminiApiKey}`;
-
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          role: "user",
-          parts: [{ text: prompt }]
-        }]
-      }),
-    });
-
-    const result = await response.json();
-    res.json(result); 
-  } catch (error) {
-    console.error('Error al llamar a la API de Gemini:', error);
-    res.status(500).json({ error: 'Error interno del servidor.' });
-  }
-});
-
-// Endpoint para generar imágenes (logo)
+// Endpoint para generar imágenes (logo) - Corregido
 app.post('/api/generate-image', async (req, res) => {
     const { prompt } = req.body;
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${geminiApiKey}`;
@@ -63,15 +13,31 @@ app.post('/api/generate-image', async (req, res) => {
             body: JSON.stringify(payload)
         });
 
+        // Verificamos si la respuesta de la API fue exitosa
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Error de la API de Imagen:', response.status, errorText);
+            // Si la respuesta no fue JSON, enviamos el error como texto.
+            return res.status(response.status).json({ error: `Error de la API: ${errorText}` });
+        }
+
         const result = await response.json();
-        res.json(result);
+
+        // 1. Extraemos los datos de la imagen codificados en Base64 de la respuesta
+        const base64Data = result?.predictions?.[0]?.bytesBase64Encoded;
+
+        // 2. Si se encuentra la imagen, la enviamos al cliente en un formato útil
+        if (base64Data) {
+            // El cliente recibirá un JSON con la propiedad `imageUrl`
+            res.json({ imageUrl: `data:image/png;base64,${base64Data}` });
+        } else {
+            // Manejamos el caso en que la respuesta no contiene la imagen
+            console.error('La respuesta de la API no contiene datos de imagen esperados.');
+            res.status(500).json({ error: 'No se pudo generar el logo. Inténtelo de nuevo.' });
+        }
+
     } catch (error) {
         console.error('Error al llamar a la API de Imagen:', error);
         res.status(500).json({ error: 'Error interno del servidor.' });
     }
-});
-
-// Inicia el servidor
-app.listen(port, () => {
-  console.log(`Servidor de backend escuchando en http://localhost:${port}`);
 });
