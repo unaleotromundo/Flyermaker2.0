@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-
 // Si usás Node <18, instalá node-fetch y descomentá esto:
 // import fetch from 'node-fetch';
 
@@ -24,8 +23,11 @@ app.use(cors({
   optionsSuccessStatus: 200,
 }));
 
-// Responde cualquier preflight OPTIONS antes de los endpoints
-app.options('*', cors());
+// (opcional, para debug) Loggea las preflight OPTIONS
+app.options('*', (req, res, next) => {
+  console.log('Preflight OPTIONS desde:', req.headers.origin);
+  next();
+}, cors());
 
 // --- Tus endpoints aquí abajo ---
 
