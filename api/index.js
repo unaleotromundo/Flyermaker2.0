@@ -2,16 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 
-// Si tu Node es menor a 18, instalá node-fetch y descomentá la siguiente línea:
+// Si usás Node <18, instalá node-fetch y descomentá esto:
 // import fetch from 'node-fetch';
 
 const app = express();
 
 app.use(express.json());
 
-// Permite CORS solo para cualquier subdominio de Vercel
+// Middleware global de CORS para todos los endpoints
 app.use(cors({
   origin: (origin, callback) => {
+    // Permite todos los subdominios de Vercel (y server-to-server)
     if (!origin || /\.vercel\.app$/.test(origin.replace(/^https?:\/\//, ''))) {
       callback(null, true);
     } else {
@@ -22,6 +23,11 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
   optionsSuccessStatus: 200,
 }));
+
+// Responde cualquier preflight OPTIONS antes de los endpoints
+app.options('*', cors());
+
+// --- Tus endpoints aquí abajo ---
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
 
