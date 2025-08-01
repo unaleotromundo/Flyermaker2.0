@@ -36,32 +36,67 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('change', () => handleImageUpload(input, bannerUploadArea));
         input.click();
     });
+    
+    // URL del servidor para la generación de imágenes
+    const IMAGE_GEN_URL = "https://tucatalogo.vercel.app/api/generate-image";
 
-    // Placeholder para la generación de contenido con IA
-    const handleAIButtonClick = (targetElement, action) => {
+    // Manejar la generación de contenido con IA
+    const handleAIButtonClick = async (targetElement, action) => {
         targetElement.textContent = 'Generando...';
-        // Aquí iría la lógica para llamar a tu API de Gemini
-        // Por ahora, usamos un temporizador para simular la respuesta
-        setTimeout(() => {
+        
+        try {
             if (action === 'slogan') {
-                targetElement.value = 'Tu Eslogan Generado por IA';
-            } else if (action === 'logo') {
-                logoUploadArea.style.backgroundImage = `url('https://via.placeholder.com/150x150.png?text=Logo+IA')`;
-                logoUploadArea.style.backgroundSize = 'cover';
-                logoUploadArea.innerHTML = '';
+                // Lógica de IA para el eslogan (podría ir a otro endpoint)
+                setTimeout(() => {
+                    sloganInput.value = 'Tu Eslogan Generado por IA';
+                    targetElement.textContent = 'Generar con IA';
+                }, 1500);
+
+            } else if (action === 'logo' || action === 'banner') {
+                const prompt = prompt("Ingresa una descripción para tu imagen:");
+                if (!prompt) {
+                    targetElement.textContent = 'Generar con IA';
+                    return;
+                }
+
+                // Llamada a tu servidor para generar la imagen
+                const response = await fetch(IMAGE_GEN_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                const result = await response.json();
+                
+                if (result.imageUrl) {
+                    const area = action === 'logo' ? logoUploadArea : bannerUploadArea;
+                    area.style.backgroundImage = `url(${result.imageUrl})`;
+                    area.style.backgroundSize = 'cover';
+                    area.style.backgroundPosition = 'center';
+                    area.innerHTML = ''; // Limpiar el icono de cámara
+                } else {
+                    alert(result.error || 'Error al generar la imagen.');
+                }
             }
-        }, 1500);
+        } catch (error) {
+            console.error('Error al generar con IA:', error);
+            alert('Hubo un error al conectar con el servidor.');
+        }
+
+        targetElement.textContent = 'Generar con IA';
     };
 
     document.querySelectorAll('.ai-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const container = e.target.closest('.slogan-container') || e.target.closest('.image-box');
             if (container.querySelector('input')) {
-                handleAIButtonClick(container.querySelector('input'), 'slogan');
+                handleAIButtonClick(e.target, 'slogan');
             } else if (container.querySelector('#logo-upload')) {
-                handleAIButtonClick(container.querySelector('#logo-upload'), 'logo');
+                handleAIButtonClick(e.target, 'logo');
             } else if (container.querySelector('#banner-upload')) {
-                // Lógica para banner IA
+                handleAIButtonClick(e.target, 'banner');
             }
         });
     });
@@ -70,8 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
     generateQrBtn.addEventListener('click', () => {
         const websiteUrl = document.getElementById('store-website').value;
         if (websiteUrl) {
-            // En un proyecto real, usarías una librería como 'qrcode.js'
-            // Por ahora, creamos una imagen placeholder
             qrCodeDiv.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(websiteUrl)}" alt="Código QR">`;
         } else {
             alert('Por favor, ingresa una dirección de página web para generar el QR.');
@@ -83,9 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const storeData = new FormData(storeForm);
-        // Aquí se recogería toda la información del formulario
-        // y se guardaría para usarla en la creación del catálogo.
-        
         console.log('Datos de la tienda guardados:', storeData);
         alert('¡Tienda guardada con éxito! Ahora puedes crear tu catálogo.');
         // Redirigir a la página de creación de catálogo
