@@ -5,11 +5,28 @@ import 'dotenv/config';
 
 const app = express();
 
-app.use(express.json());
-app.use(cors());
+// Lista de orígenes permitidos
+const allowedOrigins = [
+  'https://tucatalogo.vercel.app',
+  'https://tucatalogo-l1ym7u07y-agradecidos-projects.vercel.app',
+  'https://tucatalogo.vercel.app/',
+  'https://tucatalogo-l1ym7u07y-agradecidos-projects.vercel.app/'
+];
 
-// Usa la clave de API para ambos endpoints.
-const geminiApiKey = process.env.GEMINI_API_KEY; 
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+};
+
+app.use(cors(corsOptions));
+app.use(express.json());
+
+const geminiApiKey = process.env.GEMINI_API_KEY;
 
 // Endpoint para el chat de Gemini
 app.post('/api/chat', async (req, res) => {
