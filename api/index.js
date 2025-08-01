@@ -2,13 +2,17 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 
+// Si usás fetch en Node >=18, ya está global. Si no, descomentá esto:
+// import fetch from 'node-fetch';
+
 const app = express();
 
 app.use(express.json());
 
-// CORS para subdominios de Vercel, solo desde backend
+// CORS SOLO para subdominios de Vercel
 app.use(cors({
   origin: (origin, callback) => {
+    // Permite peticiones server-to-server y desde *.vercel.app
     if (!origin || /\.vercel\.app$/.test(origin.replace(/^https?:\/\//, ''))) {
       callback(null, true);
     } else {
@@ -26,9 +30,8 @@ const geminiApiKey = process.env.GEMINI_API_KEY;
 app.post('/api/chat', async (req, res) => {
   const userMessage = req.body.message;
 
-  if (!geminiApiKey) {
+  if (!geminiApiKey)
     return res.status(500).json({ error: 'La clave de API no está configurada.' });
-  }
 
   try {
     const response = await fetch(
@@ -40,20 +43,21 @@ app.post('/api/chat', async (req, res) => {
           contents: [
             {
               parts: [
-                {
-                  text: userMessage,
-                },
-              ],
-            },
-          ],
-        }),
+                { text: userMessage }
+              ]
+            }
+          ]
+        })
       }
     );
-
     const data = await response.json();
+    if (!response.ok) {
+      console.error('Error Gemini:', data);
+      return res.status(response.status).json({ error: data.error?.message || 'Error de Gemini' });
+    }
     res.json(data);
   } catch (error) {
-    console.error('Error al llamar a la API de Gemini:', error);
+    console.error('Error al llamar a Gemini:', error);
     res.status(500).json({ error: 'Error del servidor al procesar la solicitud.' });
   }
 });
@@ -63,6 +67,9 @@ app.post('/api/generate-image', async (req, res) => {
   const { prompt } = req.body;
   const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${geminiApiKey}`;
 
+  if (!geminiApiKey)
+    return res.status(500).json({ error: 'La clave de API no está configurada.' });
+
   try {
     const payload = { instances: [{ prompt }], parameters: { sampleCount: 1 } };
     const response = await fetch(apiUrl, {
@@ -71,19 +78,17 @@ app.post('/api/generate-image', async (req, res) => {
       body: JSON.stringify(payload),
     });
 
+    const result = await response.json();
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error de la API de Imagen:', response.status, errorText);
-      return res.status(response.status).json({ error: `Error de la API: ${errorText}` });
+      console.error('Error Imagen:', result);
+      return res.status(response.status).json({ error: result.error?.message || 'Error de la API de Imagen' });
     }
 
-    const result = await response.json();
     const base64Data = result?.predictions?.[0]?.bytesBase64Encoded;
-
     if (base64Data) {
       res.json({ imageUrl: `data:image/png;base64,${base64Data}` });
     } else {
-      console.error('La respuesta de la API no contiene datos de imagen esperados.');
+      console.error('Respuesta inesperada de Imagen:', result);
       res.status(500).json({ error: 'No se pudo generar la imagen. Inténtelo de nuevo.' });
     }
   } catch (error) {
