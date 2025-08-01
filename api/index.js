@@ -2,17 +2,16 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 
-// Si usás fetch en Node >=18, ya está global. Si no, descomentá esto:
+// Si tu Node es menor a 18, instalá node-fetch y descomentá la siguiente línea:
 // import fetch from 'node-fetch';
 
 const app = express();
 
 app.use(express.json());
 
-// CORS SOLO para subdominios de Vercel
+// Permite CORS solo para cualquier subdominio de Vercel
 app.use(cors({
   origin: (origin, callback) => {
-    // Permite peticiones server-to-server y desde *.vercel.app
     if (!origin || /\.vercel\.app$/.test(origin.replace(/^https?:\/\//, ''))) {
       callback(null, true);
     } else {
@@ -26,7 +25,7 @@ app.use(cors({
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
 
-// Endpoint chat Gemini
+// Endpoint para chat Gemini
 app.post('/api/chat', async (req, res) => {
   const userMessage = req.body.message;
 
