@@ -11,7 +11,7 @@ const geminiApiKey = process.env.GEMINI_API_KEY;
 // Endpoint para el chat de Gemini
 app.post('/api/chat', async (req, res) => {
     const userMessage = req.body.message;
-    
+
     if (!geminiApiKey) {
         return res.status(500).json({ error: 'La clave de API no está configurada.' });
     }
