@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // URL del servidor para la generación de imágenes
-    const IMAGE_GEN_URL = "http://https://tucatalogo.vercel.app/api/generate-image";
+    const IMAGE_GEN_URL = "https://tucatalogo.vercel.app/api/generate-image";
 
     // Manejar la generación de contenido con IA
     const handleAIButtonClick = async (targetElement, action) => {
