@@ -1,25 +1,17 @@
 {
   "name": "tucatalogo",
   "version": "1.0.0",
-  "description": "Crea tu logo un slogan y el catalogo de tus productos totalmente gratis y rápido",
-  "main": "server.js",
+  "description": "Una aplicación para crear catálogos con la API de Gemini.",
+  "main": "api/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/unaleotromundo/tucatalogo.git"
+    "start": "node api/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/unaleotromundo/tucatalogo/issues"
-  },
-  "homepage": "https://github.com/unaleotromundo/tucatalogo#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.1.0",
+    "express": "^4.19.2"
   }
 }
