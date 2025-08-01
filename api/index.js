@@ -1,23 +1,25 @@
 import express from 'express';
+import cors from 'cors';
 import 'dotenv/config';
 
 const app = express();
 
 app.use(express.json());
 
-// Middleware CORS flexible para todos los deploys de Vercel (*.vercel.app)
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (origin && origin.endsWith('.vercel.app')) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
+// Usa el paquete cors, configurado para Vercel
+app.use(cors({
+  origin: (origin, callback) => {
+    // Permite cualquier subdominio de vercel.app
+    if (!origin || /\.vercel\.app$/.test(origin.replace(/^https?:\/\//, ''))) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'), false);
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+  optionsSuccessStatus: 200,
+}));
 
 const geminiApiKey = process.env.GEMINI_API_KEY;
 
