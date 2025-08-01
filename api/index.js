@@ -19,7 +19,7 @@ app.post('/api/generate-text', async (req, res) => {
             return res.status(400).json({ error: 'El prompt es requerido.' });
         }
 
-        const apiKey = process.env.GEMINI_API_KEY || ''; // Obtener la clave de Vercel
+        const apiKey = process.env.GEMINI_API_KEY || '';
         if (!apiKey) {
             return res.status(500).json({ error: 'La clave de API no está configurada.' });
         }
@@ -42,7 +42,7 @@ app.post('/api/generate-text', async (req, res) => {
     }
 });
 
-// Endpoint para generar imagen
+// Endpoint para generar imagen - CORREGIDO
 app.post('/api/generate-image', async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -66,8 +66,29 @@ app.post('/api/generate-image', async (req, res) => {
             body: JSON.stringify(payload),
         });
 
+        // Verificamos si la llamada a la API fue exitosa
+        if (!response.ok) {
+            // Si hay un error, lo enviamos al cliente para que sepa qué pasó
+            const errorResult = await response.json();
+            return res.status(response.status).json(errorResult);
+        }
+
         const result = await response.json();
-        res.status(response.status).json(result);
+        
+        // 1. Extraemos los datos Base64 de la imagen de la respuesta anidada
+        const base64Data = result?.predictions?.[0]?.bytesBase64Encoded;
+
+        // 2. Si los datos existen, construimos una URL de imagen y la enviamos al cliente
+        if (base64Data) {
+            const imageUrl = `data:image/png;base64,${base64Data}`;
+            // Enviamos un objeto JSON simple con la URL de la imagen
+            res.status(200).json({ imageUrl: imageUrl });
+        } else {
+            // Si la respuesta no contiene la imagen, enviamos un error claro
+            console.error('La respuesta de la API de Imagen no contiene datos de imagen esperados.');
+            res.status(500).json({ error: 'No se pudo generar la imagen. La respuesta de la API fue inesperada.' });
+        }
+
     } catch (error) {
         console.error('Error en el endpoint de generación de imagen:', error);
         res.status(500).json({ error: 'Error interno del servidor al procesar la solicitud.' });
