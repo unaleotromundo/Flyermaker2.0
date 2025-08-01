@@ -1,13 +1,12 @@
 const allowedOrigins = [
   "https://unaleotromundo.github.io",
   "https://tucatalogo.vercel.app",
-  // Permite también cualquier deploy temporal de Vercel (solo para desarrollo/pruebas)
-  // Puedes agregar más dominios aquí según necesites
+  // Puedes agregar aquí tus dominios de producción adicionales
 ];
 
 export default async function handler(req, res) {
   const origin = req.headers.origin || "";
-  // Permite cualquier subdominio temporal de Vercel durante desarrollo
+  // Permite también cualquier subdominio temporal de Vercel (para pruebas)
   if (
     allowedOrigins.includes(origin) ||
     /^https:\/\/tucatalogo-[^.]+\.agradecidos-projects\.vercel\.app$/.test(origin)
@@ -16,16 +15,15 @@ export default async function handler(req, res) {
   }
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
   if (req.method === "OPTIONS") {
     res.status(200).end();
     return;
   }
 
   if (req.method === "POST") {
-    // Lógica para generar imagen IA:
-    // const { prompt } = req.body;
-    // const imageUrl = await generateAIImage(prompt);
-    // Por ahora solo devuelve una imagen demo:
+    // Aquí iría la lógica de generación de imagen con IA.
+    // Como ejemplo, devolvemos una imagen de placeholder:
     res.status(200).json({ url: "https://placehold.co/400x300.png?text=Demo+AI+Image" });
     return;
   }
