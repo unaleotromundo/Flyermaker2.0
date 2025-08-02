@@ -5,13 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageResultDiv = document.getElementById('imageResult');
     const promptResultDiv = document.getElementById('promptResult');
 
-    // URL base de tu backend en Vercel
-    const vercelBackendUrl = 'https://tucatalogo-e3n7.vercel.app/'; // <--- ¡AQUÍ ESTÁ EL CAMBIO!
+    // La URL base de tu backend en Vercel, SIN la barra final
+    const vercelBackendUrl = 'https://tucatalogo-e3n7.vercel.app'; 
 
     generateImageBtn.addEventListener('click', async () => {
         const prompt = imagePromptInput.value;
         if (prompt) {
-            const response = await fetch(`${vercelBackendUrl}/api/generate-image`, { // Usa la URL completa
+            const response = await fetch(`${vercelBackendUrl}/api/generate-image`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     magicPromptBtn.addEventListener('click', async () => {
-        const response = await fetch(`${vercelBackendUrl}/api/chat`, { // Usa la URL completa
+        const response = await fetch(`${vercelBackendUrl}/api/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
