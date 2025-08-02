@@ -5,20 +5,23 @@ import 'dotenv/config';
 const app = express();
 app.use(express.json());
 
-// Middleware de CORS para permitir solicitudes desde el frontend
+// Middleware de CORS corregido para Vercel
+// Esta configuración maneja correctamente los subdominios de Vercel y las solicitudes 'preflight'.
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || /\.vercel\.app$/.test(origin.replace(/^https?:\/\//, ''))) {
+        // Permite cualquier subdominio de .vercel.app y el origen nulo (para entornos de desarrollo locales)
+        if (!origin || origin.endsWith('.vercel.app')) {
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS'));
         }
     },
     methods: ['GET', 'POST', 'OPTIONS'],
-    allowedHeaders: ['Content-Type'],
+    allowedHeaders: ['Content-Type', 'Authorization'], // Es crucial permitir el header 'Authorization' para DALL-E
     optionsSuccessStatus: 200,
 }));
 
+// Este middleware es crucial para responder a las solicitudes OPTIONS 'preflight'
 app.options('*', cors());
 
 // --- Tus endpoints para Gemini y generación de imágenes ---
@@ -57,8 +60,7 @@ app.post('/api/chat', async (req, res) => {
 
 // Endpoint 2: Para generar imágenes con una API dedicada (Ejemplo con DALL-E)
 app.post('/api/generate-image', async (req, res) => {
-    // Reemplaza 'IMAGE_API_KEY' con tu clave para el servicio de imágenes (DALL-E, Imagen, etc.)
-    const imageApiKey = process.env.IMAGE_API_KEY; 
+    const imageApiKey = process.env.IMAGEN_API_KEY;  
     const { prompt } = req.body;
 
     if (!imageApiKey) {
@@ -66,20 +68,19 @@ app.post('/api/generate-image', async (req, res) => {
     }
 
     try {
-        // **ADAPTAR ESTO:** La URL y el 'payload' deben coincidir con la API que elijas.
-        const imageUrl = `https://api.openai.com/v1/images/generations`; 
-        const payload = { 
+        const imageUrl = `https://api.openai.com/v1/images/generations`;  
+        const payload = {  
             prompt,
-            model: "dall-e-3", // O el modelo que vayas a usar
-            n: 1, 
+            model: "dall-e-3", 
+            n: 1,  
             size: "1024x1024"
         };
         
         const response = await fetch(imageUrl, {
             method: 'POST',
-            headers: { 
+            headers: {  
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${imageApiKey}` 
+                'Authorization': `Bearer ${imageApiKey}`  
             },
             body: JSON.stringify(payload),
         });
@@ -90,8 +91,7 @@ app.post('/api/generate-image', async (req, res) => {
             return res.status(response.status).json({ error: data.error?.message || 'Error al generar la imagen.' });
         }
 
-        // El formato de la respuesta puede variar. Esto es para DALL-E.
-        const imageResultUrl = data.data?.[0]?.url; 
+        const imageResultUrl = data.data?.[0]?.url;  
         if (imageResultUrl) {
             res.json({ imageUrl: imageResultUrl });
         } else {
