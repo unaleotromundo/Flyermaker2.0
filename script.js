@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     generateImageBtn.addEventListener('click', async () => {
         const prompt = imagePromptInput.value;
         if (prompt) {
-            const response = await fetch(`${vercelBackendUrl}/api/generate-image`, {
+            const response = await fetch(`${vercelBackendUrl}/api/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     magicPromptBtn.addEventListener('click', async () => {
-        const response = await fetch(`${vercelBackendUrl}/api/chat`, {
+        const response = await fetch(`https://tucatalogo-e3n7.vercel.app/api/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
