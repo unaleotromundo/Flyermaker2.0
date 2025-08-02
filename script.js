@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     magicPromptBtn.addEventListener('click', async () => {
-        const response = await fetch(`https://tucatalogo-e3n7.vercel.app/api/chat`, {
+        const response = await fetch(``${vercelBackendUrl}/api/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
