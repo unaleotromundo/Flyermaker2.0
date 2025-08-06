@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Flyer Mágico Avanzado</title>
 
-  <!-- Fuentes -->
-  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Lobster&family=Montserrat&family=Oswald&family=Playfair+Display&family=Poppins&family=Quicksand&display=swap" rel="stylesheet">
+  <!-- Fuentes Google Fonts, alternativas creativas y Webdings -->
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Lobster&family=Montserrat&family=Oswald&family=Playfair+Display&family=Poppins&family=Quicksand&family=Arizonia&family=Permanent+Marker&family=Rock+Salt&family=Fredericka+the+Great&family=Bangers&family=Covered+By+Your+Grace&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&family=Indie+Flower&family=Pacifico&family=Press+Start+2P&family=Gloria+Hallelujah&family=Rammetto+One&family=Monoton&family=Rubik+Moonrocks&family=Special+Elite&family=Amatic+SC:wght@700&family=VT323&family=Chewy&family=Black+Ops+One&family=Faster+One&family=Acme&family=Rye&family=Rubik+80s+Fade&family=Luckiest+Guy&family=Sigmar+One&family=UnifrakturCook:wght@700&family=Sacramento&family=Chango&family=Major+Mono+Display&family=IBM+Plex+Mono:wght@700&family=Poiret+One&family=Orbitron:wght@900&family=Unbounded:wght@700&display=swap" rel="stylesheet">
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -175,6 +176,43 @@
     <option value="Archivo Black">Archivo Black</option>
     <option value="Abril Fatface">Abril Fatface</option>
     <option value="Quicksand">Quicksand</option>
+    <!-- Alternativas graffiti y caligráficas -->
+    <option value="Arizonia">Arizonia</option>
+    <option value="Permanent Marker">Permanent Marker (graffiti)</option>
+    <option value="Rock Salt">Rock Salt (graffiti)</option>
+    <option value="Fredericka the Great">Fredericka the Great (brush)</option>
+    <option value="Bangers">Bangers (comic/graffiti)</option>
+    <option value="Covered By Your Grace">Covered By Your Grace (urbana)</option>
+    <option value="Luckiest Guy">Luckiest Guy (bold graffiti)</option>
+    <option value="Shadows Into Light">Shadows Into Light (rotulador)</option>
+    <option value="Orbitron">Orbitron (techno/futurista)</option>
+    <!-- 20 fuentes creativas extra -->
+    <option value="Indie Flower">Indie Flower (informal, amigable)</option>
+    <option value="Pacifico">Pacifico (cursiva retro)</option>
+    <option value="Press Start 2P">Press Start 2P (pixel/gamer)</option>
+    <option value="Gloria Hallelujah">Gloria Hallelujah (handwriting)</option>
+    <option value="Rammetto One">Rammetto One (gruesa, moderna)</option>
+    <option value="Monoton">Monoton (neón disco)</option>
+    <option value="Rubik Moonrocks">Rubik Moonrocks (abstracta)</option>
+    <option value="Special Elite">Special Elite (máquina de escribir)</option>
+    <option value="Amatic SC">Amatic SC (titulares, manuscrita)</option>
+    <option value="VT323">VT323 (terminal retro)</option>
+    <option value="Chewy">Chewy (divertida, redondeada)</option>
+    <option value="Black Ops One">Black Ops One (militar, fuerte)</option>
+    <option value="Faster One">Faster One (velocidad, deporte)</option>
+    <option value="Acme">Acme (amistosa, universal)</option>
+    <option value="Rye">Rye (western)</option>
+    <option value="Rubik 80s Fade">Rubik 80s Fade (vaporwave/80s)</option>
+    <option value="Sigmar One">Sigmar One (grande, fuerte)</option>
+    <option value="UnifrakturCook">UnifrakturCook (gótica)</option>
+    <option value="Sacramento">Sacramento (caligráfica elegante)</option>
+    <option value="Chango">Chango (divertida, impactante)</option>
+    <option value="Major Mono Display">Major Mono Display (monoespaciada creativa)</option>
+    <option value="IBM Plex Mono">IBM Plex Mono (tech, monoespaciada)</option>
+    <option value="Poiret One">Poiret One (art déco)</option>
+    <option value="Unbounded">Unbounded (moderna, redondeada)</option>
+    <!-- Webdings -->
+    <option value="Webdings">Webdings (símbolos)</option>
   </select>
 
   <label for="colorTexto">Color del texto</label>
@@ -211,6 +249,10 @@
     preserveObjectStacking: true
   });
 
+  // Fondo blanco por defecto
+  canvas.setBackgroundColor("white", canvas.renderAll.bind(canvas));
+  document.getElementById("colorFondoCanvas").value = "#ffffff";
+
   // Modo claro/oscuro
   const toggleDark = document.getElementById("toggleDark");
   toggleDark.onclick = () => {
@@ -228,8 +270,10 @@
   document.getElementById("btnAgregarTexto").onclick = () => {
     const texto = document.getElementById("titulo").value;
     if (!texto.trim()) return alert("Ingresá texto.");
-    const font = document.getElementById("fuente").value;
+    let font = document.getElementById("fuente").value;
     const color = document.getElementById("colorTexto").value;
+    // Si es Webdings, usar solo 'Webdings' (no está en Google Fonts, depende del sistema)
+    if (font === "Webdings") font = "Webdings";
     const obj = new fabric.Textbox(texto, {
       left: canvas.width / 2,
       top: canvas.height / 2,
@@ -248,7 +292,9 @@
   document.getElementById("fuente").onchange = () => {
     const active = canvas.getActiveObject();
     if (active && active.type === "textbox") {
-      active.set("fontFamily", document.getElementById("fuente").value);
+      let font = document.getElementById("fuente").value;
+      if (font === "Webdings") font = "Webdings";
+      active.set("fontFamily", font);
       canvas.renderAll();
     }
   };
