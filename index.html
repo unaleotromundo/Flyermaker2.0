@@ -2,16 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Flyer Mágico Avanzado</title>
-
-  <!-- Fuentes Google Fonts, alternativas creativas y Webdings -->
-  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Lobster&family=Montserrat&family=Oswald&family=Playfair+Display&family=Poppins&family=Quicksand&family=Arizonia&family=Permanent+Marker&family=Rock+Salt&family=Fredericka+the+Great&family=Bangers&family=Covered+By+Your+Grace&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&family=Indie+Flower&family=Pacifico&family=Press+Start+2P&family=Gloria+Hallelujah&family=Rammetto+One&family=Monoton&family=Rubik+Moonrocks&family=Special+Elite&family=Amatic+SC:wght@700&family=VT323&family=Chewy&family=Black+Ops+One&family=Faster+One&family=Acme&family=Rye&family=Rubik+80s+Fade&family=Sigmar+One&family=UnifrakturCook:wght@700&family=Sacramento&family=Chango&family=Major+Mono+Display&family=IBM+Plex+Mono:wght@700&family=Poiret+One&family=Unbounded:wght@700&display=swap" rel="stylesheet">
-
+  <meta name="viewport" content="width=900, initial-scale=1.0" />
+  <title>Flyer Mágico - Editor de Flyers</title>
+  <!-- Google Fonts solo las seleccionadas -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Bebas+Neue&family=Anton&family=Lobster&family=Oswald&family=Poppins&family=Playfair+Display:wght@700&family=Permanent+Marker&family=Rock+Salt&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
   <style>
     :root {
       --bg: #f4f4f4;
@@ -23,7 +20,6 @@
       --footer-bg: #262626;
       --footer-text: #fff;
     }
-
     body.dark {
       --bg: #121212;
       --text: #eeeeee;
@@ -34,71 +30,133 @@
       --footer-bg: #131313;
       --footer-text: #bbb;
     }
-
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text);
-      display: flex;
-      gap: 20px;
-      padding: 20px;
+      margin: 0;
+      padding: 0;
       min-height: 100vh;
+      font-family: 'Montserrat', Arial, sans-serif;
       box-sizing: border-box;
-      flex-direction: column;
     }
-
-    .header-banner {
+    /* HEADER */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      min-height: 62px;
       background: var(--header-bg);
       color: var(--header-text);
-      padding: 18px 20px;
-      border-radius: 0 0 12px 12px;
-      font-size: 1.1rem;
-      font-family: "Montserrat", Arial, sans-serif;
-      text-align: center;
-      margin-bottom: 16px;
-      box-shadow: 0 6px 20px rgba(30, 136, 229, 0.18);
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      z-index: 10001;
+      box-shadow: 0 2px 16px #0002;
     }
-    .header-banner strong {
-      font-weight: bold;
-      letter-spacing: 0.5px;
-      text-shadow: 1px 1px 2px #0003;
+    .logo-title {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
-    .header-banner a {
-      color: #fff;
-      text-decoration: underline;
-      font-weight: bold;
-      margin-left: 8px;
-      transition: color 0.2s;
+    .logo-title img {
+      width: 45px;
+      height: 45px;
+      border-radius: 9px;
+      box-shadow: 0 2px 10px #0002;
+      background: #fff;
+      object-fit: cover;
     }
-    .header-banner a:hover {
-      color: #ffeb3b;
+    .logo-title .app-title {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      margin-left: 2px;
     }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .toggle-dark {
+      cursor: pointer;
+      font-size: 30px;
+      background: var(--panel);
+      border-radius: 12px;
+      padding: 7px 11px 5px 12px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 1px 7px #0002;
+      color: var(--text);
+      user-select: none;
+      transition: background 0.2s, color 0.2s, border 0.2s;
+    }
+    .toggle-dark:hover {
+      background: var(--header-bg);
+      color: var(--header-text);
+      border-color: #1976d2;
+    }
+    /* FOOTER */
+    footer {
+      background: var(--footer-bg);
+      color: var(--footer-text);
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      min-height: 45px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 15px;
+      z-index: 10001;
+      gap: 18px;
+      padding: 7px 12px 5px 12px;
+    }
+    .footer-links {
+      display: flex;
+      gap: 13px;
+      align-items: center;
+    }
+    .footer-links a {
+      color: var(--footer-text);
+      text-decoration: none;
+      opacity: 0.82;
+      font-size: 18px;
+      transition: opacity 0.2s;
+    }
+    .footer-links a:hover {
+      opacity: 1;
+      color: #1e88e5;
+    }
+    .copyright {
+      font-size: 13px;
+      margin-left: 9px;
+      opacity: 0.7;
+    }
+    /* MAIN */
     .main-content {
       display: flex;
-      gap: 20px;
-      flex: 1;
+      gap: 26px;
       width: 100%;
+      max-width: 1200px;
+      align-items: flex-start;
+      justify-content: center;
+      margin-top: 82px;
+      margin-bottom: 60px;
     }
-
     .panel {
       width: 340px;
       background: var(--panel);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 22px 22px 12px 22px;
+      border-radius: 13px;
+      box-shadow: 0 4px 14px #0001;
       display: flex;
       flex-direction: column;
       gap: 15px;
       border: 1px solid var(--border);
+      min-width: 320px;
     }
-
     .panel label {
       font-weight: bold;
     }
-
     .panel input[type="text"], .panel select {
       width: 100%;
       padding: 8px;
@@ -108,15 +166,14 @@
       background: var(--bg);
       color: var(--text);
       box-sizing: border-box;
+      margin-bottom: 3px;
     }
-
     .color-row {
       display: flex;
       align-items: center;
       gap: 10px;
       margin-bottom: 10px;
     }
-
     .color-square {
       width: 32px;
       height: 32px;
@@ -128,7 +185,6 @@
       margin-left: 0;
       background: #000;
     }
-
     #colorTexto {
       opacity: 0;
       width: 32px;
@@ -137,37 +193,84 @@
       left: 0;
       cursor: pointer;
     }
-
     .color-wrap {
       position: relative;
       display: inline-block;
       vertical-align: middle;
     }
-
-    .panel button {
+    .panel button, .panel .bg-btns button, .panel .bg-btns label {
       padding: 10px;
       border: none;
       border-radius: 8px;
-      background: #4caf50;
+      background: #1e88e5;
       color: white;
       font-weight: bold;
       cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 0;
+      margin-right: 7px;
+      transition: background 0.2s;
+      margin-top: 0;
     }
-
-    .panel button:hover {
-      background: #45a049;
+    .panel button:hover, .panel .bg-btns button:hover, .panel .bg-btns label:hover {
+      background: #005cb2;
+      color: #fff;
     }
-
+    .panel .bg-btns {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 7px;
+    }
+    .panel .bg-btns label {
+      margin: 0;
+      background: #43a047;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .panel .bg-btns label:hover {
+      background: #1b5e20;
+    }
+    #bgLocalInput {
+      display: none;
+    }
+    #removeBgImgBtn {
+      background: #e0e0e0;
+      color: #444;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      margin-left: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+      transition: background 0.2s;
+    }
+    #removeBgImgBtn:hover {
+      background: #ffcdd2;
+      color: #900;
+    }
     .layer-controls {
       display: flex;
       gap: 10px;
+      margin-bottom: 0;
     }
-
     .layer-controls button {
       flex: 1;
       background: #888;
+      border-radius: 6px;
+      padding: 8px 0;
+      font-weight: bold;
+      border: none;
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
     }
-
+    .layer-controls button:hover {
+      background: #333;
+    }
     .upload-box {
       height: 60px;
       background: #e0e0e0;
@@ -180,156 +283,221 @@
       cursor: pointer;
       font-weight: bold;
       border: 2px dashed var(--border);
+      margin-bottom: 8px;
+      margin-top: 5px;
     }
-
     #imagenInput {
       display: none;
     }
-
+    .download-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      align-items: center;
+      justify-content: flex-start;
+      margin-bottom: 0;
+    }
+    .download-buttons button {
+      flex: 1;
+      min-width: 0;
+      background: #1e88e5;
+      border-radius: 8px;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      padding: 10px 0;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .download-buttons button:hover {
+      background: #005cb2;
+    }
+    #btnCompartirWhatsapp {
+      background: #25D366;
+      border: none;
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px #25D36655;
+      cursor: pointer;
+      min-width: 52px;
+      min-height: 52px;
+      margin-left: 6px;
+    }
     .canvas-container {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
+      justify-content: flex-start;
+      min-width: 650px;
     }
-
-    #canvas-controls {
-      position: absolute;
-      left: 10px;
-      top: 10px;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
-    }
-
-    #colorFondoCanvas {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      border: 2px solid var(--border);
-      background: #fff;
-      cursor: pointer;
-      margin-bottom: 4px;
-    }
-
     #flyerCanvas {
       border: 2px solid var(--border);
-      border-radius: 8px;
+      border-radius: 12px;
       background: white;
+      margin-top: 10px;
+      box-shadow: 0 4px 28px #0002;
+      display: block;
     }
-
-    .top-bar {
+    /* Popup grid */
+    #imgFondoPopup {
+      display: none;
       position: fixed;
-      top: 10px;
-      left: 10px;
-      display: flex;
+      left: 0; top: 0; right: 0; bottom: 0;
+      background: rgba(30,30,30,0.75);
+      z-index: 10000;
       align-items: center;
-      gap: 10px;
-      z-index: 100;
+      justify-content: center;
     }
-
-    .toggle-dark {
-      cursor: pointer;
-      font-size: 24px;
-    }
-
-    .download-buttons {
+    #imgFondoPopup .popup-content {
+      background: #fff;
+      padding: 26px 16px 14px 16px;
+      border-radius: 16px;
+      max-width: 670px;
+      min-width: 320px;
+      box-shadow: 0 8px 32px #0006;
       display: flex;
-      gap: 10px;
-      margin-top: 20px;
+      flex-direction: column;
+      align-items: center;
     }
-
-    .download-buttons button {
-      flex: 1;
+    #imgFondoPopup h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 18px;
+      color: #d32f2f;
     }
-
-    /* Footer */
-    .footer-banner {
-      background: var(--footer-bg);
-      color: var(--footer-text);
-      text-align: left;
-      padding: 14px 10px 12px 10px;
-      font-size: 0.98rem;
-      letter-spacing: 1px;
-      border-radius: 12px 12px 0 0;
-      margin-top: 34px;
-      font-family: 'Montserrat', Arial, sans-serif;
-      box-shadow: 0 -2px 16px rgba(0,0,0,0.07);
-      width: 100%;
+    #imgFondoGrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 8px 0 6px 0;
+    }
+    .img-thumb {
+      width: 120px;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 3px solid #fff;
+      box-shadow: 0 1px 4px #0002;
+      cursor: pointer;
+      transition: border 0.15s, box-shadow 0.2s;
+    }
+    .img-thumb:hover, .img-thumb.selected {
+      border: 3px solid #d32f2f;
+      box-shadow: 0 1px 10px #d32f2f44;
+    }
+    #imgFondoPopup .cerrar {
+      margin-top: 8px;
+      background: #ccc;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      color: #333;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #imgFondoPopup .cerrar:hover {
+      background: #ef9a9a;
+      color: #900;
+    }
+    /* Fondo flotante para fijar imagen */
+    #bgEditControls {
+      display: none;
+      position: fixed;
+      left: 0; right: 0;
+      bottom: 50px;
+      background: rgba(255,255,255,0.97);
+      z-index: 11000;
+      padding: 18px 0 9px 0;
+      text-align: center;
+      box-shadow: 0 -1px 16px #0002;
+    }
+    #bgEditControls button{
+      padding: 8px 22px;
+      margin: 0 14px;
+      font-size: 17px;
+      border-radius: 8px;
+      font-weight: bold;
+      border: none;
+      background: #1e88e5;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+    #bgEditControls button.bg-cancel{
+      background: #e57373;
+      color: #fff;
+    }
+    #bgEditControls button:hover{
+      background: #005cb2;
+    }
+    #bgEditControls button.bg-cancel:hover{
+      background: #d32f2f;
+    }
+    .help {
+      font-size: 13px;
+      color: #555;
+      margin-top: 6px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 900px) {
+      .main-content { flex-direction: column; align-items: center; }
+      .canvas-container { min-width: unset; }
+      #flyerCanvas { width: 99vw !important; max-width: 98vw; }
+      .panel { width: 99vw; min-width: unset; }
+      header, footer { padding-left: 2vw; padding-right: 2vw; }
     }
   </style>
 </head>
 <body class="light">
-
-  <div class="header-banner">
-    <strong>🎨 ¡Crea tu flyer en segundos!</strong>
-    <span>Agregá textos, imágenes, QR y descargá en JPG o PDF.<br/>Elegí fuente y colores, todo visual. Mirá cómo funciona en este 
-      <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener">video tutorial</a> 📹
-    </span>
-  </div>
-
-  <div class="main-content">
-    <div class="top-bar">
+  <header>
+    <div class="logo-title">
+      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="Logo" />
+      <span class="app-title">Flyer Mágico</span>
+    </div>
+    <div class="header-actions">
       <div class="toggle-dark" id="toggleDark" title="Modo claro/oscuro">🌞</div>
     </div>
-
+  </header>
+  <div style="height:74px"></div>
+  <div class="help">
+    Elegí una imagen prediseñada o tu propia imagen como fondo, podés moverla y escalarla antes de fijar.<br>
+    Si querés volver a fondo color, usá "Quitar imagen".
+  </div>
+  <div class="main-content">
     <div class="panel">
-      <label for="titulo">Título</label>
+      <label for="fondoColor">Color de fondo</label>
+      <input id="fondoColor" type="color" value="#ffffff" />
+      <div class="bg-btns">
+        <button id="imgFondoBtn" type="button">Imagen de fondo</button>
+        <label id="bgLocalLabel" for="bgLocalInput">Tu propia imagen</label>
+        <input type="file" id="bgLocalInput" accept="image/*">
+        <button id="removeBgImgBtn" style="display:none;" type="button">Quitar imagen</button>
+      </div>
+
+      <label for="titulo" style="margin-top:10px;">Título o texto</label>
       <input type="text" id="titulo" placeholder="Texto..." />
 
       <label for="fuente">Fuente</label>
       <select id="fuente">
-        <option value="Arial">Arial</option>
-        <option value="Bebas Neue">Bebas Neue</option>
         <option value="Montserrat">Montserrat</option>
+        <option value="Bebas Neue">Bebas Neue</option>
         <option value="Anton">Anton</option>
+        <option value="Lobster">Lobster</option>
         <option value="Oswald">Oswald</option>
         <option value="Poppins">Poppins</option>
         <option value="Playfair Display">Playfair Display</option>
-        <option value="Lobster">Lobster</option>
-        <option value="Archivo Black">Archivo Black</option>
-        <option value="Abril Fatface">Abril Fatface</option>
-        <option value="Quicksand">Quicksand</option>
-        <!-- Alternativas graffiti y caligráficas -->
-        <option value="Arizonia">Arizonia</option>
-        <option value="Permanent Marker">Permanent Marker (graffiti)</option>
-        <option value="Rock Salt">Rock Salt (graffiti)</option>
-        <option value="Fredericka the Great">Fredericka the Great (brush)</option>
-        <option value="Bangers">Bangers (comic/graffiti)</option>
-        <option value="Covered By Your Grace">Covered By Your Grace (urbana)</option>
-        <option value="Luckiest Guy">Luckiest Guy (bold graffiti)</option>
-        <option value="Shadows Into Light">Shadows Into Light (rotulador)</option>
-        <option value="Orbitron">Orbitron (techno/futurista)</option>
-        <!-- 20 fuentes creativas extra -->
-        <option value="Indie Flower">Indie Flower (informal, amigable)</option>
-        <option value="Pacifico">Pacifico (cursiva retro)</option>
-        <option value="Press Start 2P">Press Start 2P (pixel/gamer)</option>
-        <option value="Gloria Hallelujah">Gloria Hallelujah (handwriting)</option>
-        <option value="Rammetto One">Rammetto One (gruesa, moderna)</option>
-        <option value="Monoton">Monoton (neón disco)</option>
-        <option value="Rubik Moonrocks">Rubik Moonrocks (abstracta)</option>
-        <option value="Special Elite">Special Elite (máquina de escribir)</option>
-        <option value="Amatic SC">Amatic SC (titulares, manuscrita)</option>
-        <option value="VT323">VT323 (terminal retro)</option>
-        <option value="Chewy">Chewy (divertida, redondeada)</option>
-        <option value="Black Ops One">Black Ops One (militar, fuerte)</option>
-        <option value="Faster One">Faster One (velocidad, deporte)</option>
-        <option value="Acme">Acme (amistosa, universal)</option>
-        <option value="Rye">Rye (western)</option>
-        <option value="Rubik 80s Fade">Rubik 80s Fade (vaporwave/80s)</option>
-        <option value="Sigmar One">Sigmar One (grande, fuerte)</option>
-        <option value="UnifrakturCook">UnifrakturCook (gótica)</option>
-        <option value="Sacramento">Sacramento (caligráfica elegante)</option>
-        <option value="Chango">Chango (divertida, impactante)</option>
-        <option value="Major Mono Display">Major Mono Display (monoespaciada creativa)</option>
-        <option value="IBM Plex Mono">IBM Plex Mono (tech, monoespaciada)</option>
-        <option value="Poiret One">Poiret One (art déco)</option>
-        <option value="Unbounded">Unbounded (moderna, redondeada)</option>
-        <!-- Webdings -->
-        <option value="Webdings">Webdings (símbolos)</option>
+        <option value="Permanent Marker">Permanent Marker</option>
+        <option value="Rock Salt">Rock Salt</option>
+        <option value="Luckiest Guy">Luckiest Guy</option>
+        <option value="Shadows Into Light">Shadows Into Light</option>
+        <option value="Orbitron">Orbitron</option>
       </select>
 
       <div class="color-row">
@@ -351,185 +519,400 @@
       <label for="imagenInput" class="upload-box" title="Subir imagen">+</label>
       <input type="file" id="imagenInput" accept="image/*" multiple>
 
-      <label for="telefono">WhatsApp Uruguay</label>
+      <label for="telefono" style="margin-top:5px;">WhatsApp Uruguay</label>
       <input type="text" id="telefono" placeholder="Ej: 094123456" />
       <button id="btnGenerarQR">Generar QR</button>
 
       <div class="download-buttons">
         <button id="btnDescargarJPG">Descargar JPG</button>
         <button id="btnDescargarPDF">Descargar PDF</button>
+        <button id="btnCompartirWhatsapp" title="Compartir el flyer por WhatsApp">
+          <svg width="32" height="32" viewBox="0 0 64 64" fill="none">
+            <defs>
+              <radialGradient id="wa3d" cx="0.4" cy="0.3" r="1">
+                <stop offset="0%" stop-color="#63FFB1"/>
+                <stop offset="100%" stop-color="#25D366"/>
+              </radialGradient>
+            </defs>
+            <circle cx="32" cy="32" r="32" fill="url(#wa3d)" />
+            <path d="M46 40.7c-1.3.4-2.7.7-4.1.7-7.1 0-12.9-5.8-12.9-12.9 0-1.3.2-2.6.7-3.8.3-.7.1-1.6-.5-2l-2.8-2c-.7-.5-1.6-.2-2 .5A16 16 0 1 0 48 48c.8-.5 1-1.4.5-2l-2-2.9c-.4-.5-1.2-.7-1.9-.4z" fill="#fff" opacity=".15"/>
+            <path d="M32 13c10.5 0 19 8.5 19 19 0 3.1-.8 6.1-2.1 8.7l2.2 8.3-8.5-2.2A19 19 0 1 1 32 13zm0-3C18.8 10 8 20.8 8 34c0 4.2 1.1 8.1 3 11.5l-3.5 13 13.4-3.6C25.7 58.9 28.8 59 32 59c13.2 0 24-10.8 24-24S45.2 10 32 10z" fill="#fff"/>
+            <path d="M43.3 37.2c-1.1-.6-2.4-1-3.6-.6l-1.2.4c-.6.2-1.2.1-1.6-.3l-2.3-2.3c-.4-.4-.5-1-.3-1.6l.4-1.2c.4-1.2 0-2.5-.6-3.6l-1-1.7c-.7-1.2-2.3-1.5-3.4-.7-2.6 2.1-4.2 5.2-4.2 8.5C23 42.5 29.5 49 37.5 49c3.3 0 6.3-1.6 8.5-4.2.9-1.1.6-2.8-.7-3.4l-1.7-1z" fill="#fff"/>
+            <path d="M32.1 28.1c-2.2 0-4 .9-5.1 2.2-.7.8-.7 2 .1 2.7l1.8 1.7c.7.7 1.8.9 2.7.4l2.4-1.3c.6-.3 1.3-.3 1.9 0l2.4 1.3c.9.5 2 .3 2.7-.4l1.8-1.7c.8-.7.8-1.9.1-2.7-1.1-1.3-2.9-2.2-5.1-2.2z" fill="#25D366"/>
+          </svg>
+        </button>
       </div>
     </div>
-
     <div class="canvas-container">
-      <div id="canvas-controls">
-        <label for="colorFondoCanvas" style="font-size:13px;margin-bottom:3px;">Fondo flyer</label>
-        <input type="color" id="colorFondoCanvas" title="Color de fondo del flyer" />
-      </div>
       <canvas id="flyerCanvas" width="600" height="800"></canvas>
     </div>
   </div>
 
-  <div class="footer-banner">
-    Derechos reservados &copy; OtroMundo 2025
+  <!-- Popup para elegir fondo prediseñado -->
+  <div id="imgFondoPopup">
+    <div class="popup-content">
+      <h3>Elegí un fondo promocional</h3>
+      <div id="imgFondoGrid"></div>
+      <button class="cerrar">Cerrar</button>
+    </div>
   </div>
 
-<script>
-  const canvas = new fabric.Canvas("flyerCanvas", {
-    preserveObjectStacking: true
-  });
+  <!-- Controles para fijar/cancelar fondo -->
+  <div id="bgEditControls">
+    <span style="font-weight:bold;font-size:16px;">Acomodá la imagen y fijala como fondo</span><br>
+    <button id="bgSetBtn">Fijar como fondo</button>
+    <button class="bg-cancel" id="bgCancelBtn">Cancelar</button>
+  </div>
 
-  // Fondo blanco por defecto
-  canvas.setBackgroundColor("white", canvas.renderAll.bind(canvas));
-  document.getElementById("colorFondoCanvas").value = "#ffffff";
+  <!-- FOOTER -->
+  <footer>
+    <span>Hecho con 💜 por Flyer Mágico</span>
+    <div class="footer-links">
+      <a href="https://github.com/unaleotromundo" title="GitHub" target="_blank">🐙</a>
+      <a href="https://twitter.com/unaleotromundo" title="Twitter/X" target="_blank">𝕏</a>
+      <a href="mailto:contacto@flyermagico.com" title="Email">✉️</a>
+    </div>
+    <span class="copyright">© 2025</span>
+  </footer>
 
-  // Modo claro/oscuro
-  const toggleDark = document.getElementById("toggleDark");
-  toggleDark.onclick = () => {
-    document.body.classList.toggle("dark");
-    toggleDark.textContent = document.body.classList.contains("dark") ? "🌙" : "🌞";
-  };
+  <script>
+    // MODE CLARO/OSCURO
+    const toggleDark = document.getElementById("toggleDark");
+    function updateModeIcon() {
+      toggleDark.textContent = document.body.classList.contains("dark") ? "🌙" : "🌞";
+    }
+    toggleDark.onclick = () => {
+      document.body.classList.toggle("dark");
+      updateModeIcon();
+    };
+    updateModeIcon();
 
-  // Cambiar color de fondo del canvas
-  const fondoPicker = document.getElementById("colorFondoCanvas");
-  fondoPicker.addEventListener("change", () => {
-    canvas.setBackgroundColor(fondoPicker.value, canvas.renderAll.bind(canvas));
-  });
+    // 12 fondos prediseñados de ejemplo
+    const fondos = [
+      "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1465101178521-c1a9136a3e16?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1465101011104-2d26b4a4e0c7?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1424746219973-8fe3bd07d8e3?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1444065381814-865dc9da92c0?auto=format&fit=crop&w=600&q=80",
+      "https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=600&q=80"
+    ];
 
-  // Reflejar el color del texto en el cuadrado
-  const colorInput = document.getElementById("colorTexto");
-  const colorSquare = document.getElementById("colorTextoSquare");
-  function updateColorSquare() {
-    colorSquare.style.background = colorInput.value;
-  }
-  colorInput.addEventListener("input", updateColorSquare);
-  // Permite hacer click en el cuadrado para abrir el selector
-  colorSquare.onclick = () => colorInput.click();
-  updateColorSquare();
+    const canvas = new fabric.Canvas('flyerCanvas', {preserveObjectStacking: true});
+    let bgImgObj = null;
+    let bgEditObj = null;
 
-  // Agregar texto
-  document.getElementById("btnAgregarTexto").onclick = () => {
-    const texto = document.getElementById("titulo").value;
-    if (!texto.trim()) return alert("Ingresá texto.");
-    let font = document.getElementById("fuente").value;
-    const color = colorInput.value;
-    if (font === "Webdings") font = "Webdings";
-    const obj = new fabric.Textbox(texto, {
-      left: canvas.width / 2,
-      top: canvas.height / 2,
-      fontSize: 24,
-      fill: color,
-      fontFamily: font,
-      originX: "center",
-      originY: "center",
+    // Fondo inicial blanco
+    canvas.setBackgroundColor('#fff', canvas.renderAll.bind(canvas));
+    document.getElementById("fondoColor").addEventListener("input", function() {
+      if (!bgImgObj) {
+        canvas.setBackgroundColor(this.value, canvas.renderAll.bind(canvas));
+      }
     });
-    canvas.add(obj);
-    canvas.setActiveObject(obj);
-    canvas.renderAll();
-  };
 
-  // Actualizar fuente en tiempo real
-  document.getElementById("fuente").onchange = () => {
-    const active = canvas.getActiveObject();
-    if (active && active.type === "textbox") {
-      let font = document.getElementById("fuente").value;
-      if (font === "Webdings") font = "Webdings";
-      active.set("fontFamily", font);
-      canvas.renderAll();
-    }
-  };
+    // Popup lógica
+    const imgFondoBtn = document.getElementById("imgFondoBtn");
+    const imgFondoPopup = document.getElementById("imgFondoPopup");
+    const imgFondoGrid = document.getElementById("imgFondoGrid");
+    const removeBgImgBtn = document.getElementById("removeBgImgBtn");
+    const bgLocalInput = document.getElementById("bgLocalInput");
+    const bgEditControls = document.getElementById("bgEditControls");
+    const bgSetBtn = document.getElementById("bgSetBtn");
+    const bgCancelBtn = document.getElementById("bgCancelBtn");
 
-  // Actualizar color en tiempo real
-  colorInput.onchange = () => {
-    updateColorSquare();
-    const active = canvas.getActiveObject();
-    if (active && active.type === "textbox") {
-      active.set("fill", colorInput.value);
-      canvas.renderAll();
-    }
-  };
+    // Selección fondo prediseñado
+    imgFondoBtn.onclick = () => {
+      imgFondoGrid.innerHTML = "";
+      fondos.forEach((url, i) => {
+        const img = document.createElement("img");
+        img.src = url;
+        img.className = "img-thumb";
+        img.title = `Prediseño ${i+1}`;
+        img.onclick = () => launchBgEdit(url, "remote");
+        imgFondoGrid.appendChild(img);
+      });
+      imgFondoPopup.style.display = "flex";
+    };
+    imgFondoPopup.querySelector(".cerrar").onclick = () => {
+      imgFondoPopup.style.display = "none";
+    };
 
-  // Subir capa
-  document.getElementById("btnSubirCapa").onclick = () => {
-    const obj = canvas.getActiveObject();
-    if (obj) canvas.bringForward(obj);
-  };
-
-  // Bajar capa
-  document.getElementById("btnBajarCapa").onclick = () => {
-    const obj = canvas.getActiveObject();
-    if (obj) canvas.sendBackwards(obj);
-  };
-
-  // Eliminar objeto
-  document.getElementById("btnEliminar").onclick = () => {
-    const obj = canvas.getActiveObject();
-    if (obj) canvas.remove(obj);
-  };
-
-  // Agregar imagen
-  document.getElementById("imagenInput").addEventListener("change", (e) => {
-    const files = e.target.files;
-    [...files].forEach((file) => {
+    // Fondo propio local
+    bgLocalInput.addEventListener("change", function(e) {
+      if (!e.target.files || !e.target.files[0]) return;
+      const file = e.target.files[0];
       const reader = new FileReader();
-      reader.onload = (event) => {
-        fabric.Image.fromURL(event.target.result, (img) => {
-          img.scaleToWidth(250);
-          img.set({
-            left: canvas.width / 2,
-            top: canvas.height / 2,
-            originX: "center",
-            originY: "center",
-          });
-          canvas.add(img);
-          canvas.renderAll();
-        });
+      reader.onload = function(event) {
+        launchBgEdit(event.target.result, "local");
       };
       reader.readAsDataURL(file);
+      e.target.value = "";
     });
-  });
 
-  // Generar QR
-  document.getElementById("btnGenerarQR").onclick = () => {
-    const tel = document.getElementById("telefono").value.trim();
-    if (!tel.match(/^\d{6,}$/)) return alert("Número inválido");
-    const url = `https://wa.me/598${tel}?text=Hola!%20vi%20tu%20flyer`;
-    const qr = new QRious({ value: url, size: 300 });
-    fabric.Image.fromURL(qr.toDataURL(), (img) => {
-      img.scaleToWidth(150);
-      img.set({
+    // Lanzar imagen editable sobre canvas para posicionar
+    function launchBgEdit(url, type) {
+      imgFondoPopup.style.display = "none";
+      // Borrar si ya hay una editando
+      if (bgEditObj) { canvas.remove(bgEditObj); bgEditObj = null; }
+      // Desactivar selección de todo lo demás
+      canvas.discardActiveObject();
+      canvas.selection = false;
+      fabric.Image.fromURL(url, function(img) {
+        img.set({
+          left: canvas.width / 2,
+          top: canvas.height / 2,
+          originX: "center",
+          originY: "center",
+          selectable: true,
+          hasControls: true,
+          lockUniScaling: false,
+          cornerStyle: 'circle',
+          borderColor: "#1e88e5",
+          cornerColor: "#43a047",
+          transparentCorners: true
+        });
+        // Escala inicial para cubrir canvas (cover), pero editable
+        const scale = Math.max(
+          canvas.width / img.width,
+          canvas.height / img.height
+        );
+        img.scale(scale);
+        bgEditObj = img;
+        canvas.add(img);
+        canvas.setActiveObject(img);
+        canvas.renderAll();
+        bgEditControls.style.display = "block";
+        removeBgImgBtn.style.display = "none";
+      }, { crossOrigin: type === "remote" ? "anonymous" : undefined });
+    }
+
+    // Fijar imagen como fondo y quitar controles
+    bgSetBtn.onclick = () => {
+      if (!bgEditObj) return;
+      // Tomar imagen como la ves ahora (con posición/escala/rotación)
+      // La "rasterizamos" al tamaño del canvas, así queda como fondo exacto.
+      const dataUrl = canvas.toDataURL({
+        format: "png",
+        left: 0,
+        top: 0,
+        width: canvas.width,
+        height: canvas.height,
+        withoutBackground: false
+      });
+      // Borramos objeto editable
+      canvas.remove(bgEditObj);
+      bgEditObj = null;
+      // Poner como fondo
+      fabric.Image.fromURL(dataUrl, function(bgimg) {
+        bgimg.set({
+          originX: "left",
+          originY: "top",
+          selectable: false,
+          evented: false
+        });
+        bgimg.scaleToWidth(canvas.width);
+        bgImgObj = bgimg;
+        canvas.setBackgroundImage(bgimg, canvas.renderAll.bind(canvas));
+        removeBgImgBtn.style.display = "";
+        bgEditControls.style.display = "none";
+      });
+      canvas.setBackgroundColor('#fff', canvas.renderAll.bind(canvas));
+      canvas.selection = true;
+    };
+    // Cancelar edición de fondo
+    bgCancelBtn.onclick = () => {
+      if (bgEditObj) {
+        canvas.remove(bgEditObj);
+        bgEditObj = null;
+      }
+      bgEditControls.style.display = "none";
+      canvas.selection = true;
+    };
+
+    // Quitar imagen de fondo
+    removeBgImgBtn.onclick = () => {
+      canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
+      bgImgObj = null;
+      removeBgImgBtn.style.display = "none";
+      // Restaura color elegido
+      const col = document.getElementById("fondoColor").value;
+      canvas.setBackgroundColor(col, canvas.renderAll.bind(canvas));
+    };
+
+    // Color texto cuadradito
+    const colorInput = document.getElementById("colorTexto");
+    const colorSquare = document.getElementById("colorTextoSquare");
+    function updateColorSquare() {
+      colorSquare.style.background = colorInput.value;
+    }
+    colorInput.addEventListener("input", updateColorSquare);
+    colorSquare.onclick = () => colorInput.click();
+    updateColorSquare();
+
+    // Fuente: setear correctamente en el objeto
+    const fontFamilies = {
+      "Montserrat": "'Montserrat', Arial, sans-serif",
+      "Bebas Neue": "'Bebas Neue', Arial, sans-serif",
+      "Anton": "'Anton', Arial, sans-serif",
+      "Lobster": "'Lobster', cursive, Arial, sans-serif",
+      "Oswald": "'Oswald', Arial, sans-serif",
+      "Poppins": "'Poppins', Arial, sans-serif",
+      "Playfair Display": "'Playfair Display', serif",
+      "Permanent Marker": "'Permanent Marker', cursive, Arial",
+      "Rock Salt": "'Rock Salt', cursive, Arial",
+      "Luckiest Guy": "'Luckiest Guy', cursive, Arial",
+      "Shadows Into Light": "'Shadows Into Light', cursive, Arial",
+      "Orbitron": "'Orbitron', sans-serif"
+    };
+
+    // Agregar texto
+    document.getElementById("btnAgregarTexto").onclick = () => {
+      const texto = document.getElementById("titulo").value;
+      if (!texto.trim()) return alert("Ingresá texto.");
+      let font = document.getElementById("fuente").value;
+      const color = colorInput.value;
+      const obj = new fabric.Textbox(texto, {
         left: canvas.width / 2,
         top: canvas.height / 2,
+        fontSize: 32,
+        fill: color,
+        fontFamily: fontFamilies[font] || font,
         originX: "center",
         originY: "center",
+        editable: true
       });
-      canvas.add(img);
+      canvas.add(obj);
+      canvas.setActiveObject(obj);
       canvas.renderAll();
+    };
+
+    // Actualizar fuente/color texto en tiempo real
+    document.getElementById("fuente").onchange = () => {
+      const active = canvas.getActiveObject();
+      if (active && active.type === "textbox") {
+        let font = document.getElementById("fuente").value;
+        active.set("fontFamily", fontFamilies[font] || font);
+        canvas.renderAll();
+      }
+    };
+    colorInput.onchange = () => {
+      updateColorSquare();
+      const active = canvas.getActiveObject();
+      if (active && active.type === "textbox") {
+        active.set("fill", colorInput.value);
+        canvas.renderAll();
+      }
+    };
+
+    // Subir/bajar/eliminar capas
+    document.getElementById("btnSubirCapa").onclick = () => {
+      const obj = canvas.getActiveObject();
+      if (obj) canvas.bringForward(obj);
+    };
+    document.getElementById("btnBajarCapa").onclick = () => {
+      const obj = canvas.getActiveObject();
+      if (obj) canvas.sendBackwards(obj);
+    };
+    document.getElementById("btnEliminar").onclick = () => {
+      const obj = canvas.getActiveObject();
+      if (obj) canvas.remove(obj);
+    };
+
+    // Subir imagen
+    document.getElementById("imagenInput").addEventListener("change", (e) => {
+      const files = e.target.files;
+      [...files].forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          fabric.Image.fromURL(event.target.result, (img) => {
+            img.scaleToWidth(250);
+            img.set({
+              left: canvas.width / 2,
+              top: canvas.height / 2,
+              originX: "center",
+              originY: "center",
+            });
+            canvas.add(img);
+            canvas.renderAll();
+          });
+        };
+        reader.readAsDataURL(file);
+      });
     });
-  };
 
-  // Descargar JPG
-  document.getElementById("btnDescargarJPG").onclick = () => {
-    const url = canvas.toDataURL({ format: "jpeg", quality: 0.95 });
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "flyer.jpg";
-    link.click();
-  };
+    // QR WhatsApp
+    document.getElementById("btnGenerarQR").onclick = () => {
+      const tel = document.getElementById("telefono").value.trim();
+      if (!tel.match(/^\d{6,}$/)) return alert("Número inválido");
+      const url = `https://wa.me/598${tel}?text=Hola!%20vi%20tu%20flyer`;
+      const qr = new QRious({ value: url, size: 300 });
+      fabric.Image.fromURL(qr.toDataURL(), (img) => {
+        img.scaleToWidth(150);
+        img.set({
+          left: canvas.width / 2,
+          top: canvas.height / 2,
+          originX: "center",
+          originY: "center",
+        });
+        canvas.add(img);
+        canvas.renderAll();
+      });
+    };
 
-  // Descargar PDF
-  document.getElementById("btnDescargarPDF").onclick = async () => {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "px",
-      format: [canvas.width, canvas.height],
-    });
-    const dataURL = canvas.toDataURL({ format: "jpeg", quality: 1.0 });
-    pdf.addImage(dataURL, "JPEG", 0, 0, canvas.width, canvas.height);
-    pdf.save("flyer.pdf");
-  };
-</script>
+    // Descargar JPG
+    document.getElementById("btnDescargarJPG").onclick = () => {
+      const url = canvas.toDataURL({ format: "jpeg", quality: 0.95 });
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "flyer.jpg";
+      link.click();
+    };
+    // Descargar PDF
+    document.getElementById("btnDescargarPDF").onclick = async () => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [canvas.width, canvas.height],
+      });
+      const dataURL = canvas.toDataURL({ format: "jpeg", quality: 1.0 });
+      pdf.addImage(dataURL, "JPEG", 0, 0, canvas.width, canvas.height);
+      pdf.save("flyer.pdf");
+    };
 
+    // Compartir WhatsApp moderno instantáneo
+    document.getElementById("btnCompartirWhatsapp").onclick = async () => {
+      const fileName = "flyer.jpg";
+      const dataUrl = canvas.toDataURL({ format: "jpeg", quality: 0.95 });
+      if (navigator.canShare && window.Blob) {
+        try {
+          const res = await fetch(dataUrl);
+          const blob = await res.blob();
+          const file = new File([blob], fileName, { type: "image/jpeg" });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: "Flyer creado con Flyer Mágico",
+              text: "¡Mirá este flyer que acabo de crear!",
+            });
+            return;
+          }
+        } catch (e) {}
+      }
+      const mensaje = encodeURIComponent("¡Mirá este flyer que acabo de crear!");
+      let waUrl = `https://wa.me/?text=${mensaje}`;
+      window.open(waUrl, "_blank");
+      const link = document.createElement("a");
+      link.href = dataUrl;
+      link.download = fileName;
+      link.click();
+      setTimeout(() => alert('Se abrió WhatsApp y se descargó tu flyer. Adjuntalo desde tu galería para compartirlo.'), 600);
+    };
+  </script>
 </body>
 </html>
