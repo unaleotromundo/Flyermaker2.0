@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=900, initial-scale=1.0" />
   <title>Flyer Mágico - Editor de Flyers</title>
-  <!-- Google Fonts solo las seleccionadas -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Bebas+Neue&family=Anton&family=Lobster&family=Oswald&family=Poppins&family=Playfair+Display:wght@700&family=Permanent+Marker&family=Rock+Salt&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&display=swap" rel="stylesheet">
+  <!-- +30 Google Fonts para selector completo -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Bebas+Neue&family=Anton&family=Lobster&family=Oswald&family=Poppins&family=Playfair+Display:wght@700&family=Permanent+Marker&family=Rock+Salt&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&family=Archivo+Black&family=Quicksand:wght@700&family=Arizonia&family=Bangers&family=Covered+By+Your+Grace&family=Fredericka+the+Great&family=Indie+Flower&family=Pacifico&family=Press+Start+2P&family=Gloria+Hallelujah&family=Rammetto+One&family=Monoton&family=Rubik+Moonrocks&family=Special+Elite&family=Amatic+SC:wght@700&family=VT323&family=Chewy&family=Black+Ops+One&family=Faster+One&family=Acme&family=Rye&family=Rubik+80s+Fade&family=Sigmar+One&family=UnifrakturCook&family=Sacramento&family=Chango&family=Major+Mono+Display&family=IBM+Plex+Mono:wght@700&family=Poiret+One&family=Unbounded:wght@700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -39,7 +39,6 @@
       font-family: 'Montserrat', Arial, sans-serif;
       box-sizing: border-box;
     }
-    /* HEADER */
     header {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -95,7 +94,6 @@
       color: var(--header-text);
       border-color: #1976d2;
     }
-    /* FOOTER */
     footer {
       background: var(--footer-bg);
       color: var(--footer-text);
@@ -131,7 +129,6 @@
       margin-left: 9px;
       opacity: 0.7;
     }
-    /* MAIN */
     .main-content {
       display: flex;
       gap: 26px;
@@ -168,6 +165,7 @@
       box-sizing: border-box;
       margin-bottom: 3px;
     }
+    #fuente option { font-size: 16px; font-family: inherit; }
     .color-row {
       display: flex;
       align-items: center;
@@ -472,8 +470,7 @@
   </div>
   <div class="main-content">
     <div class="panel">
-      <label for="fondoColor">Color de fondo</label>
-      <input id="fondoColor" type="color" value="#ffffff" />
+   
       <div class="bg-btns">
         <button id="imgFondoBtn" type="button">Imagen de fondo</button>
         <label id="bgLocalLabel" for="bgLocalInput">Tu propia imagen</label>
@@ -483,23 +480,54 @@
 
       <label for="titulo" style="margin-top:10px;">Título o texto</label>
       <input type="text" id="titulo" placeholder="Texto..." />
-
+     <button id="btnAgregarTexto">Agregar texto</button>
       <label for="fuente">Fuente</label>
       <select id="fuente">
-        <option value="Montserrat">Montserrat</option>
-        <option value="Bebas Neue">Bebas Neue</option>
-        <option value="Anton">Anton</option>
-        <option value="Lobster">Lobster</option>
-        <option value="Oswald">Oswald</option>
-        <option value="Poppins">Poppins</option>
-        <option value="Playfair Display">Playfair Display</option>
-        <option value="Permanent Marker">Permanent Marker</option>
-        <option value="Rock Salt">Rock Salt</option>
-        <option value="Luckiest Guy">Luckiest Guy</option>
-        <option value="Shadows Into Light">Shadows Into Light</option>
-        <option value="Orbitron">Orbitron</option>
+        <option value="Montserrat" style="font-family:'Montserrat',Arial,sans-serif;">Montserrat</option>
+        <option value="Bebas Neue" style="font-family:'Bebas Neue',Arial,sans-serif;">Bebas Neue</option>
+        <option value="Anton" style="font-family:'Anton',Arial,sans-serif;">Anton</option>
+        <option value="Archivo Black" style="font-family:'Archivo Black',Arial,sans-serif;">Archivo Black</option>
+        <option value="Oswald" style="font-family:'Oswald',Arial,sans-serif;">Oswald</option>
+        <option value="Poppins" style="font-family:'Poppins',Arial,sans-serif;">Poppins</option>
+        <option value="Lobster" style="font-family:'Lobster',cursive;">Lobster</option>
+        <option value="Playfair Display" style="font-family:'Playfair Display',serif;">Playfair Display</option>
+        <option value="Permanent Marker" style="font-family:'Permanent Marker',cursive;">Permanent Marker</option>
+        <option value="Rock Salt" style="font-family:'Rock Salt',cursive;">Rock Salt</option>
+        <option value="Luckiest Guy" style="font-family:'Luckiest Guy',cursive;">Luckiest Guy</option>
+        <option value="Shadows Into Light" style="font-family:'Shadows Into Light',cursive;">Shadows Into Light</option>
+        <option value="Orbitron" style="font-family:'Orbitron',sans-serif;">Orbitron</option>
+        <option value="Quicksand" style="font-family:'Quicksand',Arial,sans-serif;">Quicksand</option>
+        <option value="Arizonia" style="font-family:'Arizonia',cursive;">Arizonia</option>
+        <option value="Bangers" style="font-family:'Bangers',cursive;">Bangers</option>
+        <option value="Covered By Your Grace" style="font-family:'Covered By Your Grace',cursive;">Covered By Your Grace</option>
+        <option value="Fredericka the Great" style="font-family:'Fredericka the Great',cursive;">Fredericka the Great</option>
+        <option value="Indie Flower" style="font-family:'Indie Flower',cursive;">Indie Flower</option>
+        <option value="Pacifico" style="font-family:'Pacifico',cursive;">Pacifico</option>
+        <option value="Press Start 2P" style="font-family:'Press Start 2P',monospace;">Press Start 2P</option>
+        <option value="Gloria Hallelujah" style="font-family:'Gloria Hallelujah',cursive;">Gloria Hallelujah</option>
+        <option value="Rammetto One" style="font-family:'Rammetto One',cursive;">Rammetto One</option>
+        <option value="Monoton" style="font-family:'Monoton',cursive;">Monoton</option>
+        <option value="Rubik Moonrocks" style="font-family:'Rubik Moonrocks',cursive;">Rubik Moonrocks</option>
+        <option value="Special Elite" style="font-family:'Special Elite',monospace;">Special Elite</option>
+        <option value="Amatic SC" style="font-family:'Amatic SC',cursive;">Amatic SC</option>
+        <option value="VT323" style="font-family:'VT323',monospace;">VT323</option>
+        <option value="Chewy" style="font-family:'Chewy',cursive;">Chewy</option>
+        <option value="Black Ops One" style="font-family:'Black Ops One',cursive;">Black Ops One</option>
+        <option value="Faster One" style="font-family:'Faster One',cursive;">Faster One</option>
+        <option value="Acme" style="font-family:'Acme',sans-serif;">Acme</option>
+        <option value="Rye" style="font-family:'Rye',cursive;">Rye</option>
+        <option value="Rubik 80s Fade" style="font-family:'Rubik 80s Fade',cursive;">Rubik 80s Fade</option>
+        <option value="Sigmar One" style="font-family:'Sigmar One',cursive;">Sigmar One</option>
+        <option value="UnifrakturCook" style="font-family:'UnifrakturCook',cursive;">UnifrakturCook</option>
+        <option value="Sacramento" style="font-family:'Sacramento',cursive;">Sacramento</option>
+        <option value="Chango" style="font-family:'Chango',cursive;">Chango</option>
+        <option value="Major Mono Display" style="font-family:'Major Mono Display',monospace;">Major Mono Display</option>
+        <option value="IBM Plex Mono" style="font-family:'IBM Plex Mono',monospace;">IBM Plex Mono</option>
+        <option value="Poiret One" style="font-family:'Poiret One',cursive;">Poiret One</option>
+        <option value="Unbounded" style="font-family:'Unbounded',sans-serif;">Unbounded</option>
       </select>
-
+   <label for="fondoColor">Color de fondo</label>
+      <input id="fondoColor" type="color" value="#ffffff" />
       <div class="color-row">
         <label for="colorTexto" style="margin-bottom:0;">Color del texto</label>
         <div class="color-wrap" style="margin-left:auto;">
@@ -508,15 +536,15 @@
         </div>
       </div>
 
-      <button id="btnAgregarTexto">Agregar texto</button>
+ 
 
       <div class="layer-controls">
-        <button id="btnSubirCapa">↑</button>
-        <button id="btnBajarCapa">↓</button>
-        <button id="btnEliminar">🗑</button>
+        <button id="btnSubirCapa">↑ Subir Objeto</button>
+        <button id="btnBajarCapa">↓ Bajar Objeto</button>
+        <button id="btnEliminar">🗑 Borrar Objeto</button>
       </div>
 
-      <label for="imagenInput" class="upload-box" title="Subir imagen">+</label>
+      <label for="imagenInput" class="upload-box" title="Subir imagen">+ Agregar imágenes</label>
       <input type="file" id="imagenInput" accept="image/*" multiple>
 
       <label for="telefono" style="margin-top:5px;">WhatsApp Uruguay</label>
@@ -547,7 +575,6 @@
       <canvas id="flyerCanvas" width="600" height="800"></canvas>
     </div>
   </div>
-
   <!-- Popup para elegir fondo prediseñado -->
   <div id="imgFondoPopup">
     <div class="popup-content">
@@ -556,14 +583,12 @@
       <button class="cerrar">Cerrar</button>
     </div>
   </div>
-
   <!-- Controles para fijar/cancelar fondo -->
   <div id="bgEditControls">
     <span style="font-weight:bold;font-size:16px;">Acomodá la imagen y fijala como fondo</span><br>
     <button id="bgSetBtn">Fijar como fondo</button>
     <button class="bg-cancel" id="bgCancelBtn">Cancelar</button>
   </div>
-
   <!-- FOOTER -->
   <footer>
     <span>Hecho con 💜 por Flyer Mágico</span>
@@ -574,9 +599,8 @@
     </div>
     <span class="copyright">© 2025</span>
   </footer>
-
   <script>
-    // MODE CLARO/OSCURO
+    // DARK MODE
     const toggleDark = document.getElementById("toggleDark");
     function updateModeIcon() {
       toggleDark.textContent = document.body.classList.contains("dark") ? "🌙" : "🌞";
@@ -587,7 +611,7 @@
     };
     updateModeIcon();
 
-    // 12 fondos prediseñados de ejemplo
+    // 12 fondos prediseñados
     const fondos = [
       "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
       "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
@@ -607,7 +631,6 @@
     let bgImgObj = null;
     let bgEditObj = null;
 
-    // Fondo inicial blanco
     canvas.setBackgroundColor('#fff', canvas.renderAll.bind(canvas));
     document.getElementById("fondoColor").addEventListener("input", function() {
       if (!bgImgObj) {
@@ -625,7 +648,6 @@
     const bgSetBtn = document.getElementById("bgSetBtn");
     const bgCancelBtn = document.getElementById("bgCancelBtn");
 
-    // Selección fondo prediseñado
     imgFondoBtn.onclick = () => {
       imgFondoGrid.innerHTML = "";
       fondos.forEach((url, i) => {
@@ -657,9 +679,7 @@
     // Lanzar imagen editable sobre canvas para posicionar
     function launchBgEdit(url, type) {
       imgFondoPopup.style.display = "none";
-      // Borrar si ya hay una editando
       if (bgEditObj) { canvas.remove(bgEditObj); bgEditObj = null; }
-      // Desactivar selección de todo lo demás
       canvas.discardActiveObject();
       canvas.selection = false;
       fabric.Image.fromURL(url, function(img) {
@@ -676,7 +696,6 @@
           cornerColor: "#43a047",
           transparentCorners: true
         });
-        // Escala inicial para cubrir canvas (cover), pero editable
         const scale = Math.max(
           canvas.width / img.width,
           canvas.height / img.height
@@ -694,8 +713,6 @@
     // Fijar imagen como fondo y quitar controles
     bgSetBtn.onclick = () => {
       if (!bgEditObj) return;
-      // Tomar imagen como la ves ahora (con posición/escala/rotación)
-      // La "rasterizamos" al tamaño del canvas, así queda como fondo exacto.
       const dataUrl = canvas.toDataURL({
         format: "png",
         left: 0,
@@ -704,10 +721,8 @@
         height: canvas.height,
         withoutBackground: false
       });
-      // Borramos objeto editable
       canvas.remove(bgEditObj);
       bgEditObj = null;
-      // Poner como fondo
       fabric.Image.fromURL(dataUrl, function(bgimg) {
         bgimg.set({
           originX: "left",
@@ -724,7 +739,6 @@
       canvas.setBackgroundColor('#fff', canvas.renderAll.bind(canvas));
       canvas.selection = true;
     };
-    // Cancelar edición de fondo
     bgCancelBtn.onclick = () => {
       if (bgEditObj) {
         canvas.remove(bgEditObj);
@@ -734,12 +748,10 @@
       canvas.selection = true;
     };
 
-    // Quitar imagen de fondo
     removeBgImgBtn.onclick = () => {
       canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
       bgImgObj = null;
       removeBgImgBtn.style.display = "none";
-      // Restaura color elegido
       const col = document.getElementById("fondoColor").value;
       canvas.setBackgroundColor(col, canvas.renderAll.bind(canvas));
     };
@@ -754,20 +766,50 @@
     colorSquare.onclick = () => colorInput.click();
     updateColorSquare();
 
-    // Fuente: setear correctamente en el objeto
+    // Mapeo fuentes
     const fontFamilies = {
       "Montserrat": "'Montserrat', Arial, sans-serif",
       "Bebas Neue": "'Bebas Neue', Arial, sans-serif",
       "Anton": "'Anton', Arial, sans-serif",
-      "Lobster": "'Lobster', cursive, Arial, sans-serif",
+      "Archivo Black": "'Archivo Black', Arial, sans-serif",
       "Oswald": "'Oswald', Arial, sans-serif",
       "Poppins": "'Poppins', Arial, sans-serif",
+      "Lobster": "'Lobster', cursive, Arial, sans-serif",
       "Playfair Display": "'Playfair Display', serif",
       "Permanent Marker": "'Permanent Marker', cursive, Arial",
       "Rock Salt": "'Rock Salt', cursive, Arial",
       "Luckiest Guy": "'Luckiest Guy', cursive, Arial",
       "Shadows Into Light": "'Shadows Into Light', cursive, Arial",
-      "Orbitron": "'Orbitron', sans-serif"
+      "Orbitron": "'Orbitron', sans-serif",
+      "Quicksand": "'Quicksand', Arial, sans-serif",
+      "Arizonia": "'Arizonia', cursive",
+      "Bangers": "'Bangers', cursive",
+      "Covered By Your Grace": "'Covered By Your Grace', cursive",
+      "Fredericka the Great": "'Fredericka the Great', cursive",
+      "Indie Flower": "'Indie Flower', cursive",
+      "Pacifico": "'Pacifico', cursive",
+      "Press Start 2P": "'Press Start 2P', monospace",
+      "Gloria Hallelujah": "'Gloria Hallelujah', cursive",
+      "Rammetto One": "'Rammetto One', cursive",
+      "Monoton": "'Monoton', cursive",
+      "Rubik Moonrocks": "'Rubik Moonrocks', cursive",
+      "Special Elite": "'Special Elite', monospace",
+      "Amatic SC": "'Amatic SC', cursive",
+      "VT323": "'VT323', monospace",
+      "Chewy": "'Chewy', cursive",
+      "Black Ops One": "'Black Ops One', cursive",
+      "Faster One": "'Faster One', cursive",
+      "Acme": "'Acme', sans-serif",
+      "Rye": "'Rye', cursive",
+      "Rubik 80s Fade": "'Rubik 80s Fade', cursive",
+      "Sigmar One": "'Sigmar One', cursive",
+      "UnifrakturCook": "'UnifrakturCook', cursive",
+      "Sacramento": "'Sacramento', cursive",
+      "Chango": "'Chango', cursive",
+      "Major Mono Display": "'Major Mono Display', monospace",
+      "IBM Plex Mono": "'IBM Plex Mono', monospace",
+      "Poiret One": "'Poiret One', cursive",
+      "Unbounded": "'Unbounded', sans-serif"
     };
 
     // Agregar texto
