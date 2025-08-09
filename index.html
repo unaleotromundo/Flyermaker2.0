@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -1154,16 +1155,39 @@
     }
 
     // Add text function
+    
+    // Add text function (wait for font to load before adding to canvas)
     function addText() {
       const texto = document.getElementById("titulo").value;
       if (!texto.trim()) {
         alert("Por favor, ingresá algún texto.");
         return;
       }
-      
+
       const font = document.getElementById("fuente").value;
       const color = document.getElementById("colorTexto").value;
-      
+
+      // Helper to wait for font to load with timeout fallback
+      function waitForFont(fontName, timeout = 1500) {
+        if (!(document.fonts && document.fonts.load)) return Promise.resolve();
+        const fontPromise = document.fonts.load(`16px "${fontName}"`);
+        const timer = new Promise(resolve => setTimeout(resolve, timeout));
+        return Promise.race([fontPromise, timer]);
+      }
+
+      if (document.fonts && document.fonts.load) {
+        waitForFont(font).then(() => {
+          createTextOnCanvas(texto, font, color);
+        }).catch(() => {
+          createTextOnCanvas(texto, font, color);
+        });
+      } else {
+        // Older browsers: just create text
+        createTextOnCanvas(texto, font, color);
+      }
+    }
+
+    function createTextOnCanvas(texto, font, color) {
       const textObj = new fabric.Textbox(texto, {
         left: canvas.width / 2,
         top: canvas.height / 2,
@@ -1176,14 +1200,14 @@
         width: canvas.width * 0.8,
         textAlign: 'center'
       });
-      
+
       canvas.add(textObj);
       canvas.setActiveObject(textObj);
       canvas.renderAll();
-      
+
       // Clear input
       document.getElementById("titulo").value = "";
-      
+
       // Switch to canvas tab if not already there
       if (!document.getElementById('tab-canvas').classList.contains('active')) {
         document.querySelector('[data-tab="canvas"]').click();
