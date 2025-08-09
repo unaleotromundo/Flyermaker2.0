@@ -1,1536 +1,1117 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Haceloquesea - Editor de Flyers</title>
-  <!-- +30 Google Fonts para selector completo -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Bebas+Neue&family=Anton&family=Lobster&family=Oswald&family=Poppins&family=Playfair+Display:wght@700&family=Permanent+Marker&family=Rock+Salt&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&family=Archivo+Black&family=Quicksand:wght@700&family=Arizonia&family=Bangers&family=Covered+By+Your+Grace&family=Fredericka+the+Great&family=Indie+Flower&family=Pacifico&family=Press+Start+2P&family=Gloria+Hallelujah&family=Rammetto+One&family=Monoton&family=Rubik+Moonrocks&family=Special+Elite&family=Amatic+SC:wght@700&family=VT323&family=Chewy&family=Black+Ops+One&family=Faster+One&family=Acme&family=Rye&family=Rubik+80s+Fade&family=Sigmar+One&family=UnifrakturCook&family=Sacramento&family=Chango&family=Major+Mono+Display&family=IBM+Plex+Mono:wght@700&family=Poiret+One&family=Unbounded:wght@700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <style>
-    :root {
-      --bg: #f4f4f4;
-      --text: #111;
-      --panel: #ffffff;
-      --border: #ccc;
-      --header-bg: #1e88e5;
-      --header-text: #fff;
-      --footer-bg: #262626;
-      --footer-text: #fff;
-      --primary: #1e88e5;
-      --primary-dark: #005cb2;
-      --success: #43a047;
-      --success-dark: #1b5e20;
-      --danger: #e57373;
-      --danger-dark: #d32f2f;
-    }
-    
-    body.dark {
-      --bg: #121212;
-      --text: #eeeeee;
-      --panel: #1e1e1e;
-      --border: #444;
-      --header-bg: #263859;
-      --header-text: #fff;
-      --footer-bg: #131313;
-      --footer-text: #bbb;
-    }
-    
-    * { box-sizing: border-box; }
-    
-    body {
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      font-family: 'Montserrat', Arial, sans-serif;
-      font-size: 14px;
-      overflow-x: hidden;
-      touch-action: manipulation;
-    }
-    
-    header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 60px;
-      background: var(--header-bg);
-      color: var(--header-text);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      z-index: 10001;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .logo-title {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .logo-title img {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: #fff;
-      object-fit: cover;
-    }
-    
-    .logo-title .app-title {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-    
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .toggle-dark {
-      cursor: pointer;
-      font-size: 24px;
-      background: var(--panel);
-      border-radius: 8px;
-      padding: 8px;
-      border: 1px solid var(--border);
-      color: var(--text);
-      user-select: none;
-      transition: all 0.2s;
-      min-width: 44px;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .toggle-dark:active {
-      transform: scale(0.95);
-    }
-    
-    .main-content {
-      margin-top: 60px;
-      margin-bottom: 60px;
-      padding: 16px;
-      min-height: calc(100vh - 120px);
-    }
-    
-    .mobile-tabs {
-      display: flex;
-      background: var(--panel);
-      border-radius: 12px;
-      margin-bottom: 16px;
-      padding: 4px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    
-    .tab-btn {
-      flex: 1;
-      padding: 12px 8px;
-      background: transparent;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-    }
-    
-    .tab-btn.active {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 2px 4px rgba(30, 136, 229, 0.3);
-    }
-    
-    .tab-content {
-      display: none;
-    }
-    
-    .tab-content.active {
-      display: block;
-    }
-    
-    .canvas-container {
-      margin-bottom: 16px;
-    }
-    
-    #flyerCanvas {
-      width: 100% !important;
-      max-width: 100%;
-      height: auto !important;
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      background: white;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-      display: block;
-      margin: 0 auto;
-      touch-action: none;
-    }
-    
-    .controls-panel {
-      background: var(--panel);
-      padding: 16px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      border: 1px solid var(--border);
-    }
-    
-    .control-group {
-      margin-bottom: 20px;
-    }
-    
-    .control-group:last-child {
-      margin-bottom: 0;
-    }
-    
-    .control-group label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text);
-    }
-    
-    .control-group input[type="text"], 
-    .control-group select {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1.5px solid var(--border);
-      font-size: 16px;
-      background: var(--bg);
-      color: var(--text);
-      transition: border-color 0.2s;
-    }
-    
-    .control-group input:focus,
-    .control-group select:focus {
-      outline: none;
-      border-color: var(--primary);
-    }
-    
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      background: var(--primary);
-      color: white;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-bottom: 8px;
-      min-height: 48px;
-      touch-action: manipulation;
-    }
-    
-    .btn:active {
-      transform: scale(0.98);
-    }
-    
-    .btn:hover {
-      background: var(--primary-dark);
-    }
-    
-    .btn.success {
-      background: var(--success);
-    }
-    
-    .btn.success:hover {
-      background: var(--success-dark);
-    }
-    
-    .btn.danger {
-      background: var(--danger);
-    }
-    
-    .btn.danger:hover {
-      background: var(--danger-dark);
-    }
-    
-    .btn.secondary {
-      background: #666;
-      color: white;
-    }
-    
-    .btn.secondary:hover {
-      background: #444;
-    }
-    
-    .btn-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    
-    .btn-row .btn {
-      margin-bottom: 0;
-    }
-    
-    .color-picker-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    
-    .color-preview {
-      width: 44px;
-      height: 44px;
-      border-radius: 8px;
-      border: 2px solid var(--border);
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .color-picker-group input[type="color"] {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      cursor: pointer;
-    }
-    
-    .upload-area {
-      border: 2px dashed var(--border);
-      border-radius: 8px;
-      padding: 20px;
-      text-align: center;
-      background: var(--bg);
-      cursor: pointer;
-      transition: all 0.2s;
-      min-height: 80px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 8px;
-    }
-    
-    .upload-area:hover {
-      border-color: var(--primary);
-      background: rgba(30, 136, 229, 0.05);
-    }
-    
-    .upload-area .icon {
-      font-size: 32px;
-      color: var(--primary);
-    }
-    
-    .upload-area .text {
-      font-weight: 600;
-      color: var(--text);
-    }
-    
-    .hidden-input {
-      display: none;
-    }
-    
-    .layer-controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    
-    .layer-btn {
-      padding: 12px 8px;
-      background: #666;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-      min-height: 48px;
-    }
-    
-    .layer-btn:active {
-      transform: scale(0.95);
-    }
-    
-    .layer-btn:hover {
-      background: #444;
-    }
-    
-    .download-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 16px;
-    }
-    
-    .whatsapp-share {
-      grid-column: span 2;
-      background: #25D366;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 16px;
-      border-radius: 8px;
-      color: white;
-      font-weight: 600;
-      font-size: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-      border: none;
-      min-height: 56px;
-    }
-    
-    .whatsapp-share:active {
-      transform: scale(0.98);
-    }
-    
-    .whatsapp-share:hover {
-      background: #128C7E;
-    }
-    
-    .help-text {
-      font-size: 13px;
-      color: #666;
-      text-align: center;
-      padding: 16px;
-      margin-bottom: 16px;
-      line-height: 1.4;
-    }
-    
-    footer {
-      background: var(--footer-bg);
-      color: var(--footer-text);
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
-      height: 50px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 13px;
-      z-index: 10001;
-      padding: 8px 16px;
-    }
-    
-    .footer-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 12px;
-    }
-    
-    .footer-links {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    
-    .footer-links a {
-      color: var(--footer-text);
-      text-decoration: none;
-      opacity: 0.8;
-      font-size: 16px;
-      transition: opacity 0.2s;
-      padding: 4px;
-    }
-    
-    .footer-links a:hover {
-      opacity: 1;
-    }
-    
-    /* Popup styles */
-    .popup {
-      display: none;
-      position: fixed;
-      left: 0; top: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.8);
-      z-index: 20000;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-    }
-    
-    .popup-content {
-      background: var(--panel);
-      padding: 20px;
-      border-radius: 16px;
-      max-width: 400px;
-      width: 100%;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    }
-    
-    .popup-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      color: var(--text);
-      text-align: center;
-    }
-    
-    .image-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    
-    .image-thumb {
-      width: 100%;
-      height: 120px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 2px solid var(--border);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    
-    .image-thumb:active {
-      transform: scale(0.98);
-    }
-    
-    .image-thumb.selected {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.3);
-    }
-    
-    .popup-close {
-      width: 100%;
-      padding: 12px;
-      background: #666;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    
-    .popup-close:hover {
-      background: #444;
-    }
-    
-    /* Background edit controls */
-    .bg-edit-overlay {
-      display: none;
-      position: fixed;
-      left: 0; right: 0; bottom: 60px;
-      background: rgba(255,255,255,0.98);
-      backdrop-filter: blur(10px);
-      z-index: 15000;
-      padding: 16px;
-      text-align: center;
-      box-shadow: 0 -2px 16px rgba(0,0,0,0.1);
-    }
-    
-    body.dark .bg-edit-overlay {
-      background: rgba(30,30,30,0.98);
-      color: var(--text);
-    }
-    
-    .bg-edit-title {
-      font-weight: 600;
-      font-size: 16px;
-      margin-bottom: 16px;
-    }
-    
-    .bg-edit-controls {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-    }
-    
-    .bg-edit-controls .btn {
-      flex: 1;
-      max-width: 150px;
-      margin-bottom: 0;
-    }
-    
-    .control-group select option {
-      font-size: 16px;
-      padding: 8px;
-      font-weight: 500;
-    }
-    
-    /* Font preview styles */
-    .font-preview {
-      background: var(--bg);
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      margin-top: 8px;
-      text-align: center;
-      min-height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-    }
-    
-    .font-preview #previewText {
-      font-size: 24px;
-      color: var(--text);
-      font-weight: 600;
-      line-height: 1.2;
-      word-break: break-word;
-      transition: all 0.3s ease;
-      font-family: 'Montserrat', Arial, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor Canvas con Iconos 3D CMYK</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Bebas+Neue&family=Anton&family=Lobster&family=Oswald&family=Poppins&family=Playfair+Display:wght@700&family=Permanent+Marker&family=Rock+Salt&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&family=Archivo+Black&family=Quicksand:wght@700&family=Arizonia&family=Bangers&family=Covered+By+Your+Grace&family=Fredericka+the+Great&family=Indie+Flower&family=Pacifico&family=Press+Start+2P&family=Gloria+Hallelujah&family=Rammetto+One&family=Monoton&family=Rubik+Moonrocks&family=Special+Elite&family=Amatic+SC:wght@700&family=VT323&family=Chewy&family=Black+Ops+One&family=Faster+One&family=Acme&family=Rye&family=Rubik+80s+Fade&family=Sigmar+One&family=UnifrakturCook&family=Sacramento&family=Chango&family=Major+Mono+Display&family=IBM+Plex+Mono:wght@700&family=Poiret+One&family=Unbounded:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root {
+  --c-cyan: #00B4D8;
+  --c-magenta: #D0006F;
+  --c-yellow: #FFD166;
+  --c-key: #073B4C;
+  --surface: rgba(255, 255, 255, 0.92);
+  --border: rgba(0, 0, 0, 0.08);
+  --text: #0f172a;
+  --text-secondary: #64748b;
+  --shadow: 0 4px 24px rgba(0,0,0,0.05);
+  --shadow-active: 0 6px 32px rgba(0,0,0,0.12);
+  --panel-bg: rgba(255, 255, 255, 0.85);
+}
 
-    /* New: visual font selector */
-    .font-selector {
-      max-height: 220px;
-      overflow-y: auto;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--panel);
-      padding: 6px;
-      display: grid;
-      gap: 6px;
-      margin-bottom: 8px;
-    }
-    .font-option {
-      padding: 8px 10px;
-      border-radius: 8px;
-      background: transparent;
-      cursor: pointer;
-      font-size: 16px;
-      border: 1px solid transparent;
-      transition: all 0.12s ease;
-    }
-    .font-option:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
-    }
-    .font-option.selected {
-      background: var(--primary);
-      color: #fff !important;
-      border-color: rgba(0,0,0,0.06);
-      box-shadow: 0 6px 18px rgba(30,136,229,0.12);
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    @media (max-width: 480px) {
-      .font-preview #previewText {
-        font-size: 20px;
-      }
-      .font-selector {
-        max-height: 180px;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .logo-title .app-title {
-        font-size: 16px;
-      }
-      
-      .tab-btn {
-        font-size: 12px;
-        padding: 10px 6px;
-      }
-      
-      .image-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      
-      .image-thumb {
-        height: 100px;
-      }
-      
-      .layer-controls {
-        grid-template-columns: 1fr;
-        gap: 6px;
-      }
-      
-      .layer-btn {
-        font-size: 12px;
-        padding: 10px 8px;
-      }
-      
-      .download-section {
-        grid-template-columns: 1fr;
-        gap: 8px;
-      }
-    }
-    
-    /* Prevent zoom on inputs */
-    @media screen and (-webkit-min-device-pixel-ratio:0) {
-      select, textarea, input[type="text"] {
-        font-size: 16px;
-      }
-    }
-  </style>
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(135deg, #fbfcfd 0%, #f6f9fb 100%);
+  min-height: 100vh;
+  color: var(--text);
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* Header Styles - Botones sobre el canvas */
+header {
+  display: flex;
+  overflow-x: auto;
+  gap: 6px;
+  padding: 8px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+  z-index: 100;
+  scrollbar-width: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+header::-webkit-scrollbar {
+  display: none;
+}
+
+.icon-btn {
+  flex: 0 0 auto;
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  box-shadow: 
+    0 4px 8px rgba(0,0,0,0.1),
+    inset 0 -2px 0 rgba(0,0,0,0.05),
+    inset 0 0 10px rgba(255,255,255,0.5);
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.icon-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(rgba(255,255,255,0.2), transparent);
+  pointer-events: none;
+}
+
+.icon-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 6px 12px rgba(0,0,0,0.15),
+    inset 0 -2px 0 rgba(0,0,0,0.05),
+    inset 0 0 10px rgba(255,255,255,0.5);
+}
+
+.icon-btn:active {
+  transform: translateY(1px);
+  box-shadow: 
+    0 2px 4px rgba(0,0,0,0.1),
+    inset 0 -2px 0 rgba(0,0,0,0.05),
+    inset 0 0 10px rgba(255,255,255,0.5);
+}
+
+.icon-btn svg {
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
+}
+
+.icon-label {
+  font-size: 9px;
+  font-weight: 600;
+  margin-top: 4px;
+  text-align: center;
+  color: var(--c-key);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+}
+
+/* Main Canvas Area - Ocupa toda la pantalla */
+main {
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f0f4f8;
+}
+
+.canvas-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#flyerCanvas {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  max-width: 100%;
+  max-height: 100%;
+  touch-action: none;
+}
+
+/* Floating Tools - Movible */
+.floating-tools {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  z-index: 10;
+  cursor: move;
+  user-select: none;
+}
+
+.floating-tools button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  cursor: pointer;
+  border: none;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.floating-tools button:hover {
+  background: #f1f5f9;
+}
+
+.floating-tools button:nth-child(1) {
+  color: var(--c-cyan);
+}
+.floating-tools button:nth-child(2) {
+  color: var(--c-magenta);
+}
+.floating-tools button:nth-child(3) {
+  color: var(--c-yellow);
+}
+
+/* Popup Styles */
+.popup {
+  display: none;
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.popup-content {
+  background: var(--panel-bg);
+  padding: 24px;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+}
+
+.popup-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--text);
+  text-align: center;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.popup-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--c-cyan), var(--c-magenta));
+  border-radius: 3px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.image-thumb {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.image-thumb:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.popup-close {
+  width: 100%;
+  padding: 14px;
+  background: var(--c-key);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 10px;
+}
+
+.popup-close:hover {
+  background: #052a39;
+}
+
+/* Font Selector */
+.font-selector {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.font-option {
+  padding: 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  cursor: pointer;
+  font-size: 16px;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  text-align: center;
+  font-weight: 500;
+}
+
+.font-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+}
+
+.font-option.selected {
+  background: var(--c-cyan);
+  color: #fff;
+  border-color: rgba(0,0,0,0.06);
+  box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);
+}
+
+/* Color Picker */
+.color-picker-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.color-label {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.color-preview {
+  width: 100%;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.color-preview input[type="color"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Footer */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  padding: 8px 20px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+  z-index: 90;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-links {
+  display: flex;
+  gap: 12px;
+}
+
+.footer-links a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.2s;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.footer-links a:hover {
+  color: var(--c-cyan);
+}
+
+/* Help message */
+.help-message {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  z-index: 10;
+  animation: fadeInOut 4s forwards;
+  display: none;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; display: none; }
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  .icon-btn {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .popup-content {
+    padding: 16px;
+  }
+  
+  .image-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .font-selector {
+    max-height: 200px;
+  }
+  
+  .floating-tools {
+    top: 10px;
+    right: 10px;
+    transform: scale(0.9);
+  }
+  
+  .icon-label {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+  
+  header {
+    padding: 6px;
+    gap: 4px;
+  }
+  
+  .popup-title {
+    font-size: 18px;
+  }
+  
+  .image-thumb {
+    height: 80px;
+  }
+  
+  footer {
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+  }
+  
+  .footer-links {
+    gap: 8px;
+  }
+  
+  .icon-label {
+    font-size: 7px;
+  }
+}
+
+/* Hide file inputs */
+.hidden-input {
+  display: none;
+}
+</style>
 </head>
-<body class="light">
-  <header>
-    <div class="logo-title">
-      <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="Logo" />
-      <span class="app-title">Haceloquesea</span>
+<body>
+<header>
+  <button class="icon-btn" title="Fondo / Galería" id="bgGalleryBtn">
+    <svg viewBox="0 0 24 24" fill="var(--c-cyan)">
+      <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
+      <circle cx="8" cy="8" r="2" fill="#fff"/>
+      <path d="M21 15l-5-5-3 3-3-3-3 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="icon-label">Fondo</span>
+  </button>
+  
+  <button class="icon-btn" title="Quitar fondo" id="removeBgBtn" style="display:none;">
+    <svg viewBox="0 0 24 24" fill="var(--c-magenta)">
+      <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor" opacity="0.8"/>
+      <path d="M6 6l12 12M6 18L18 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="icon-label">Quitar</span>
+  </button>
+  
+  <button class="icon-btn" title="Color / Textura" id="bgColorBtn">
+    <svg viewBox="0 0 24 24" fill="var(--c-yellow)">
+      <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
+      <circle cx="12" cy="12" r="4" fill="#fff"/>
+      <path d="M12 8v4M8 12h4" stroke="#000" stroke-width="1.5"/>
+    </svg>
+    <span class="icon-label">Color</span>
+  </button>
+  
+  <button class="icon-btn" title="Agregar texto" id="addTextBtn">
+    <svg viewBox="0 0 24 24" fill="var(--c-key)">
+      <path d="M5 5h14v3H5z" fill="currentColor"/>
+      <path d="M5 10h14v2H5z" fill="currentColor"/>
+      <path d="M5 14h10v2H5z" fill="currentColor"/>
+      <path d="M5 18h8v2H5z" fill="currentColor"/>
+    </svg>
+    <span class="icon-label">Texto</span>
+  </button>
+  
+  <button class="icon-btn" title="Fuente" id="fontBtn">
+    <svg viewBox="0 0 24 24" fill="var(--c-cyan)">
+      <path d="M5 5h14v3H5z" fill="currentColor"/>
+      <path d="M5 10h14v2H5z" fill="currentColor"/>
+      <path d="M9 14h6v6H9z" fill="currentColor"/>
+    </svg>
+    <span class="icon-label">Fuente</span>
+  </button>
+  
+  <button class="icon-btn" title="Color de texto" id="textColorBtn">
+    <svg viewBox="0 0 24 24" fill="var(--c-magenta)">
+      <path d="M12 3L3 21h18z" fill="currentColor"/>
+      <circle cx="12" cy="12" r="2" fill="#fff"/>
+      <path d="M12 7v3M9 10h6" stroke="#fff" stroke-width="1.5"/>
+    </svg>
+    <span class="icon-label">T. Color</span>
+  </button>
+  
+  <button class="icon-btn" title="Agregar imagen" id="addImageBtn">
+    <svg viewBox="0 0 24 24" fill="var(--c-yellow)">
+      <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
+      <circle cx="8.5" cy="8.5" r="2.5" fill="#fff"/>
+      <path d="M21 15l-5-5-3 3-3-3-3 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span class="icon-label">Imagen</span>
+  </button>
+  
+  <button class="icon-btn" title="Generar QR" id="generateQrBtn">
+    <svg viewBox="0 0 24 24" fill="var(--c-key)">
+      <rect x="3" y="3" width="7" height="7" fill="currentColor"/>
+      <rect x="14" y="3" width="7" height="7" fill="currentColor"/>
+      <rect x="3" y="14" width="7" height="7" fill="currentColor"/>
+      <rect x="10" y="10" width="4" height="4" fill="#fff"/>
+      <rect x="14" y="14" width="7" height="7" fill="currentColor"/>
+    </svg>
+    <span class="icon-label">QR</span>
+  </button>
+  
+  <button class="icon-btn" title="Exportar" id="exportBtn">
+    <svg viewBox="0 0 24 24" fill="var(--c-cyan)">
+      <path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M5 20h14a1 1 0 001-1v-4H4v4a1 1 0 001 1z" fill="currentColor"/>
+    </svg>
+    <span class="icon-label">Exportar</span>
+  </button>
+  
+  <button class="icon-btn" title="Compartir WhatsApp" id="whatsappBtn">
+    <svg viewBox="0 0 24 24" fill="#25D366">
+      <circle cx="12" cy="12" r="10" fill="currentColor"/>
+      <path d="M8 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M12 8v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <span class="icon-label">WhatsApp</span>
+  </button>
+</header>
+
+<main>
+  <div class="canvas-container">
+    <canvas id="flyerCanvas" width="800" height="1066"></canvas>
+    <div class="floating-tools" id="floatingTools">
+      <button id="btnSubirCapa">↑</button>
+      <button id="btnBajarCapa">↓</button>
+      <button id="btnEliminar">🗑</button>
     </div>
-    <div class="header-actions">
-      <div class="toggle-dark" id="toggleDark" title="Modo claro/oscuro">🌞</div>
-    </div>
-  </header>
-
-  <div class="main-content">
-    <div class="help-text">
-      Creá tu catálogo de productos, un logotipo para tu marca, un flyer para ofrecer servicios, una invitación de cumpleaños, la tapa de un libro, un banner para tu página ¡Hacé lo que sea! Los límites los pone tu creatividad. ¡Brillá!
-    </div>
-
-    <!-- Mobile Navigation Tabs -->
-    <div class="mobile-tabs">
-      <button class="tab-btn active" data-tab="canvas">📋 Canvas</button>
-      <button class="tab-btn" data-tab="design">🎨 Diseño</button>
-      <button class="tab-btn" data-tab="images">🖼️ Imágenes</button>
-      <button class="tab-btn" data-tab="export">📤 Exportar</button>
-    </div>
-
-    <!-- Canvas Tab -->
-    <div class="tab-content active" id="tab-canvas">
-      <div class="canvas-container">
-        <div class="canvas-wrapper">
-          <canvas id="flyerCanvas" width="600" height="800"></canvas>
-        </div>
-      </div>
-      
-      <div class="layer-controls">
-        <button class="layer-btn" id="btnSubirCapa">↑ Subir</button>
-        <button class="layer-btn" id="btnBajarCapa">↓ Bajar</button>
-        <button class="layer-btn" id="btnEliminar">🗑 Borrar</button>
-      </div>
-    </div>
-
-    <!-- Design Tab -->
-    <div class="tab-content" id="tab-design">
-      <div class="controls-panel">
-        <!-- Background Controls -->
-        <div class="control-group">
-          <label>Fondo</label>
-          <div class="btn-row">
-            <button class="btn" id="imgFondoBtn">🖼️ Galería</button>
-            <label class="btn success" for="bgLocalInput">📁 Tu imagen</label>
-          </div>
-          <input type="file" id="bgLocalInput" accept="image/*" class="hidden-input">
-          <button class="btn danger" id="removeBgImgBtn" style="display:none;">❌ Quitar fondo</button>
-          
-          <div class="color-picker-group">
-            <label>Color de fondo:</label>
-            <div class="color-preview" style="background: #ffffff;">
-              <input type="color" id="fondoColor" value="#ffffff">
-            </div>
-          </div>
-        </div>
-
-        <!-- Text Controls -->
-        <div class="control-group">
-          <label for="titulo">Texto</label>
-          <input type="text" id="titulo" placeholder="Escribí tu texto aquí...">
-          <button class="btn" id="btnAgregarTexto">➕ Agregar texto</button>
-        </div>
-
-        <div class="control-group">
-          <label for="fuente">Fuente</label>
-
-          <!-- NUEVO: Selector visual de fuentes -->
-          <div id="customFontSelector" class="font-selector" role="listbox" aria-label="Selector de fuentes"></div>
-          <input type="hidden" id="fuente" value="Montserrat">
-
-          <!-- Vista previa de la fuente -->
-          <div class="font-preview" id="fontPreview">
-            <span id="previewText">Tu texto aquí</span>
-          </div>
-        </div>
-
-        <div class="control-group">
-          <div class="color-picker-group">
-            <label>Color del texto:</label>
-            <div class="color-preview" style="background: #000000;">
-              <input type="color" id="colorTexto" value="#000000">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Images Tab -->
-    <div class="tab-content" id="tab-images">
-      <div class="controls-panel">
-        <div class="control-group">
-          <label>Agregar imágenes</label>
-          <label class="upload-area" for="imagenInput">
-            <div class="icon">📷</div>
-            <div class="text">Toca para subir imágenes</div>
-          </label>
-          <input type="file" id="imagenInput" accept="image/*" multiple class="hidden-input">
-        </div>
-
-        <div class="control-group">
-          <label for="telefono">WhatsApp Uruguay</label>
-          <input type="text" id="telefono" placeholder="Ej: 094123456">
-          <button class="btn" id="btnGenerarQR">📱 Generar QR WhatsApp</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Export Tab -->
-    <div class="tab-content" id="tab-export">
-      <div class="controls-panel">
-        <div class="download-section">
-          <button class="btn" id="btnDescargarJPG">📥 Descargar JPG</button>
-          <button class="btn" id="btnDescargarPDF">📄 Descargar PDF</button>
-        </div>
-        
-        <button class="whatsapp-share" id="btnCompartirWhatsapp">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.085"/>
-          </svg>
-          Compartir por WhatsApp
-        </button>
-      </div>
-    </div>
+    <div class="help-message" id="helpMessage">¡Puedes mover, rotar y escalar los objetos con el ratón!</div>
   </div>
+</main>
 
-  <!-- Background Images Popup -->
-  <div class="popup" id="imgFondoPopup">
-    <div class="popup-content">
-      <div class="popup-title">Elegí un fondo</div>
-      <div class="image-grid" id="imgFondoGrid"></div>
-      <button class="popup-close">Cerrar</button>
-    </div>
+<!-- Popups -->
+<div class="popup" id="imgFondoPopup">
+  <div class="popup-content">
+    <div class="popup-title">Elegí un fondo</div>
+    <div class="image-grid" id="imgFondoGrid"></div>
+    <label for="bgLocalInput" class="popup-close">Subir tu propia imagen</label>
+    <input type="file" id="bgLocalInput" accept="image/*" class="hidden-input">
+    <button class="popup-close">Cerrar</button>
   </div>
+</div>
 
-  <!-- Background Edit Overlay -->
-  <div class="bg-edit-overlay" id="bgEditControls">
-    <div class="bg-edit-title">Ajustá la imagen y fijala como fondo</div>
-    <div class="bg-edit-controls">
-      <button class="btn success" id="bgSetBtn">✅ Fijar fondo</button>
-      <button class="btn danger" id="bgCancelBtn">❌ Cancelar</button>
-    </div>
-  </div>
-
-  <footer>
-    <div class="footer-content">
-      <span>Hecho con 💜 por Flyer Mágico</span>
-      <div class="footer-links">
-        <a href="https://github.com/unaleotromundo" title="GitHub" target="_blank">🐙</a>
-        <a href="https://twitter.com/unaleotromundo" title="Twitter/X" target="_blank">𝕏</a>
-        <a href="mailto:contacto@flyermagico.com" title="Email">✉️</a>
+<div class="popup" id="fontPopup">
+  <div class="popup-content">
+    <div class="popup-title">Seleccionar fuente</div>
+    <div id="customFontSelector" class="font-selector"></div>
+    <div class="color-picker-group">
+      <div class="color-label">Color del texto:</div>
+      <div class="color-preview" style="background: #000000;">
+        <input type="color" id="colorTexto" value="#000000">
       </div>
     </div>
-  </footer>
+    <button class="popup-close">Aplicar</button>
+  </div>
+</div>
 
-  <script>
-    // Mobile-optimized JavaScript (modificado con selector visual)
-    let canvas;
-    let bgImgObj = null;
-    let bgEditObj = null;
-    let isMobile = window.innerWidth <= 768;
-    
-    // Initialize app
-    function initApp() {
-      setupDarkMode();
-      setupTabs();
-      setupCanvas();
-      setupEventListeners();
-      setupBackgroundImages();
-      renderFontOptions(); // nuevo: renderizar selector visual
-      updateFontPreview(); // establecer vista previa inicial
-      updateCanvasSize();
-    }
+<div class="popup" id="exportPopup">
+  <div class="popup-content">
+    <div class="popup-title">Exportar Flyer</div>
+    <button class="popup-close" id="btnDescargarJPG">Descargar como JPG</button>
+    <button class="popup-close" id="btnDescargarPDF" style="margin-top: 10px;">Descargar como PDF</button>
+  </div>
+</div>
 
-    // Dark mode setup
-    function setupDarkMode() {
-      const toggleDark = document.getElementById("toggleDark");
-      
-      function updateModeIcon() {
-        toggleDark.textContent = document.body.classList.contains("dark") ? "🌙" : "🌞";
-      }
-      
-      toggleDark.addEventListener('click', () => {
-        document.body.classList.toggle("dark");
-        updateModeIcon();
-      });
-      
-      updateModeIcon();
-    }
+<footer>
+  <div>Hecho con 💜 por Flyer Mágico</div>
+  <div class="footer-links">
+    <a href="https://github.com/unaleotromundo" target="_blank">GitHub</a>
+    <a href="https://twitter.com/unaleotromundo" target="_blank">Twitter</a>
+    <a href="mailto:contacto@flyermagico.com">Contacto</a>
+  </div>
+</footer>
 
-    // Mobile tabs setup
-    function setupTabs() {
-      const tabButtons = document.querySelectorAll('.tab-btn');
-      const tabContents = document.querySelectorAll('.tab-content');
-      
-      tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const targetTab = button.dataset.tab;
-          
-          // Remove active class from all tabs and contents
-          tabButtons.forEach(btn => btn.classList.remove('active'));
-          tabContents.forEach(content => content.classList.remove('active'));
-          
-          // Add active class to clicked tab and corresponding content
-          button.classList.add('active');
-          document.getElementById(`tab-${targetTab}`).classList.add('active');
-          
-          // Update canvas size when canvas tab is shown
-          if (targetTab === 'canvas') {
-            setTimeout(updateCanvasSize, 100);
-          }
-        });
-      });
-    }
+<script>
+// Font families mapping - Lista completa
+const fontFamilies = {
+  "Montserrat": "'Montserrat', Arial, sans-serif",
+  "Bebas Neue": "'Bebas Neue', Arial, sans-serif",
+  "Anton": "'Anton', Arial, sans-serif",
+  "Archivo Black": "'Archivo Black', Arial, sans-serif",
+  "Oswald": "'Oswald', Arial, sans-serif",
+  "Poppins": "'Poppins', Arial, sans-serif",
+  "Lobster": "'Lobster', cursive",
+  "Playfair Display": "'Playfair Display', serif",
+  "Permanent Marker": "'Permanent Marker', cursive",
+  "Rock Salt": "'Rock Salt', cursive",
+  "Luckiest Guy": "'Luckiest Guy', cursive",
+  "Shadows Into Light": "'Shadows Into Light', cursive",
+  "Orbitron": "'Orbitron', sans-serif",
+  "Quicksand": "'Quicksand', Arial, sans-serif",
+  "Arizonia": "'Arizonia', cursive",
+  "Bangers": "'Bangers', cursive",
+  "Covered By Your Grace": "'Covered By Your Grace', cursive",
+  "Fredericka the Great": "'Fredericka the Great', cursive",
+  "Indie Flower": "'Indie Flower', cursive",
+  "Pacifico": "'Pacifico', cursive",
+  "Press Start 2P": "'Press Start 2P', monospace",
+  "Gloria Hallelujah": "'Gloria Hallelujah', cursive",
+  "Rammetto One": "'Rammetto One', cursive",
+  "Monoton": "'Monoton', cursive",
+  "Rubik Moonrocks": "'Rubik Moonrocks', cursive",
+  "Special Elite": "'Special Elite', monospace",
+  "Amatic SC": "'Amatic SC', cursive",
+  "VT323": "'VT323', monospace",
+  "Chewy": "'Chewy', cursive",
+  "Black Ops One": "'Black Ops One', cursive",
+  "Faster One": "'Faster One', cursive",
+  "Acme": "'Acme', sans-serif",
+  "Rye": "'Rye', cursive",
+  "Rubik 80s Fade": "'Rubik 80s Fade', cursive",
+  "Sigmar One": "'Sigmar One', cursive",
+  "UnifrakturCook": "'UnifrakturCook', cursive",
+  "Sacramento": "'Sacramento', cursive",
+  "Chango": "'Chango', cursive",
+  "Major Mono Display": "'Major Mono Display', monospace",
+  "IBM Plex Mono": "'IBM Plex Mono', monospace",
+  "Poiret One": "'Poiret One', cursive",
+  "Unbounded": "'Unbounded', sans-serif"
+};
 
-    // Canvas setup with mobile optimizations
-    function setupCanvas() {
-      canvas = new fabric.Canvas('flyerCanvas', {
-        preserveObjectStacking: true,
-        selection: true,
-        allowTouchScrolling: false,
-        enableRetinaScaling: true,
-        devicePixelRatio: window.devicePixelRatio || 1
-      });
-      
-      // Set initial background
-      canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
-      
-      // Mobile touch optimizations
-      if (isMobile) {
-        canvas.on('touch:gesture', function(e) {
-          e.e.preventDefault();
-        });
-        
-        // Improve touch selection on mobile
-        canvas.on('selection:created', function(e) {
-          const activeObject = e.target;
-          if (activeObject) {
-            activeObject.set({
-              cornerSize: 20,
-              transparentCorners: false,
-              cornerColor: '#1e88e5',
-              cornerStrokeColor: '#fff',
-              borderColor: '#1e88e5',
-              borderScaleFactor: 2
-            });
-            canvas.renderAll();
-          }
-        });
-      }
-    }
+// Initialize canvas
+const canvas = new fabric.Canvas('flyerCanvas', {
+  preserveObjectStacking: true,
+  selection: true,
+  allowTouchScrolling: true,
+  enableRetinaScaling: true,
+  devicePixelRatio: window.devicePixelRatio || 1
+});
+canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
 
-    // Update canvas size for mobile responsiveness
-    function updateCanvasSize() {
-      const container = document.querySelector('.canvas-container');
-      const containerWidth = container.offsetWidth - 32; // Account for padding
-      const aspectRatio = 800 / 600; // height / width
-      
-      let newWidth = Math.min(containerWidth, 600);
-      let newHeight = newWidth * aspectRatio;
-      
-      // Set canvas display size
-      const canvasEl = document.getElementById('flyerCanvas');
-      canvasEl.style.width = newWidth + 'px';
-      canvasEl.style.height = newHeight + 'px';
-      
-      // Update fabric.js canvas size
-      canvas.setDimensions({
-        width: newWidth,
-        height: newHeight
-      }, {
-        cssOnly: false
-      });
-      
+// Background images
+const fondos = [
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1465101178521-c1a9136a3e16?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1465101011104-2d26b4a4e0c7?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1424746219973-8fe3bd07d8e3?auto=format&fit=crop&w=600&q=80"
+];
+
+// Setup background images in popup
+const imgFondoGrid = document.getElementById('imgFondoGrid');
+fondos.forEach((url, i) => {
+  const img = document.createElement("img");
+  img.src = url;
+  img.className = "image-thumb";
+  img.alt = `Fondo ${i+1}`;
+  img.addEventListener("click", () => {
+    canvas.setBackgroundImage(url, canvas.renderAll.bind(canvas));
+    document.getElementById('removeBgBtn').style.display = 'block';
+    document.getElementById('imgFondoPopup').style.display = 'none';
+  });
+  imgFondoGrid.appendChild(img);
+});
+
+// Canvas size adjustment
+function adjustCanvasSize() {
+  const container = document.querySelector('.canvas-container');
+  const maxWidth = container.clientWidth;
+  const maxHeight = container.clientHeight;
+  
+  // Calculate aspect ratio
+  const aspectRatio = 800 / 1066;
+  let newWidth = maxWidth;
+  let newHeight = maxWidth / aspectRatio;
+  
+  // If height is too big, adjust
+  if (newHeight > maxHeight) {
+    newHeight = maxHeight;
+    newWidth = maxHeight * aspectRatio;
+  }
+  
+  // Set canvas dimensions
+  canvas.setWidth(newWidth);
+  canvas.setHeight(newHeight);
+  canvas.renderAll();
+}
+
+// Window resize handler
+window.addEventListener('resize', () => {
+  adjustCanvasSize();
+});
+
+// Initial canvas size adjustment
+adjustCanvasSize();
+
+// Event Listeners
+document.getElementById('bgGalleryBtn').addEventListener('click', () => {
+  document.getElementById('imgFondoPopup').style.display = 'flex';
+});
+
+document.getElementById('bgLocalInput').addEventListener('change', function(e) {
+  if (!e.target.files || !e.target.files[0]) return;
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    canvas.setBackgroundImage(event.target.result, canvas.renderAll.bind(canvas));
+    document.getElementById('removeBgBtn').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+  e.target.value = "";
+});
+
+document.getElementById('removeBgBtn').addEventListener('click', () => {
+  canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
+  document.getElementById('removeBgBtn').style.display = 'none';
+});
+
+document.getElementById('bgColorBtn').addEventListener('click', () => {
+  const colorPicker = document.createElement('input');
+  colorPicker.type = 'color';
+  colorPicker.value = '#ffffff';
+  colorPicker.click();
+  
+  colorPicker.addEventListener('input', function() {
+    canvas.setBackgroundColor(this.value, canvas.renderAll.bind(canvas));
+  });
+});
+
+document.getElementById('addTextBtn').addEventListener('click', () => {
+  const text = prompt("Ingresa tu texto:", "Texto personalizado");
+  if (text && text.trim()) {
+    const textObj = new fabric.Textbox(text, {
+      left: canvas.width / 2,
+      top: canvas.height / 2,
+      fontSize: 40,
+      fill: '#000000',
+      fontFamily: fontFamilies["Montserrat"] || "Montserrat",
+      originX: "center",
+      originY: "center",
+      editable: true,
+      width: canvas.width * 0.8,
+      textAlign: 'center',
+      hasControls: true,
+      lockRotation: false,
+      lockScalingX: false,
+      lockScalingY: false,
+      lockMovementX: false,
+      lockMovementY: false
+    });
+    canvas.add(textObj);
+    canvas.setActiveObject(textObj);
+    canvas.renderAll();
+    showHelpMessage("Texto agregado. Puedes moverlo, rotarlo y escalarlo libremente.");
+  }
+});
+
+document.getElementById('fontBtn').addEventListener('click', () => {
+  renderFontOptions();
+  document.getElementById('fontPopup').style.display = 'flex';
+});
+
+document.getElementById('textColorBtn').addEventListener('click', () => {
+  const colorPicker = document.createElement('input');
+  colorPicker.type = 'color';
+  colorPicker.value = '#000000';
+  colorPicker.click();
+  
+  colorPicker.addEventListener('input', function() {
+    const active = canvas.getActiveObject();
+    if (active && active.type === "textbox") {
+      active.set("fill", this.value);
       canvas.renderAll();
     }
+  });
+});
 
-    // Setup all event listeners
-    function setupEventListeners() {
-      // Background color
-      document.getElementById("fondoColor").addEventListener("input", function() {
-        if (!bgImgObj) {
-          canvas.setBackgroundColor(this.value, canvas.renderAll.bind(canvas));
-        }
-        this.parentElement.querySelector('.color-preview').style.background = this.value;
-      });
-
-      // Text color with preview
-      const colorTexto = document.getElementById("colorTexto");
-      colorTexto.addEventListener("input", function() {
-        this.parentElement.querySelector('.color-preview').style.background = this.value;
-        updateFontPreview();
-        renderFontOptions(); // actualizar color en el selector visual
+document.getElementById('addImageBtn').addEventListener('click', () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.click();
+  
+  input.addEventListener('change', function(e) {
+    if (!e.target.files || !e.target.files[0]) return;
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      fabric.Image.fromURL(event.target.result, (img) => {
+        // Scale image to fit canvas
+        const maxWidth = canvas.width * 0.6;
+        const maxHeight = canvas.height * 0.6;
+        const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
         
-        const active = canvas.getActiveObject();
-        if (active && active.type === "textbox") {
-          active.set("fill", this.value);
-          canvas.renderAll();
-        }
-      });
-
-      // Text input for preview updates
-      document.getElementById("titulo").addEventListener("input", function() {
-        updateFontPreview();
-        renderFontOptions();
-      });
-
-      // NOTE: el selector visual llama a applyFontChange() al hacer clic — abajo definimos applyFontChange
-
-      // Add text
-      document.getElementById("btnAgregarTexto").addEventListener("click", addText);
-
-      // Layer controls
-      document.getElementById("btnSubirCapa").addEventListener("click", () => {
-        const obj = canvas.getActiveObject();
-        if (obj) canvas.bringForward(obj);
-      });
-
-      document.getElementById("btnBajarCapa").addEventListener("click", () => {
-        const obj = canvas.getActiveObject();
-        if (obj) canvas.sendBackwards(obj);
-      });
-
-      document.getElementById("btnEliminar").addEventListener("click", () => {
-        const obj = canvas.getActiveObject();
-        if (obj) canvas.remove(obj);
-      });
-
-      // Image upload
-      document.getElementById("imagenInput").addEventListener("change", handleImageUpload);
-
-      // QR generation
-      document.getElementById("btnGenerarQR").addEventListener("click", generateWhatsAppQR);
-
-      // Download buttons
-      document.getElementById("btnDescargarJPG").addEventListener("click", downloadJPG);
-      document.getElementById("btnDescargarPDF").addEventListener("click", downloadPDF);
-      document.getElementById("btnCompartirWhatsapp").addEventListener("click", shareWhatsApp);
-
-      // Background controls
-      document.getElementById("removeBgImgBtn").addEventListener("click", removeBackground);
-
-      // Window resize
-      window.addEventListener('resize', debounce(updateCanvasSize, 250));
-      
-      // Hidden input change (compatibilidad)
-      document.getElementById("fuente").addEventListener("change", function() {
-        const font = this.value;
-        updateFontPreview();
-        const active = canvas.getActiveObject();
-        if (active && active.type === "textbox") {
-          const fontCss = fontFamilies[font] || font;
-          active.set("fontFamily", fontCss);
-          canvas.renderAll();
-        }
-        // resaltar opción seleccionada
-        document.querySelectorAll('.font-option').forEach(o => o.classList.toggle('selected', o.dataset.font === font));
-      });
-    }
-
-    // Background images setup
-    function setupBackgroundImages() {
-      const fondos = [
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-        "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
-        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80",
-        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
-        "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
-        "https://images.unsplash.com/photo-1465101178521-c1a9136a3e16?auto=format&fit=crop&w=600&q=80",
-        "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=600&q=80",
-        "https://images.unsplash.com/photo-1465101011104-2d26b4a4e0c7?auto=format&fit=crop&w=600&q=80",
-        "https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=600&q=80",
-        "https://images.unsplash.com/photo-1424746219973-8fe3bd07d8e3?auto=format&fit=crop&w=600&q=80"
-      ];
-
-      const imgFondoBtn = document.getElementById("imgFondoBtn");
-      const imgFondoPopup = document.getElementById("imgFondoPopup");
-      const imgFondoGrid = document.getElementById("imgFondoGrid");
-      const bgLocalInput = document.getElementById("bgLocalInput");
-      const bgEditControls = document.getElementById("bgEditControls");
-      const bgSetBtn = document.getElementById("bgSetBtn");
-      const bgCancelBtn = document.getElementById("bgCancelBtn");
-
-      // Show background gallery
-      imgFondoBtn.addEventListener("click", () => {
-        imgFondoGrid.innerHTML = "";
-        fondos.forEach((url, i) => {
-          const img = document.createElement("img");
-          img.src = url;
-          img.className = "image-thumb";
-          img.alt = `Fondo ${i+1}`;
-          img.addEventListener("click", () => launchBgEdit(url, "remote"));
-          imgFondoGrid.appendChild(img);
-        });
-        imgFondoPopup.style.display = "flex";
-      });
-
-      // Close popup
-      imgFondoPopup.querySelector(".popup-close").addEventListener("click", () => {
-        imgFondoPopup.style.display = "none";
-      });
-
-      // Handle local background upload
-      bgLocalInput.addEventListener("change", function(e) {
-        if (!e.target.files || !e.target.files[0]) return;
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          launchBgEdit(event.target.result, "local");
-        };
-        reader.readAsDataURL(file);
-        e.target.value = "";
-      });
-
-      // Background edit controls
-      bgSetBtn.addEventListener("click", setBackground);
-      bgCancelBtn.addEventListener("click", cancelBackgroundEdit);
-    }
-
-    // Font families mapping - Updated with complete list
-    const fontFamilies = {
-      "Montserrat": "'Montserrat', Arial, sans-serif",
-      "Bebas Neue": "'Bebas Neue', Arial, sans-serif",
-      "Anton": "'Anton', Arial, sans-serif",
-      "Archivo Black": "'Archivo Black', Arial, sans-serif",
-      "Oswald": "'Oswald', Arial, sans-serif",
-      "Poppins": "'Poppins', Arial, sans-serif",
-      "Lobster": "'Lobster', cursive",
-      "Playfair Display": "'Playfair Display', serif",
-      "Permanent Marker": "'Permanent Marker', cursive",
-      "Rock Salt": "'Rock Salt', cursive",
-      "Luckiest Guy": "'Luckiest Guy', cursive",
-      "Shadows Into Light": "'Shadows Into Light', cursive",
-      "Orbitron": "'Orbitron', sans-serif",
-      "Quicksand": "'Quicksand', Arial, sans-serif",
-      "Arizonia": "'Arizonia', cursive",
-      "Bangers": "'Bangers', cursive",
-      "Covered By Your Grace": "'Covered By Your Grace', cursive",
-      "Fredericka the Great": "'Fredericka the Great', cursive",
-      "Indie Flower": "'Indie Flower', cursive",
-      "Pacifico": "'Pacifico', cursive",
-      "Press Start 2P": "'Press Start 2P', monospace",
-      "Gloria Hallelujah": "'Gloria Hallelujah', cursive",
-      "Rammetto One": "'Rammetto One', cursive",
-      "Monoton": "'Monoton', cursive",
-      "Rubik Moonrocks": "'Rubik Moonrocks', cursive",
-      "Special Elite": "'Special Elite', monospace",
-      "Amatic SC": "'Amatic SC', cursive",
-      "VT323": "'VT323', monospace",
-      "Chewy": "'Chewy', cursive",
-      "Black Ops One": "'Black Ops One', cursive",
-      "Faster One": "'Faster One', cursive",
-      "Acme": "'Acme', sans-serif",
-      "Rye": "'Rye', cursive",
-      "Rubik 80s Fade": "'Rubik 80s Fade', cursive",
-      "Sigmar One": "'Sigmar One', cursive",
-      "UnifrakturCook": "'UnifrakturCook', cursive",
-      "Sacramento": "'Sacramento', cursive",
-      "Chango": "'Chango', cursive",
-      "Major Mono Display": "'Major Mono Display', monospace",
-      "IBM Plex Mono": "'IBM Plex Mono', monospace",
-      "Poiret One": "'Poiret One', cursive",
-      "Unbounded": "'Unbounded', sans-serif"
-    };
-
-    // Render the visual font options (uses the text in #titulo and color #colorTexto)
-    function renderFontOptions() {
-      const container = document.getElementById("customFontSelector");
-      container.innerHTML = "";
-      const sampleText = document.getElementById("titulo").value || "Tu texto aquí";
-      const color = document.getElementById("colorTexto").value || "#000000";
-      const current = document.getElementById("fuente").value || "Montserrat";
-
-      Object.keys(fontFamilies).forEach(fontName => {
-        const div = document.createElement("div");
-        div.className = "font-option";
-        div.dataset.font = fontName;
-        div.style.fontFamily = fontFamilies[fontName] || fontName;
-        div.style.color = color;
-        div.textContent = sampleText;
-        if (fontName === current) div.classList.add("selected");
-        div.addEventListener("click", () => {
-          applyFontChange(fontName);
-        });
-        container.appendChild(div);
-      });
-    }
-
-    function applyFontChange(fontName) {
-      // set hidden input (compatibilidad con código existente)
-      document.getElementById("fuente").value = fontName;
-      // update preview & selected state
-      updateFontPreview();
-      document.querySelectorAll('.font-option').forEach(o => o.classList.toggle('selected', o.dataset.font === fontName));
-      // apply to active textbox if any
-      const active = canvas.getActiveObject();
-      if (active && active.type === "textbox") {
-        const fontCss = fontFamilies[fontName] || fontName;
-        active.set("fontFamily", fontCss);
-        canvas.renderAll();
-      }
-    }
-
-    // Update font preview
-    function updateFontPreview() {
-      const texto = document.getElementById("titulo").value || "Tu texto aquí";
-      const fontKey = document.getElementById("fuente").value || "Montserrat";
-      const color = document.getElementById("colorTexto").value || "#000000";
-      const previewText = document.getElementById("previewText");
-      
-      previewText.textContent = texto;
-      previewText.style.fontFamily = fontFamilies[fontKey] || `'${fontKey}', Arial, sans-serif`;
-      previewText.style.color = color;
-      
-      // Force font load for preview (improves reliability on mobile)
-      if (document.fonts && document.fonts.load) {
-        document.fonts.load(`24px "${fontKey}"`).then(() => {
-          previewText.style.fontFamily = fontFamilies[fontKey] || `'${fontKey}', Arial, sans-serif`;
-        }).catch(() => {
-          // no pasa nada si falla
-        });
-      }
-    }
-
-    // Add text function (con espera de carga de fuente en móvil)
-    function addText() {
-      const texto = document.getElementById("titulo").value;
-      if (!texto.trim()) {
-        alert("Por favor, ingresá algún texto.");
-        return;
-      }
-      
-      const fontKey = document.getElementById("fuente").value || "Montserrat";
-      const color = document.getElementById("colorTexto").value || "#000000";
-      
-      // Esperar a que la fuente se cargue antes de añadir el texto
-      if (document.fonts && document.fonts.load) {
-        document.fonts.load(`32px "${fontKey}"`).then(() => {
-          createTextOnCanvas(texto, fontKey, color);
-        }).catch(() => {
-          createTextOnCanvas(texto, fontKey, color);
-        });
-      } else {
-        createTextOnCanvas(texto, fontKey, color);
-      }
-    }
-
-    function createTextOnCanvas(texto, fontKey, color) {
-      const textObj = new fabric.Textbox(texto, {
-        left: canvas.width / 2,
-        top: canvas.height / 2,
-        fontSize: isMobile ? 24 : 32,
-        fill: color,
-        fontFamily: fontFamilies[fontKey] || fontKey,
-        originX: "center",
-        originY: "center",
-        editable: true,
-        width: canvas.width * 0.8,
-        textAlign: 'center'
-      });
-      
-      canvas.add(textObj);
-      canvas.setActiveObject(textObj);
-      canvas.renderAll();
-      
-      // Clear input
-      document.getElementById("titulo").value = "";
-      
-      // Switch to canvas tab if not already there
-      if (!document.getElementById('tab-canvas').classList.contains('active')) {
-        document.querySelector('[data-tab="canvas"]').click();
-      }
-    }
-
-    // Handle image upload
-    function handleImageUpload(e) {
-      const files = e.target.files;
-      if (!files.length) return;
-      
-      Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          fabric.Image.fromURL(event.target.result, (img) => {
-            // Scale image to fit canvas
-            const maxWidth = canvas.width * 0.6;
-            const maxHeight = canvas.height * 0.6;
-            const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
-            
-            img.scale(scale);
-            img.set({
-              left: canvas.width / 2,
-              top: canvas.height / 2,
-              originX: "center",
-              originY: "center"
-            });
-            
-            canvas.add(img);
-            canvas.setActiveObject(img);
-            canvas.renderAll();
-          });
-        };
-        reader.readAsDataURL(file);
-      });
-      
-      e.target.value = "";
-      
-      // Switch to canvas tab
-      if (!document.getElementById('tab-canvas').classList.contains('active')) {
-        document.querySelector('[data-tab="canvas"]').click();
-      }
-    }
-
-    // Generate WhatsApp QR
-    function generateWhatsAppQR() {
-      const tel = document.getElementById("telefono").value.trim();
-      if (!tel.match(/^\d{6,}$/)) {
-        alert("Por favor, ingresá un número de WhatsApp válido (solo números, ej: 094123456)");
-        return;
-      }
-      
-      const url = `https://wa.me/598${tel}?text=¡Hola!%20Vi%20tu%20flyer%20y%20me%20interesa%20saber%20más`;
-      const qr = new QRious({ 
-        value: url, 
-        size: 300,
-        background: 'white',
-        foreground: 'black'
-      });
-      
-      fabric.Image.fromURL(qr.toDataURL(), (img) => {
-        const scale = isMobile ? 0.4 : 0.5;
         img.scale(scale);
-        img.set({
-          left: canvas.width / 2,
-          top: canvas.height / 2,
-          originX: "center",
-          originY: "center"
-        });
-        
-        canvas.add(img);
-        canvas.setActiveObject(img);
-        canvas.renderAll();
-      });
-      
-      // Switch to canvas tab
-      if (!document.getElementById('tab-canvas').classList.contains('active')) {
-        document.querySelector('[data-tab="canvas"]').click();
-      }
-    }
-
-    // Launch background edit mode
-    function launchBgEdit(url, type) {
-      document.getElementById("imgFondoPopup").style.display = "none";
-      
-      if (bgEditObj) {
-        canvas.remove(bgEditObj);
-        bgEditObj = null;
-      }
-      
-      canvas.discardActiveObject();
-      canvas.selection = false;
-      
-      fabric.Image.fromURL(url, function(img) {
         img.set({
           left: canvas.width / 2,
           top: canvas.height / 2,
           originX: "center",
           originY: "center",
-          selectable: true,
           hasControls: true,
-          lockUniScaling: false,
-          cornerStyle: 'circle',
-          borderColor: "#1e88e5",
-          cornerColor: "#43a047",
-          transparentCorners: false,
-          cornerSize: isMobile ? 20 : 12
+          lockRotation: false,
+          lockScalingX: false,
+          lockScalingY: false,
+          lockMovementX: false,
+          lockMovementY: false
         });
         
-        const scale = Math.max(
-          canvas.width / img.width,
-          canvas.height / img.height
-        );
-        img.scale(scale);
-        
-        bgEditObj = img;
         canvas.add(img);
         canvas.setActiveObject(img);
         canvas.renderAll();
-        
-        document.getElementById("bgEditControls").style.display = "block";
-        document.getElementById("removeBgImgBtn").style.display = "none";
-      }, { 
-        crossOrigin: type === "remote" ? "anonymous" : undefined 
+        showHelpMessage("Imagen agregada. Puedes moverla, rotarla y escalarla libremente.");
       });
-    }
+    };
+    reader.readAsDataURL(file);
+  });
+});
 
-    // Set background
-    function setBackground() {
-      if (!bgEditObj) return;
-      
-      const dataUrl = canvas.toDataURL({
-        format: "png",
-        left: 0,
-        top: 0,
-        width: canvas.width,
-        height: canvas.height,
-        withoutBackground: false
-      });
-      
-      canvas.remove(bgEditObj);
-      bgEditObj = null;
-      
-      fabric.Image.fromURL(dataUrl, function(bgimg) {
-        bgimg.set({
-          originX: "left",
-          originY: "top",
-          selectable: false,
-          evented: false
-        });
-        
-        bgimg.scaleToWidth(canvas.width);
-        bgImgObj = bgimg;
-        canvas.setBackgroundImage(bgimg, canvas.renderAll.bind(canvas));
-        
-        document.getElementById("removeBgImgBtn").style.display = "inline-block";
-        document.getElementById("bgEditControls").style.display = "none";
-      });
-      
-      canvas.setBackgroundColor('#fff', canvas.renderAll.bind(canvas));
-      canvas.selection = true;
-    }
-
-    // Cancel background edit
-    function cancelBackgroundEdit() {
-      if (bgEditObj) {
-        canvas.remove(bgEditObj);
-        bgEditObj = null;
-      }
-      document.getElementById("bgEditControls").style.display = "none";
-      canvas.selection = true;
-    }
-
-    // Remove background
-    function removeBackground() {
-      canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
-      bgImgObj = null;
-      document.getElementById("removeBgImgBtn").style.display = "none";
-      const color = document.getElementById("fondoColor").value;
-      canvas.setBackgroundColor(color, canvas.renderAll.bind(canvas));
-    }
-
-    // Download JPG
-    function downloadJPG() {
-      const url = canvas.toDataURL({ 
-        format: "jpeg", 
-        quality: 0.95,
-        multiplier: 2 // Higher quality for mobile
-      });
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "flyer.jpg";
-      link.click();
-    }
-
-    // Download PDF
-    async function downloadPDF() {
-      try {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-          orientation: "portrait",
-          unit: "px",
-          format: [canvas.width, canvas.height]
-        });
-        
-        const dataURL = canvas.toDataURL({ 
-          format: "jpeg", 
-          quality: 1.0,
-          multiplier: 2
-        });
-        
-        pdf.addImage(dataURL, "JPEG", 0, 0, canvas.width, canvas.height);
-        pdf.save("flyer.pdf");
-      } catch (error) {
-        alert("Error al generar PDF. Intentá descargar como JPG.");
-      }
-    }
-
-    // Share via WhatsApp
-    async function shareWhatsApp() {
-      const fileName = "flyer.jpg";
-      const dataUrl = canvas.toDataURL({ 
-        format: "jpeg", 
-        quality: 0.95,
-        multiplier: 2
-      });
-      
-      // Try native sharing API first
-      if (navigator.canShare && window.Blob) {
-        try {
-          const res = await fetch(dataUrl);
-          const blob = await res.blob();
-          const file = new File([blob], fileName, { type: "image/jpeg" });
-          
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: "Flyer creado con Haceloquesea",
-              text: "¡Mirá este flyer que acabo de crear!"
-            });
-            return;
-          }
-        } catch (e) {
-          console.log("Native sharing failed, falling back to URL method");
-        }
-      }
-      
-      // Fallback: Download and open WhatsApp
-      const mensaje = encodeURIComponent("¡Mirá este flyer que acabo de crear con Haceloquesea!");
-      const waUrl = `https://wa.me/?text=${mensaje}`;
-      
-      // Download image
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = fileName;
-      link.click();
-      
-      // Open WhatsApp
-      setTimeout(() => {
-        window.open(waUrl, "_blank");
-        alert("Se descargó tu flyer y se abrió WhatsApp. Adjuntá la imagen desde tu galería para compartirla.");
-      }, 500);
-    }
-
-    // Utility: Debounce function
-    function debounce(func, wait) {
-      let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
-
-    // Initialize app when DOM is ready
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        initApp();
-        // Wait for fonts to load before initializing preview
-        setTimeout(() => { renderFontOptions(); updateFontPreview(); }, 800);
-      });
-    } else {
-      initApp();
-      // Wait for fonts to load before initializing preview
-      setTimeout(() => { renderFontOptions(); updateFontPreview(); }, 800);
-    }
-
-    // Update mobile flag on resize
-    window.addEventListener('resize', () => {
-      isMobile = window.innerWidth <= 768;
+document.getElementById('generateQrBtn').addEventListener('click', () => {
+  const tel = prompt("Ingresa número de WhatsApp (ej: 094123456):", "");
+  if (tel && tel.match(/^\d{6,}$/)) {
+    const url = `https://wa.me/598${tel}?text=¡Hola!%20Vi%20tu%20flyer%20y%20me%20interesa%20saber%20más`;
+    const qr = new QRious({ 
+      value: url, 
+      size: 300,
+      background: 'white',
+      foreground: 'black'
     });
-  </script>
+    
+    fabric.Image.fromURL(qr.toDataURL(), (img) => {
+      img.scale(0.3);
+      img.set({
+        left: canvas.width / 2,
+        top: canvas.height / 2,
+        originX: "center",
+        originY: "center",
+        hasControls: true,
+        lockRotation: false,
+        lockScalingX: false,
+        lockScalingY: false,
+        lockMovementX: false,
+        lockMovementY: false
+      });
+      
+      canvas.add(img);
+      canvas.setActiveObject(img);
+      canvas.renderAll();
+      showHelpMessage("Código QR agregado. Puedes moverlo y escalarlo libremente.");
+    });
+  } else {
+    alert("Por favor, ingresá un número de WhatsApp válido");
+  }
+});
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  document.getElementById('exportPopup').style.display = 'flex';
+});
+
+document.getElementById('whatsappBtn').addEventListener('click', shareWhatsApp);
+
+// Layer controls
+document.getElementById('btnSubirCapa').addEventListener('click', () => {
+  const obj = canvas.getActiveObject();
+  if (obj) canvas.bringForward(obj);
+});
+
+document.getElementById('btnBajarCapa').addEventListener('click', () => {
+  const obj = canvas.getActiveObject();
+  if (obj) canvas.sendBackwards(obj);
+});
+
+document.getElementById('btnEliminar').addEventListener('click', () => {
+  const obj = canvas.getActiveObject();
+  if (obj) canvas.remove(obj);
+});
+
+// Close popups
+document.querySelectorAll('.popup-close').forEach(btn => {
+  btn.addEventListener('click', function() {
+    this.closest('.popup').style.display = 'none';
+  });
+});
+
+// Render font options
+function renderFontOptions() {
+  const container = document.getElementById("customFontSelector");
+  container.innerHTML = "";
+  
+  Object.keys(fontFamilies).forEach(fontName => {
+    const div = document.createElement("div");
+    div.className = "font-option";
+    div.textContent = fontName;
+    div.style.fontFamily = fontFamilies[fontName] || fontName;
+    div.addEventListener("click", () => {
+      document.querySelectorAll('.font-option').forEach(o => o.classList.remove('selected'));
+      div.classList.add('selected');
+      
+      const active = canvas.getActiveObject();
+      if (active && active.type === "textbox") {
+        active.set("fontFamily", fontFamilies[fontName] || fontName);
+        canvas.renderAll();
+      }
+    });
+    container.appendChild(div);
+  });
+}
+
+// Download functions
+document.getElementById('btnDescargarJPG').addEventListener('click', () => {
+  const url = canvas.toDataURL({ 
+    format: "jpeg", 
+    quality: 0.95,
+    multiplier: 2
+  });
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "flyer.jpg";
+  link.click();
+  document.getElementById('exportPopup').style.display = 'none';
+});
+
+document.getElementById('btnDescargarPDF').addEventListener('click', async () => {
+  try {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "px",
+      format: [canvas.width, canvas.height]
+    });
+    
+    const dataURL = canvas.toDataURL({ 
+      format: "jpeg", 
+      quality: 1.0,
+      multiplier: 2
+    });
+    
+    pdf.addImage(dataURL, "JPEG", 0, 0, canvas.width, canvas.height);
+    pdf.save("flyer.pdf");
+  } catch (error) {
+    alert("Error al generar PDF. Intentá descargar como JPG.");
+  }
+  document.getElementById('exportPopup').style.display = 'none';
+});
+
+// Share via WhatsApp
+async function shareWhatsApp() {
+  const fileName = "flyer.jpg";
+  const dataUrl = canvas.toDataURL({ 
+    format: "jpeg", 
+    quality: 0.95,
+    multiplier: 2
+  });
+  
+  const mensaje = encodeURIComponent("¡Mirá este flyer que acabo de crear con Haceloquesea!");
+  const waUrl = `https://wa.me/?text=${mensaje}`;
+  
+  // Download image
+  const link = document.createElement("a");
+  link.href = dataUrl;
+  link.download = fileName;
+  link.click();
+  
+  // Open WhatsApp
+  setTimeout(() => {
+    window.open(waUrl, "_blank");
+    alert("Se descargó tu flyer y se abrió WhatsApp. Adjuntá la imagen desde tu galería para compartirla.");
+  }, 500);
+}
+
+// Show help message
+function showHelpMessage(message) {
+  const helpElement = document.getElementById('helpMessage');
+  helpElement.textContent = message;
+  helpElement.style.display = 'block';
+  
+  setTimeout(() => {
+    helpElement.style.opacity = '0';
+    setTimeout(() => {
+      helpElement.style.display = 'none';
+      helpElement.style.opacity = '1';
+    }, 1000);
+  }, 3000);
+}
+
+// Floating tools drag functionality
+const floatingTools = document.getElementById('floatingTools');
+let isDragging = false;
+let offsetX, offsetY;
+
+floatingTools.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  offsetX = e.clientX - floatingTools.getBoundingClientRect().left;
+  offsetY = e.clientY - floatingTools.getBoundingClientRect().top;
+  floatingTools.style.cursor = 'grabbing';
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (isDragging) {
+    const x = e.clientX - offsetX;
+    const y = e.clientY - offsetY;
+    
+    // Keep within canvas boundaries
+    const container = document.querySelector('.canvas-container');
+    const containerRect = container.getBoundingClientRect();
+    const maxX = containerRect.width - floatingTools.offsetWidth;
+    const maxY = containerRect.height - floatingTools.offsetHeight;
+    
+    floatingTools.style.left = Math.min(Math.max(0, x), maxX) + 'px';
+    floatingTools.style.top = Math.min(Math.max(0, y), maxY) + 'px';
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+  floatingTools.style.cursor = 'grab';
+});
+
+// Touch events for mobile
+floatingTools.addEventListener('touchstart', (e) => {
+  isDragging = true;
+  const touch = e.touches[0];
+  offsetX = touch.clientX - floatingTools.getBoundingClientRect().left;
+  offsetY = touch.clientY - floatingTools.getBoundingClientRect().top;
+  e.preventDefault();
+});
+
+document.addEventListener('touchmove', (e) => {
+  if (isDragging) {
+    const touch = e.touches[0];
+    const x = touch.clientX - offsetX;
+    const y = touch.clientY - offsetY;
+    
+    // Keep within canvas boundaries
+    const container = document.querySelector('.canvas-container');
+    const containerRect = container.getBoundingClientRect();
+    const maxX = containerRect.width - floatingTools.offsetWidth;
+    const maxY = containerRect.height - floatingTools.offsetHeight;
+    
+    floatingTools.style.left = Math.min(Math.max(0, x), maxX) + 'px';
+    floatingTools.style.top = Math.min(Math.max(0, y), maxY) + 'px';
+    e.preventDefault();
+  }
+});
+
+document.addEventListener('touchend', () => {
+  isDragging = false;
+});
+
+// Initialize font options
+renderFontOptions();
+
+// Show initial help message
+setTimeout(() => {
+  showHelpMessage("¡Puedes mover, rotar y escalar los objetos con el ratón!");
+}, 1500);
+</script>
 </body>
 </html>
