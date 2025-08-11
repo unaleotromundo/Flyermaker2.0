@@ -1,1203 +1,153 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Editor Canvas con Botones CMYK</title>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Bebas+Neue&family=Anton&family=Lobster&family=Oswald&family=Poppins&family=Playfair+Display:wght@700&family=Permanent+Marker&family=Rock+Salt&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&family=Archivo+Black&family=Quicksand:wght@700&family=Arizonia&family=Bangers&family=Covered+By+Your+Grace&family=Fredericka+the+Great&family=Indie+Flower&family=Pacifico&family=Press+Start+2P&family=Gloria+Hallelujah&family=Rammetto+One&family=Monoton&family=Rubik+Moonrocks&family=Special+Elite&family=Amatic+SC:wght@700&family=VT323&family=Chewy&family=Black+Ops+One&family=Faster+One&family=Acme&family=Rye&family=Rubik+80s+Fade&family=Sigmar+One&family=UnifrakturCook&family=Sacramento&family=Chango&family=Major+Mono+Display&family=IBM+Plex+Mono:wght@700&family=Poiret+One&family=Unbounded:wght@700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<style>
-:root {
-  --c-cyan: #00B4D8;
-  --c-magenta: #D0006F;
-  --c-yellow: #FFD166;
-  --c-key: #073B4C;
-  --surface: rgba(255, 255, 255, 0.92);
-  --border: rgba(0, 0, 0, 0.08);
-  --text: #0f172a;
-  --text-secondary: #64748b;
-  --shadow: 0 4px 24px rgba(0,0,0,0.05);
-  --shadow-active: 0 6px 32px rgba(0,0,0,0.12);
-  --panel-bg: rgba(255, 255, 255, 0.85);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Montserrat', sans-serif;
-  background: linear-gradient(135deg, #fbfcfd 0%, #f6f9fb 100%);
-  min-height: 100vh;
-  color: var(--text);
-  overflow: hidden;
-  touch-action: none;
-}
-
-header {
-  display: flex;
-  overflow-x: auto;
-  gap: 6px;
-  padding: 8px;
-  background: var(--panel-bg);
-  backdrop-filter: blur(12px);
-  box-shadow: var(--shadow);
-  z-index: 100;
-  scrollbar-width: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-}
-
-header::-webkit-scrollbar {
-  display: none;
-}
-
-.icon-btn {
-  flex: 0 0 auto;
-  width: 54px;
-  height: 54px;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(145deg, #ffffff, #f0f0f0);
-  box-shadow: 
-    0 4px 8px rgba(0,0,0,0.1),
-    inset 0 -2px 0 rgba(0,0,0,0.05),
-    inset 0 0 10px rgba(255,255,255,0.5);
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Colores de fondo CMYK */
-#bgColorBtn { background: var(--c-cyan); }
-#addTextBtn { background: var(--c-magenta); }
-#addImageBtn { background: var(--c-yellow); }
-#generateQrBtn { background: var(--c-key); }
-#exportBtn { background: #E9ECEF; } /* Un color neutral para que los de CMYK destaquen */
-#whatsappBtn { background: #25D366; }
-
-.icon-btn::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  background: linear-gradient(rgba(255,255,255,0.2), transparent);
-  pointer-events: none;
-}
-
-.icon-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 
-    0 6px 12px rgba(0,0,0,0.15),
-    inset 0 -2px 0 rgba(0,0,0,0.05),
-    inset 0 0 10px rgba(255,255,255,0.5);
-}
-
-.icon-btn:active {
-  transform: translateY(1px);
-  box-shadow: 
-    0 2px 4px rgba(0,0,0,0.1),
-    inset 0 -2px 0 rgba(0,0,0,0.05),
-    inset 0 0 10px rgba(255,255,255,0.5);
-}
-
-.icon-btn svg {
-  width: 24px;
-  height: 24px;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
-}
-
-.icon-btn svg path, .icon-btn svg rect, .icon-btn svg circle {
-  fill: #fff;
-  stroke: #fff;
-}
-
-/* Excepciones para iconos con varios colores */
-#bgColorBtn svg path, #bgColorBtn svg circle, #bgColorBtn svg rect {
-  fill: #fff;
-  stroke: #000;
-}
-
-#addImageBtn svg path, #addImageBtn svg circle, #addImageBtn svg rect {
-  fill: #fff;
-  stroke: #fff;
-}
-
-#generateQrBtn svg rect {
-  fill: #fff;
-  stroke: none;
-}
-#generateQrBtn svg rect[width="4"] {
-  fill: #000;
-}
-
-#whatsappBtn svg path, #whatsappBtn svg circle, #whatsappBtn svg rect {
-  fill: #fff;
-  stroke: #fff;
-}
-
-.icon-label {
-  font-size: 9px;
-  font-weight: 600;
-  margin-top: 4px;
-  text-align: center;
-  color: #fff;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
-}
-
-#exportBtn .icon-label, #whatsappBtn .icon-label {
-    color: var(--text);
-    text-shadow: none;
-}
-
-
-main {
-  position: fixed;
-  top: 70px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f0f4f8;
-}
-
-.canvas-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
-
-#flyerCanvas {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  max-width: 100%;
-  max-height: 100%;
-  touch-action: none;
-}
-
-.floating-tools {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: var(--panel-bg);
-  backdrop-filter: blur(8px);
-  border-radius: 12px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column; 
-  gap: 6px;
-  padding: 8px;
-  border: 1px solid var(--border);
-  z-index: 10;
-  cursor: move;
-  user-select: none;
-  flex-wrap: wrap; 
-}
-
-.floating-tools button {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  cursor: pointer;
-  border: none;
-  font-size: 16px;
-  transition: all 0.2s ease;
-}
-
-.floating-tools button:hover {
-  background: #f1f5f9;
-}
-
-#generalTools, #textTools, #imageTools {
-  display: flex;
-  gap: 6px;
-  background: #fff;
-  padding: 6px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.popup {
-  display: none;
-  position: fixed;
-  left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-
-.popup-content {
-  background: var(--panel-bg);
-  padding: 24px;
-  border-radius: 16px;
-  max-width: 500px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--border);
-}
-
-.popup-title {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: var(--text);
-  text-align: center;
-  position: relative;
-  padding-bottom: 12px;
-}
-
-.popup-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60px;
-  height: 3px;
-  background: linear-gradient(90deg, var(--c-cyan), var(--c-magenta));
-  border-radius: 3px;
-}
-
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.image-thumb {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 2px solid var(--border);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.image-thumb:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
-}
-
-.popup-close {
-  width: 100%;
-  padding: 14px;
-  background: var(--c-key);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-  margin-top: 10px;
-}
-
-.popup-close:hover {
-  background: #052a39;
-}
-
-.font-selector {
-  max-height: 300px;
-  overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: #fff;
-  padding: 8px;
-  display: grid;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.font-option {
-  padding: 12px;
-  border-radius: 8px;
-  background: #f8fafc;
-  cursor: pointer;
-  font-size: 16px;
-  border: 1px solid transparent;
-  transition: all 0.15s ease;
-  text-align: center;
-  font-weight: 500;
-}
-
-.font-option:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.06);
-}
-
-.font-option.selected {
-  background: var(--c-cyan);
-  color: #fff;
-  border-color: rgba(0,0,0,0.06);
-  box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);
-}
-
-.color-picker-group {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 16px 0;
-}
-
-.color-label {
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.color-preview {
-  width: 100%;
-  height: 40px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-}
-
-.color-preview input[type="color"] {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-
-footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--panel-bg);
-  backdrop-filter: blur(12px);
-  padding: 8px 20px;
-  text-align: center;
-  font-size: 12px;
-  color: var(--text-secondary);
-  border-top: 1px solid var(--border);
-  z-index: 90;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.footer-links {
-  display: flex;
-  gap: 12px;
-}
-
-.footer-links a {
-  color: var(--text);
-  text-decoration: none;
-  transition: color 0.2s;
-  font-weight: 500;
-  font-size: 12px;
-}
-
-.footer-links a:hover {
-  color: var(--c-cyan);
-}
-
-.help-message {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  z-index: 10;
-  animation: fadeInOut 4s forwards;
-  display: none;
-}
-
-@keyframes fadeInOut {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 1; }
-  100% { opacity: 0; display: none; }
-}
-
-@media (max-width: 768px) {
-  .icon-btn {
-    width: 48px;
-    height: 48px;
-  }
-  
-  .popup-content {
-    padding: 16px;
-  }
-  
-  .image-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .font-selector {
-    max-height: 200px;
-  }
-  
-  .floating-tools {
-    top: 10px;
-    right: 10px;
-    transform: scale(0.9);
-  }
-  
-  .icon-label {
-    font-size: 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .icon-btn {
-    width: 44px;
-    height: 44px;
-  }
-  
-  header {
-    padding: 6px;
-    gap: 4px;
-  }
-  
-  .popup-title {
-    font-size: 18px;
-  }
-  
-  .image-thumb {
-    height: 80px;
-  }
-  
-  footer {
-    flex-direction: column;
-    gap: 4px;
-    padding: 6px;
-  }
-  
-  .footer-links {
-    gap: 8px;
-  }
-  
-  .icon-label {
-    font-size: 7px;
-  }
-}
-
-.hidden-input {
-  display: none;
-}
-
-.upload-card {
-  width: 100%;
-  height: 100px;
-  background-color: #f0f4f8;
-  border: 2px dashed #94a3b8;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: #64748b;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.upload-card:hover {
-  background-color: #e2e8f0;
-  border-color: #334155;
-  color: #334155;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Leandro Lizarazu">
+  <meta name="description" content="Catálogo de productos de prueba con editor de flyers">
+  <title>Tu Catálogo con Editor de Flyers</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-  <button class="icon-btn" title="Color de fondo" id="bgColorBtn">
-    <svg viewBox="0 0 24 24">
-      <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
-      <circle cx="12" cy="12" r="4" fill="#fff"/>
-      <path d="M12 8v4M8 12h4" stroke="#000" stroke-width="1.5"/>
-    </svg>
-    <span class="icon-label">Fondo</span>
-  </button>
-  
-  <button class="icon-btn" title="Agregar texto" id="addTextBtn">
-    <svg viewBox="0 0 24 24">
-      <path d="M5 5h14v3H5z" fill="currentColor"/>
-      <path d="M5 10h14v2H5z" fill="currentColor"/>
-      <path d="M5 14h10v2H5z" fill="currentColor"/>
-      <path d="M5 18h8v2H5z" fill="currentColor"/>
-    </svg>
-    <span class="icon-label">Texto</span>
-  </button>
-  
-  <button class="icon-btn" title="Agregar imagen" id="addImageBtn">
-    <svg viewBox="0 0 24 24">
-      <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
-      <circle cx="8.5" cy="8.5" r="2.5" fill="#fff"/>
-      <path d="M21 15l-5-5-3 3-3-3-3 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span class="icon-label">Imagen</span>
-  </button>
-  
-  <button class="icon-btn" title="Generar QR" id="generateQrBtn">
-    <svg viewBox="0 0 24 24">
-      <rect x="3" y="3" width="7" height="7" fill="currentColor"/>
-      <rect x="14" y="3" width="7" height="7" fill="currentColor"/>
-      <rect x="3" y="14" width="7" height="7" fill="currentColor"/>
-      <rect x="10" y="10" width="4" height="4" fill="#fff"/>
-      <rect x="14" y="14" width="7" height="7" fill="currentColor"/>
-    </svg>
-    <span class="icon-label">QR</span>
-  </button>
-  
-  <button class="icon-btn" title="Exportar" id="exportBtn">
-    <svg viewBox="0 0 24 24">
-      <path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      <path d="M5 20h14a1 1 0 001-1v-4H4v4a1 1 0 001 1z" fill="currentColor"/>
-    </svg>
-    <span class="icon-label">Exportar</span>
-  </button>
-  
-  <button class="icon-btn" title="Compartir WhatsApp" id="whatsappBtn">
-    <svg viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="10" fill="currentColor"/>
-      <path d="M8 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M12 8v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-    <span class="icon-label">WhatsApp</span>
-  </button>
+
+<header class="menu-catalogo">
+  <a href="#" class="logo">Tu Catálogo</a>
+  <div class="botones">
+    <a href="https://wa.me/tunumerodecelular" class="btn-whatsapp" target="_blank">
+      <img src="images/whatsapp.png" alt="WhatsApp">
+    </a>
+    <button id="abrirGaleriaBtn" class="btn-stickers">
+      <img src="images/emoji.png" alt="Stickers">
+    </button>
+  </div>
 </header>
 
 <main>
-  <div class="canvas-container">
-    <canvas id="flyerCanvas" width="800" height="1066"></canvas>
-    <div class="floating-tools" id="floatingTools">
-      <div id="generalTools">
-          <button id="btnSubirCapa" title="Subir capa">↑</button>
-          <button id="btnBajarCapa" title="Bajar capa">↓</button>
-          <button id="btnEnviarFondo" title="Enviar al fondo">⤓</button>
-          <button id="btnEliminar" title="Eliminar">🗑</button>
-      </div>
-      <div id="textTools" style="display: none;">
-          <button id="btnOpenFontPopup" title="Cambiar fuente">Aa</button>
-          <button id="btnOpenTextColorPopup" title="Cambiar color">🎨</button>
-          <button id="btnAlinIzq" title="Alinear izquierda">⚍</button>
-          <button id="btnAlinCen" title="Alinear centro">☰</button>
-          <button id="btnAlinDer" title="Alinear derecha">⚍</button>
-      </div>
-      <div id="imageTools" style="display: none;">
-          <button id="btnApplyFilter" title="Aplicar filtro">✨</button>
-          <button id="btnRemoveFilters" title="Quitar filtros">🚫</button>
-      </div>
+  <section class="editor-flyer">
+    <h2>Crea tu Flyer</h2>
+    <canvas id="flyerCanvas" width="600" height="400"></canvas>
+    <div class="herramientas">
+      <button id="descargarFlyerBtn" class="boton">Descargar Flyer</button>
     </div>
-    <div class="help-message" id="helpMessage">¡Puedes mover, rotar y escalar los objetos con el ratón!</div>
+  </section>
+
+  <div id="galeriaStickers" class="galeria-overlay">
+    <div class="galeria-contenido">
+      <h3>Elige un Sticker:</h3>
+      <div class="stickers-bar">
+        </div>
+    </div>
   </div>
+
+  <section class="productos">
+    <h2>Nuestros Productos</h2>
+    <div class="producto">
+      <img src="images/producto1.jpg" alt="Producto 1">
+      <h3>Producto 1</h3>
+      <p>Descripción breve del producto 1.</p>
+      <span class="precio">$100</span>
+      <button class="boton-agregar">Agregar</button>
+    </div>
+    <div class="producto">
+      <img src="images/producto2.jpg" alt="Producto 2">
+      <h3>Producto 2</h3>
+      <p>Descripción breve del producto 2.</p>
+      <span class="precio">$150</span>
+      <button class="boton-agregar">Agregar</button>
+    </div>
+    <div class="producto">
+      <img src="images/producto3.jpg" alt="Producto 3">
+      <h3>Producto 3</h3>
+      <p>Descripción breve del producto 3.</p>
+      <span class="precio">$200</span>
+      <button class="boton-agregar">Agregar</button>
+    </div>
+  </section>
 </main>
 
-<div class="popup" id="imgGalleryPopup">
-  <div class="popup-content">
-    <div class="popup-title">Galería de Imágenes</div>
-    
-    <label for="bgLocalInput" class="upload-card">
-      Subir tu propia imagen
-    </label>
-    <input type="file" id="bgLocalInput" accept="image/*" class="hidden-input">
-    
-    <div class="image-grid" id="imgFondoGrid"></div>
-    <button class="popup-close">Cerrar</button>
-  </div>
-</div>
-
-<div class="popup" id="fontPopup">
-  <div class="popup-content">
-    <div class="popup-title">Seleccionar fuente</div>
-    <div id="customFontSelector" class="font-selector"></div>
-    <button class="popup-close">Aplicar</button>
-  </div>
-</div>
-
-<div class="popup" id="exportPopup">
-  <div class="popup-content">
-    <div class="popup-title">Exportar Flyer</div>
-    <button class="popup-close" id="btnDescargarJPG">Descargar como JPG</button>
-    <button class="popup-close" id="btnDescargarPDF" style="margin-top: 10px;">Descargar como PDF</button>
-  </div>
-</div>
-
 <footer>
-  <div>Hecho con 💜 por OtroMundo</div>
-  <div class="footer-links">
-    <a href="https://https://unaleotromundo.github.io/tucatalogo/" target="_blank">GitHub</a>
-    <a href="https://twitter.com/unaleotromundo" target="_blank">X</a>
-    <a href="mailto:otromundoale@gmail.com">Contacto</a>
-  </div>
+  <p>&copy; 2023 Tu Catálogo. Todos los derechos reservados.</p>
 </footer>
 
 <script>
-const fontFamilies = {
-  "Montserrat": "'Montserrat', Arial, sans-serif",
-  "Bebas Neue": "'Bebas Neue', Arial, sans-serif",
-  "Anton": "'Anton', Arial, sans-serif",
-  "Archivo Black": "'Archivo Black', Arial, sans-serif",
-  "Oswald": "'Oswald', Arial, sans-serif",
-  "Poppins": "'Poppins', Arial, sans-serif",
-  "Lobster": "'Lobster', cursive",
-  "Playfair Display": "'Playfair Display', serif",
-  "Permanent Marker": "'Permanent Marker', cursive",
-  "Rock Salt": "'Rock Salt', cursive",
-  "Luckiest Guy": "'Luckiest Guy', cursive",
-  "Shadows Into Light": "'Shadows Into Light', cursive",
-  "Orbitron": "'Orbitron', sans-serif",
-  "Quicksand": "'Quicksand', Arial, sans-serif",
-  "Arizonia": "'Arizonia', cursive",
-  "Bangers": "'Bangers', cursive",
-  "Covered By Your Grace": "'Covered By Your Grace', cursive",
-  "Fredericka the Great": "'Fredericka the Great', cursive",
-  "Indie Flower": "'Indie Flower', cursive",
-  "Pacifico": "'Pacifico', cursive",
-  "Press Start 2P": "'Press Start 2P', monospace",
-  "Gloria Hallelujah": "'Gloria Hallelujah', cursive",
-  "Rammetto One": "'Rammetto One', cursive",
-  "Monoton": "'Monoton', cursive",
-  "Rubik Moonrocks": "'Rubik Moonrocks', cursive",
-  "Special Elite": "'Special Elite', monospace",
-  "Amatic SC": "'Amatic SC', cursive",
-  "VT323": "'VT323', monospace",
-  "Chewy": "'Chewy', cursive",
-  "Black Ops One": "'Black Ops One', cursive",
-  "Faster One": "'Faster One', cursive",
-  "Acme": "'Acme', sans-serif",
-  "Rye": "'Rye', cursive",
-  "Rubik 80s Fade": "'Rubik 80s Fade', cursive",
-  "Sigmar One": "'Sigmar One', cursive",
-  "UnifrakturCook": "'UnifrakturCook', cursive",
-  "Sacramento": "'Sacramento', cursive",
-  "Chango": "'Chango', cursive",
-  "Major Mono Display": "'Major Mono Display', monospace",
-  "IBM Plex Mono": "'IBM Plex Mono', monospace",
-  "Poiret One": "'Poiret One', cursive",
-  "Unbounded": "'Unbounded', sans-serif"
-};
+document.addEventListener('DOMContentLoaded', function() {
+  const canvas = document.getElementById('flyerCanvas');
+  const ctx = canvas.getContext('2d');
+  const galeriaStickers = document.getElementById('galeriaStickers');
+  const abrirGaleriaBtn = document.getElementById('abrirGaleriaBtn');
+  const descargarFlyerBtn = document.getElementById('descargarFlyerBtn');
+  const stickersBar = document.querySelector('.stickers-bar');
+  
+  let selectedSticker = null;
+  const stickers = {};
+  const imagesPath = 'images/';
 
-const canvas = new fabric.Canvas('flyerCanvas', {
-  preserveObjectStacking: true,
-  selection: true,
-  allowTouchScrolling: true,
-  enableRetinaScaling: true,
-  devicePixelRatio: window.devicePixelRatio || 1
-});
-canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
+  // Lista de nombres de archivo de los stickers
+  const stickerFiles = [
+    'fb-icon.png', 'whatsapp-icon.png', 'ig-icon.png', 'x-icon.png', 'telegram-icon.png',
+    'happy.png', 'sad.png', 'heart.png', 'flag-arg.png', 'flag-bra.png'
+  ];
 
-fabric.Textbox.prototype.textBaseline = 'alphabetic';
+  // Precargar las imágenes de los stickers y crear los elementos en la galería
+  stickerFiles.forEach(file => {
+    const imageName = file.split('.')[0];
+    const stickerDiv = document.createElement('div');
+    stickerDiv.classList.add('sticker-option');
+    stickerDiv.dataset.sticker = imageName;
+    stickerDiv.style.backgroundImage = `url('${imagesPath}${file}')`;
+    stickersBar.appendChild(stickerDiv);
 
-const fondos = [
-  "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=600&q=80",
-  "https://images.unsplash.com/photo-1424746219973-8fe3bd07d8e3?auto=format&fit=crop&w=600&q=80"
-];
-
-const imgFondoGrid = document.getElementById('imgFondoGrid');
-fondos.forEach((url, i) => {
-  const img = document.createElement("img");
-  img.src = url;
-  img.className = "image-thumb";
-  img.alt = `Fondo ${i+1}`;
-  img.addEventListener("click", () => {
-    addImageToCanvas(url);
+    stickers[imageName] = new Image();
+    stickers[imageName].src = `${imagesPath}${file}`;
   });
-  imgFondoGrid.appendChild(img);
-});
 
-function addImageToCanvas(url) {
-  fabric.Image.fromURL(url, (img) => {
-    const maxWidth = canvas.width * 0.6;
-    const maxHeight = canvas.height * 0.6;
-    const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
-    
-    img.scale(scale);
-    img.set({
-      left: canvas.width / 2,
-      top: canvas.height / 2,
-      originX: "center",
-      originY: "center",
-      hasControls: true,
-      lockRotation: false,
-      lockScalingX: false,
-      lockScalingY: false,
-      lockMovementX: false,
-      lockMovementY: false,
-      crossOrigin: 'anonymous'
-    });
-    
-    canvas.add(img);
-    canvas.setActiveObject(img);
-    canvas.renderAll();
-    showHelpMessage("Imagen agregada. Puedes moverla, rotarla y escalarla libremente.");
-    document.getElementById('imgGalleryPopup').style.display = 'none';
-  }, { crossOrigin: 'anonymous' });
-}
-
-function adjustCanvasSize() {
-  const container = document.querySelector('.canvas-container');
-  const maxWidth = container.clientWidth;
-  const maxHeight = container.clientHeight;
-  
-  const aspectRatio = 800 / 1066;
-  let newWidth = maxWidth;
-  let newHeight = maxWidth / aspectRatio;
-  
-  if (newHeight > maxHeight) {
-    newHeight = maxHeight;
-    newWidth = maxHeight * aspectRatio;
-  }
-  
-  canvas.setWidth(newWidth);
-  canvas.setHeight(newHeight);
-  canvas.renderAll();
-}
-
-window.addEventListener('resize', () => {
-  adjustCanvasSize();
-});
-
-adjustCanvasSize();
-
-document.getElementById('addImageBtn').addEventListener('click', () => {
-  document.getElementById('imgGalleryPopup').style.display = 'flex';
-});
-
-document.getElementById('bgLocalInput').addEventListener('change', function(e) {
-  if (!e.target.files || !e.target.files[0]) return;
-  const file = e.target.files[0];
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const imgElement = new Image();
-    imgElement.crossOrigin = 'anonymous';
-    imgElement.src = event.target.result;
-    
-    imgElement.onload = () => {
-      const img = new fabric.Image(imgElement);
-      const maxWidth = canvas.width * 0.6;
-      const maxHeight = canvas.height * 0.6;
-      const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
-      
-      img.scale(scale);
-      img.set({
-        left: canvas.width / 2,
-        top: canvas.height / 2,
-        originX: "center",
-        originY: "center",
-        hasControls: true,
-        lockRotation: false,
-        lockScalingX: false,
-        lockScalingY: false,
-        lockMovementX: false,
-        lockMovementY: false
-      });
-      canvas.add(img);
-      canvas.setActiveObject(img);
-      canvas.renderAll();
-      showHelpMessage("Imagen agregada. Puedes moverla, rotarla y escalarla libremente.");
-    };
-  };
-  reader.readAsDataURL(file);
-  e.target.value = "";
-});
-
-
-document.getElementById('bgColorBtn').addEventListener('click', () => {
-  const colorPicker = document.createElement('input');
-  colorPicker.type = 'color';
-  colorPicker.value = '#ffffff';
-  colorPicker.click();
-  
-  colorPicker.addEventListener('input', function() {
-    canvas.setBackgroundColor(this.value, canvas.renderAll.bind(canvas));
+  // Mostrar la galería de stickers al hacer clic en el botón
+  abrirGaleriaBtn.addEventListener('click', function() {
+    galeriaStickers.style.display = 'flex';
   });
-});
 
-document.getElementById('addTextBtn').addEventListener('click', () => {
-  const text = prompt("Ingresa tu texto:", "Texto personalizado");
-  if (text && text.trim()) {
-    const textObj = new fabric.Textbox(text, {
-      left: canvas.width / 2,
-      top: canvas.height / 2,
-      fontSize: 40,
-      fill: '#000000',
-      fontFamily: fontFamilies["Montserrat"] || "Montserrat",
-      originX: "center",
-      originY: "center",
-      editable: true,
-      width: canvas.width * 0.8,
-      textAlign: 'center',
-      hasControls: true,
-      lockRotation: false,
-      lockScalingX: false,
-      lockScalingY: false,
-      lockMovementX: false,
-      lockMovementY: false
-    });
-    canvas.add(textObj);
-    canvas.setActiveObject(textObj);
-    canvas.renderAll();
-    showHelpMessage("Texto agregado. Puedes moverlo, rotarlo y escalarlo libremente.");
-  }
-});
-
-document.getElementById('generateQrBtn').addEventListener('click', () => {
-  const tel = prompt("Ingresa número de WhatsApp (ej: 094123456):", "");
-  if (tel && tel.match(/^\d{6,}$/)) {
-    const url = `https://wa.me/598${tel}?text=¡Hola!%20Vi%20tu%20flyer%20y%20me%20interesa%20saber%20más`;
-    const qr = new QRious({ 
-      value: url, 
-      size: 300,
-      background: 'white',
-      foreground: 'black'
-    });
-    
-    fabric.Image.fromURL(qr.toDataURL(), (img) => {
-      img.scale(0.3);
-      img.set({
-        left: canvas.width / 2,
-        top: canvas.height / 2,
-        originX: "center",
-        originY: "center",
-        hasControls: true,
-        lockRotation: false,
-        lockScalingX: false,
-        lockScalingY: false,
-        lockMovementX: false,
-        lockMovementY: false
-      });
-      
-      canvas.add(img);
-      canvas.setActiveObject(img);
-      canvas.renderAll();
-      showHelpMessage("Código QR agregado. Puedes moverlo y escalarlo libremente.");
-    });
-  } else {
-    alert("Por favor, ingresá un número de WhatsApp válido");
-  }
-});
-
-document.getElementById('exportBtn').addEventListener('click', () => {
-  document.getElementById('exportPopup').style.display = 'flex';
-});
-
-document.getElementById('whatsappBtn').addEventListener('click', shareWhatsApp);
-
-document.getElementById('btnSubirCapa').addEventListener('click', () => {
-  const obj = canvas.getActiveObject();
-  if (obj) canvas.bringForward(obj);
-});
-
-document.getElementById('btnBajarCapa').addEventListener('click', () => {
-  const obj = canvas.getActiveObject();
-  if (obj) canvas.sendBackwards(obj);
-});
-
-document.getElementById('btnEnviarFondo').addEventListener('click', () => {
-  const obj = canvas.getActiveObject();
-  if (obj) canvas.sendToBack(obj);
-});
-
-document.getElementById('btnEliminar').addEventListener('click', () => {
-  const obj = canvas.getActiveObject();
-  if (obj) canvas.remove(obj);
-});
-
-document.querySelectorAll('.popup-close').forEach(btn => {
-  btn.addEventListener('click', function() {
-    this.closest('.popup').style.display = 'none';
+  // Ocultar la galería y seleccionar el sticker
+  stickersBar.addEventListener('click', function(e) {
+    const target = e.target;
+    if (target.classList.contains('sticker-option')) {
+      selectedSticker = target.dataset.sticker;
+      galeriaStickers.style.display = 'none'; // Oculta la galería al seleccionar
+      console.log(`Sticker seleccionado: ${selectedSticker}`);
+    }
   });
-});
 
-function renderFontOptions() {
-  const container = document.getElementById("customFontSelector");
-  container.innerHTML = "";
-  
-  Object.keys(fontFamilies).forEach(fontName => {
-    const div = document.createElement("div");
-    div.className = "font-option";
-    div.textContent = fontName;
-    div.style.fontFamily = fontFamilies[fontName] || fontName;
-    div.addEventListener("click", () => {
-      document.querySelectorAll('.font-option').forEach(o => o.classList.remove('selected'));
-      div.classList.add('selected');
-      
-      const active = canvas.getActiveObject();
-      if (active && active.type === "textbox") {
-        active.set("fontFamily", fontFamilies[fontName] || fontName);
-        canvas.renderAll();
+  // Dibujar el sticker en el canvas al hacer clic
+  canvas.addEventListener('click', function(e) {
+    if (selectedSticker && stickers.hasOwnProperty(selectedSticker)) {
+      const stickerImage = stickers[selectedSticker];
+      if (stickerImage.complete) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left - (stickerImage.width / 2);
+        const y = e.clientY - rect.top - (stickerImage.height / 2);
+        ctx.drawImage(stickerImage, x, y);
+      } else {
+        stickerImage.onload = function() {
+          const rect = canvas.getBoundingClientRect();
+          const x = e.clientX - rect.left - (stickerImage.width / 2);
+          const y = e.clientY - rect.top - (stickerImage.height / 2);
+          ctx.drawImage(stickerImage, x, y);
+        };
       }
-    });
-    container.appendChild(div);
-  });
-}
-
-document.getElementById('btnDescargarJPG').addEventListener('click', () => {
-  const url = canvas.toDataURL({ 
-    format: "jpeg", 
-    quality: 0.95,
-    multiplier: 2
-  });
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = "flyer.jpg";
-  link.click();
-  document.getElementById('exportPopup').style.display = 'none';
-});
-
-document.getElementById('btnDescargarPDF').addEventListener('click', async () => {
-  try {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "px",
-      format: [canvas.width, canvas.height]
-    });
-    
-    const dataURL = canvas.toDataURL({ 
-      format: "jpeg", 
-      quality: 1.0,
-      multiplier: 2
-    });
-    
-    pdf.addImage(dataURL, "JPEG", 0, 0, canvas.width, canvas.height);
-    pdf.save("flyer.pdf");
-  } catch (error) {
-    alert("Error al generar PDF. Intentá descargar como JPG.");
-  }
-  document.getElementById('exportPopup').style.display = 'none';
-});
-
-async function shareWhatsApp() {
-  const fileName = "flyer.jpg";
-  const dataUrl = canvas.toDataURL({ 
-    format: "jpeg", 
-    quality: 0.95,
-    multiplier: 2
-  });
-  
-  const mensaje = encodeURIComponent("¡Mirá este flyer que acabo de crear con Haceloquesea!");
-  const waUrl = `https://wa.me/?text=${mensaje}`;
-  
-  const link = document.createElement("a");
-  link.href = dataUrl;
-  link.download = fileName;
-  link.click();
-  
-  setTimeout(() => {
-      alert("Se descargó tu flyer y se abrió WhatsApp. Adjuntá la imagen desde tu galería para compartirla.");
-      window.open(waUrl, "_blank");
-  }, 500);
-}
-
-function showHelpMessage(message) {
-  const helpElement = document.getElementById('helpMessage');
-  helpElement.textContent = message;
-  helpElement.style.display = 'block';
-  
-  setTimeout(() => {
-    helpElement.style.opacity = '0';
-    setTimeout(() => {
-      helpElement.style.display = 'none';
-      helpElement.style.opacity = '1';
-    }, 1000);
-  }, 3000);
-}
-
-const generalTools = document.getElementById('generalTools');
-const textTools = document.getElementById('textTools');
-const imageTools = document.getElementById('imageTools');
-const floatingTools = document.getElementById('floatingTools');
-
-canvas.on('selection:created', (e) => {
-  const activeObject = e.selected[0];
-  floatingTools.style.display = 'flex';
-  
-  if (activeObject && activeObject.type === 'textbox') {
-    textTools.style.display = 'flex';
-    imageTools.style.display = 'none';
-  } else if (activeObject && activeObject.type === 'image') {
-    imageTools.style.display = 'flex';
-    textTools.style.display = 'none';
-  } else {
-    textTools.style.display = 'none';
-    imageTools.style.display = 'none';
-  }
-});
-
-canvas.on('selection:updated', (e) => {
-  const activeObject = e.selected[0];
-  if (activeObject && activeObject.type === 'textbox') {
-    textTools.style.display = 'flex';
-    imageTools.style.display = 'none';
-  } else if (activeObject && activeObject.type === 'image') {
-    imageTools.style.display = 'flex';
-    textTools.style.display = 'none';
-  } else {
-    textTools.style.display = 'none';
-    imageTools.style.display = 'none';
-  }
-});
-
-canvas.on('selection:cleared', () => {
-  textTools.style.display = 'none';
-  imageTools.style.display = 'none';
-});
-
-document.getElementById('btnAlinIzq').addEventListener('click', () => {
-  const active = canvas.getActiveObject();
-  if (active && active.type === "textbox") {
-    active.set("textAlign", "left");
-    canvas.renderAll();
-  }
-});
-
-document.getElementById('btnAlinCen').addEventListener('click', () => {
-  const active = canvas.getActiveObject();
-  if (active && active.type === "textbox") {
-    active.set("textAlign", "center");
-    canvas.renderAll();
-  }
-});
-
-document.getElementById('btnAlinDer').addEventListener('click', () => {
-  const active = canvas.getActiveObject();
-  if (active && active.type === "textbox") {
-    active.set("textAlign", "right");
-    canvas.renderAll();
-  }
-});
-
-document.getElementById('btnOpenFontPopup').addEventListener('click', () => {
-  renderFontOptions();
-  document.getElementById('fontPopup').style.display = 'flex';
-});
-
-document.getElementById('btnOpenTextColorPopup').addEventListener('click', () => {
-  const active = canvas.getActiveObject();
-  if (active && active.type === "textbox") {
-    const colorPicker = document.createElement('input');
-    colorPicker.type = 'color';
-    colorPicker.value = active.fill;
-    colorPicker.click();
-    
-    colorPicker.addEventListener('input', function() {
-      active.set("fill", this.value);
-      canvas.renderAll();
-    });
-  }
-});
-
-const filters = [
-  new fabric.Image.filters.Grayscale(),
-  new fabric.Image.filters.Sepia(),
-  new fabric.Image.filters.Invert(),
-  new fabric.Image.filters.Blur({ blur: 0.5 }),
-  new fabric.Image.filters.Brightness({ brightness: 0.2 }),
-  new fabric.Image.filters.Contrast({ contrast: 0.2 }),
-  new fabric.Image.filters.Saturation({ saturation: 0.5 }),
-  new fabric.Image.filters.HueRotation({ rotation: 0.5 }),
-  new fabric.Image.filters.Vintage(),
-  new fabric.Image.filters.Kodachrome(),
-  new fabric.Image.filters.Technicolor(),
-  new fabric.Image.filters.Brownie(),
-  new fabric.Image.filters.Polaroid()
-];
-let currentFilterIndex = 0;
-
-document.getElementById('btnApplyFilter').addEventListener('click', () => {
-  const activeObject = canvas.getActiveObject();
-  if (!activeObject || activeObject.type !== 'image') {
-    showHelpMessage("Selecciona una imagen para aplicar filtros.");
-    return;
-  }
-  
-  if (currentFilterIndex >= filters.length) {
-    currentFilterIndex = 0;
-  }
-  
-  activeObject.filters = [filters[currentFilterIndex]];
-  activeObject.applyFilters();
-  canvas.renderAll();
-  
-  const filterNames = Object.keys({
-    'Grayscale': new fabric.Image.filters.Grayscale(),
-    'Sepia': new fabric.Image.filters.Sepia(),
-    'Invert': new fabric.Image.filters.Invert(),
-    'Blur': new fabric.Image.filters.Blur({ blur: 0.5 }),
-    'Brightness': new fabric.Image.filters.Brightness({ brightness: 0.2 }),
-    'Contrast': new fabric.Image.filters.Contrast({ contrast: 0.2 }),
-    'Saturation': new fabric.Image.filters.Saturation({ saturation: 0.5 }),
-    'Hue Rotation': new fabric.Image.filters.HueRotation({ rotation: 0.5 }),
-    'Vintage': new fabric.Image.filters.Vintage(),
-    'Kodachrome': new fabric.Image.filters.Kodachrome(),
-    'Technicolor': new fabric.Image.filters.Technicolor(),
-    'Brownie': new fabric.Image.filters.Brownie(),
-    'Polaroid': new fabric.Image.filters.Polaroid()
+    }
   });
 
-  showHelpMessage(`Filtro aplicado: ${filterNames[currentFilterIndex]}`);
-  
-  currentFilterIndex++;
-});
-
-document.getElementById('btnRemoveFilters').addEventListener('click', () => {
-  const activeObject = canvas.getActiveObject();
-  if (activeObject && activeObject.type === 'image') {
-    activeObject.filters = [];
-    activeObject.applyFilters();
-    canvas.renderAll();
-    showHelpMessage("Filtros removidos.");
-    currentFilterIndex = 0;
-  } else {
-    showHelpMessage("Selecciona una imagen primero.");
-  }
+  // Descargar el flyer
+  descargarFlyerBtn.addEventListener('click', function() {
+    const dataURL = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = dataURL;
+    a.download = 'mi_flyer.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  });
 });
 </script>
+
 </body>
 </html>
