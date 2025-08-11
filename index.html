@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Editor Canvas con Iconos 3D CMYK</title>
+<title>Editor Canvas con Botones CMYK</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Bebas+Neue&family=Anton&family=Lobster&family=Oswald&family=Poppins&family=Playfair+Display:wght@700&family=Permanent+Marker&family=Rock+Salt&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&family=Archivo+Black&family=Quicksand:wght@700&family=Arizonia&family=Bangers&family=Covered+By+Your+Grace&family=Fredericka+the+Great&family=Indie+Flower&family=Pacifico&family=Press+Start+2P&family=Gloria+Hallelujah&family=Rammetto+One&family=Monoton&family=Rubik+Moonrocks&family=Special+Elite&family=Amatic+SC:wght@700&family=VT323&family=Chewy&family=Black+Ops+One&family=Faster+One&family=Acme&family=Rye&family=Rubik+80s+Fade&family=Sigmar+One&family=UnifrakturCook&family=Sacramento&family=Chango&family=Major+Mono+Display&family=IBM+Plex+Mono:wght@700&family=Poiret+One&family=Unbounded:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.2.4/fabric.min.js"></script>
@@ -39,7 +39,6 @@ body {
   touch-action: none;
 }
 
-/* Header Styles - Botones sobre el canvas */
 header {
   display: flex;
   overflow-x: auto;
@@ -81,6 +80,14 @@ header::-webkit-scrollbar {
   overflow: hidden;
 }
 
+/* Colores de fondo CMYK */
+#bgColorBtn { background: var(--c-cyan); }
+#addTextBtn { background: var(--c-magenta); }
+#addImageBtn { background: var(--c-yellow); }
+#generateQrBtn { background: var(--c-key); }
+#exportBtn { background: #E9ECEF; } /* Un color neutral para que los de CMYK destaquen */
+#whatsappBtn { background: #25D366; }
+
 .icon-btn::after {
   content: '';
   position: absolute;
@@ -114,16 +121,50 @@ header::-webkit-scrollbar {
   filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
 }
 
+.icon-btn svg path, .icon-btn svg rect, .icon-btn svg circle {
+  fill: #fff;
+  stroke: #fff;
+}
+
+/* Excepciones para iconos con varios colores */
+#bgColorBtn svg path, #bgColorBtn svg circle, #bgColorBtn svg rect {
+  fill: #fff;
+  stroke: #000;
+}
+
+#addImageBtn svg path, #addImageBtn svg circle, #addImageBtn svg rect {
+  fill: #fff;
+  stroke: #fff;
+}
+
+#generateQrBtn svg rect {
+  fill: #fff;
+  stroke: none;
+}
+#generateQrBtn svg rect[width="4"] {
+  fill: #000;
+}
+
+#whatsappBtn svg path, #whatsappBtn svg circle, #whatsappBtn svg rect {
+  fill: #fff;
+  stroke: #fff;
+}
+
 .icon-label {
   font-size: 9px;
   font-weight: 600;
   margin-top: 4px;
   text-align: center;
-  color: var(--c-key);
-  text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
 }
 
-/* Main Canvas Area - Ocupa toda la pantalla */
+#exportBtn .icon-label, #whatsappBtn .icon-label {
+    color: var(--text);
+    text-shadow: none;
+}
+
+
 main {
   position: fixed;
   top: 70px;
@@ -155,7 +196,6 @@ main {
   touch-action: none;
 }
 
-/* Floating Tools - Movible */
 .floating-tools {
   position: absolute;
   top: 20px;
@@ -165,13 +205,14 @@ main {
   border-radius: 12px;
   box-shadow: var(--shadow);
   display: flex;
-  flex-direction: column;
+  flex-direction: column; 
   gap: 6px;
   padding: 8px;
   border: 1px solid var(--border);
   z-index: 10;
   cursor: move;
   user-select: none;
+  flex-wrap: wrap; 
 }
 
 .floating-tools button {
@@ -193,17 +234,15 @@ main {
   background: #f1f5f9;
 }
 
-.floating-tools button:nth-child(1) {
-  color: var(--c-cyan);
-}
-.floating-tools button:nth-child(2) {
-  color: var(--c-magenta);
-}
-.floating-tools button:nth-child(3) {
-  color: var(--c-yellow);
+#generalTools, #textTools, #imageTools {
+  display: flex;
+  gap: 6px;
+  background: #fff;
+  padding: 6px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-/* Popup Styles */
 .popup {
   display: none;
   position: fixed;
@@ -290,7 +329,6 @@ main {
   background: #052a39;
 }
 
-/* Font Selector */
 .font-selector {
   max-height: 300px;
   overflow-y: auto;
@@ -327,7 +365,6 @@ main {
   box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);
 }
 
-/* Color Picker */
 .color-picker-group {
   display: flex;
   flex-direction: column;
@@ -359,7 +396,6 @@ main {
   cursor: pointer;
 }
 
-/* Footer */
 footer {
   position: fixed;
   bottom: 0;
@@ -395,7 +431,6 @@ footer {
   color: var(--c-cyan);
 }
 
-/* Help message */
 .help-message {
   position: absolute;
   bottom: 40px;
@@ -418,7 +453,6 @@ footer {
   100% { opacity: 0; display: none; }
 }
 
-/* Mobile Optimization */
 @media (max-width: 768px) {
   .icon-btn {
     width: 48px;
@@ -482,42 +516,47 @@ footer {
   }
 }
 
-/* Hide file inputs */
 .hidden-input {
   display: none;
+}
+
+.upload-card {
+  width: 100%;
+  height: 100px;
+  background-color: #f0f4f8;
+  border: 2px dashed #94a3b8;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upload-card:hover {
+  background-color: #e2e8f0;
+  border-color: #334155;
+  color: #334155;
 }
 </style>
 </head>
 <body>
 <header>
-  <button class="icon-btn" title="Fondo / Galería" id="bgGalleryBtn">
-    <svg viewBox="0 0 24 24" fill="var(--c-cyan)">
-      <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
-      <circle cx="8" cy="8" r="2" fill="#fff"/>
-      <path d="M21 15l-5-5-3 3-3-3-3 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-    <span class="icon-label">Fondo</span>
-  </button>
-  
-  <button class="icon-btn" title="Quitar fondo" id="removeBgBtn" style="display:none;">
-    <svg viewBox="0 0 24 24" fill="var(--c-magenta)">
-      <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor" opacity="0.8"/>
-      <path d="M6 6l12 12M6 18L18 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-    </svg>
-    <span class="icon-label">Quitar</span>
-  </button>
-  
-  <button class="icon-btn" title="Color / Textura" id="bgColorBtn">
-    <svg viewBox="0 0 24 24" fill="var(--c-yellow)">
+  <button class="icon-btn" title="Color de fondo" id="bgColorBtn">
+    <svg viewBox="0 0 24 24">
       <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
       <circle cx="12" cy="12" r="4" fill="#fff"/>
       <path d="M12 8v4M8 12h4" stroke="#000" stroke-width="1.5"/>
     </svg>
-    <span class="icon-label">Color</span>
+    <span class="icon-label">Fondo</span>
   </button>
   
   <button class="icon-btn" title="Agregar texto" id="addTextBtn">
-    <svg viewBox="0 0 24 24" fill="var(--c-key)">
+    <svg viewBox="0 0 24 24">
       <path d="M5 5h14v3H5z" fill="currentColor"/>
       <path d="M5 10h14v2H5z" fill="currentColor"/>
       <path d="M5 14h10v2H5z" fill="currentColor"/>
@@ -526,26 +565,8 @@ footer {
     <span class="icon-label">Texto</span>
   </button>
   
-  <button class="icon-btn" title="Fuente" id="fontBtn">
-    <svg viewBox="0 0 24 24" fill="var(--c-cyan)">
-      <path d="M5 5h14v3H5z" fill="currentColor"/>
-      <path d="M5 10h14v2H5z" fill="currentColor"/>
-      <path d="M9 14h6v6H9z" fill="currentColor"/>
-    </svg>
-    <span class="icon-label">Fuente</span>
-  </button>
-  
-  <button class="icon-btn" title="Color de texto" id="textColorBtn">
-    <svg viewBox="0 0 24 24" fill="var(--c-magenta)">
-      <path d="M12 3L3 21h18z" fill="currentColor"/>
-      <circle cx="12" cy="12" r="2" fill="#fff"/>
-      <path d="M12 7v3M9 10h6" stroke="#fff" stroke-width="1.5"/>
-    </svg>
-    <span class="icon-label">T. Color</span>
-  </button>
-  
   <button class="icon-btn" title="Agregar imagen" id="addImageBtn">
-    <svg viewBox="0 0 24 24" fill="var(--c-yellow)">
+    <svg viewBox="0 0 24 24">
       <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor"/>
       <circle cx="8.5" cy="8.5" r="2.5" fill="#fff"/>
       <path d="M21 15l-5-5-3 3-3-3-3 3" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -554,7 +575,7 @@ footer {
   </button>
   
   <button class="icon-btn" title="Generar QR" id="generateQrBtn">
-    <svg viewBox="0 0 24 24" fill="var(--c-key)">
+    <svg viewBox="0 0 24 24">
       <rect x="3" y="3" width="7" height="7" fill="currentColor"/>
       <rect x="14" y="3" width="7" height="7" fill="currentColor"/>
       <rect x="3" y="14" width="7" height="7" fill="currentColor"/>
@@ -565,7 +586,7 @@ footer {
   </button>
   
   <button class="icon-btn" title="Exportar" id="exportBtn">
-    <svg viewBox="0 0 24 24" fill="var(--c-cyan)">
+    <svg viewBox="0 0 24 24">
       <path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       <path d="M5 20h14a1 1 0 001-1v-4H4v4a1 1 0 001 1z" fill="currentColor"/>
     </svg>
@@ -573,7 +594,7 @@ footer {
   </button>
   
   <button class="icon-btn" title="Compartir WhatsApp" id="whatsappBtn">
-    <svg viewBox="0 0 24 24" fill="#25D366">
+    <svg viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="10" fill="currentColor"/>
       <path d="M8 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M12 8v4" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
@@ -586,21 +607,38 @@ footer {
   <div class="canvas-container">
     <canvas id="flyerCanvas" width="800" height="1066"></canvas>
     <div class="floating-tools" id="floatingTools">
-      <button id="btnSubirCapa">↑</button>
-      <button id="btnBajarCapa">↓</button>
-      <button id="btnEliminar">🗑</button>
+      <div id="generalTools">
+          <button id="btnSubirCapa" title="Subir capa">↑</button>
+          <button id="btnBajarCapa" title="Bajar capa">↓</button>
+          <button id="btnEnviarFondo" title="Enviar al fondo">⤓</button>
+          <button id="btnEliminar" title="Eliminar">🗑</button>
+      </div>
+      <div id="textTools" style="display: none;">
+          <button id="btnOpenFontPopup" title="Cambiar fuente">Aa</button>
+          <button id="btnOpenTextColorPopup" title="Cambiar color">🎨</button>
+          <button id="btnAlinIzq" title="Alinear izquierda">⚍</button>
+          <button id="btnAlinCen" title="Alinear centro">☰</button>
+          <button id="btnAlinDer" title="Alinear derecha">⚍</button>
+      </div>
+      <div id="imageTools" style="display: none;">
+          <button id="btnApplyFilter" title="Aplicar filtro">✨</button>
+          <button id="btnRemoveFilters" title="Quitar filtros">🚫</button>
+      </div>
     </div>
     <div class="help-message" id="helpMessage">¡Puedes mover, rotar y escalar los objetos con el ratón!</div>
   </div>
 </main>
 
-<!-- Popups -->
-<div class="popup" id="imgFondoPopup">
+<div class="popup" id="imgGalleryPopup">
   <div class="popup-content">
-    <div class="popup-title">Elegí un fondo</div>
-    <div class="image-grid" id="imgFondoGrid"></div>
-    <label for="bgLocalInput" class="popup-close">Subir tu propia imagen</label>
+    <div class="popup-title">Galería de Imágenes</div>
+    
+    <label for="bgLocalInput" class="upload-card">
+      Subir tu propia imagen
+    </label>
     <input type="file" id="bgLocalInput" accept="image/*" class="hidden-input">
+    
+    <div class="image-grid" id="imgFondoGrid"></div>
     <button class="popup-close">Cerrar</button>
   </div>
 </div>
@@ -609,12 +647,6 @@ footer {
   <div class="popup-content">
     <div class="popup-title">Seleccionar fuente</div>
     <div id="customFontSelector" class="font-selector"></div>
-    <div class="color-picker-group">
-      <div class="color-label">Color del texto:</div>
-      <div class="color-preview" style="background: #000000;">
-        <input type="color" id="colorTexto" value="#000000">
-      </div>
-    </div>
     <button class="popup-close">Aplicar</button>
   </div>
 </div>
@@ -637,7 +669,6 @@ footer {
 </footer>
 
 <script>
-// Font families mapping - Lista completa
 const fontFamilies = {
   "Montserrat": "'Montserrat', Arial, sans-serif",
   "Bebas Neue": "'Bebas Neue', Arial, sans-serif",
@@ -683,7 +714,6 @@ const fontFamilies = {
   "Unbounded": "'Unbounded', sans-serif"
 };
 
-// Initialize canvas
 const canvas = new fabric.Canvas('flyerCanvas', {
   preserveObjectStacking: true,
   selection: true,
@@ -693,7 +723,8 @@ const canvas = new fabric.Canvas('flyerCanvas', {
 });
 canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
 
-// Background images
+fabric.Textbox.prototype.textBaseline = 'alphabetic';
+
 const fondos = [
   "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
   "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80",
@@ -707,7 +738,6 @@ const fondos = [
   "https://images.unsplash.com/photo-1424746219973-8fe3bd07d8e3?auto=format&fit=crop&w=600&q=80"
 ];
 
-// Setup background images in popup
 const imgFondoGrid = document.getElementById('imgFondoGrid');
 fondos.forEach((url, i) => {
   const img = document.createElement("img");
@@ -715,47 +745,67 @@ fondos.forEach((url, i) => {
   img.className = "image-thumb";
   img.alt = `Fondo ${i+1}`;
   img.addEventListener("click", () => {
-    canvas.setBackgroundImage(url, canvas.renderAll.bind(canvas));
-    document.getElementById('removeBgBtn').style.display = 'block';
-    document.getElementById('imgFondoPopup').style.display = 'none';
+    addImageToCanvas(url);
   });
   imgFondoGrid.appendChild(img);
 });
 
-// Canvas size adjustment
+function addImageToCanvas(url) {
+  fabric.Image.fromURL(url, (img) => {
+    const maxWidth = canvas.width * 0.6;
+    const maxHeight = canvas.height * 0.6;
+    const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
+    
+    img.scale(scale);
+    img.set({
+      left: canvas.width / 2,
+      top: canvas.height / 2,
+      originX: "center",
+      originY: "center",
+      hasControls: true,
+      lockRotation: false,
+      lockScalingX: false,
+      lockScalingY: false,
+      lockMovementX: false,
+      lockMovementY: false,
+      crossOrigin: 'anonymous'
+    });
+    
+    canvas.add(img);
+    canvas.setActiveObject(img);
+    canvas.renderAll();
+    showHelpMessage("Imagen agregada. Puedes moverla, rotarla y escalarla libremente.");
+    document.getElementById('imgGalleryPopup').style.display = 'none';
+  }, { crossOrigin: 'anonymous' });
+}
+
 function adjustCanvasSize() {
   const container = document.querySelector('.canvas-container');
   const maxWidth = container.clientWidth;
   const maxHeight = container.clientHeight;
   
-  // Calculate aspect ratio
   const aspectRatio = 800 / 1066;
   let newWidth = maxWidth;
   let newHeight = maxWidth / aspectRatio;
   
-  // If height is too big, adjust
   if (newHeight > maxHeight) {
     newHeight = maxHeight;
     newWidth = maxHeight * aspectRatio;
   }
   
-  // Set canvas dimensions
   canvas.setWidth(newWidth);
   canvas.setHeight(newHeight);
   canvas.renderAll();
 }
 
-// Window resize handler
 window.addEventListener('resize', () => {
   adjustCanvasSize();
 });
 
-// Initial canvas size adjustment
 adjustCanvasSize();
 
-// Event Listeners
-document.getElementById('bgGalleryBtn').addEventListener('click', () => {
-  document.getElementById('imgFondoPopup').style.display = 'flex';
+document.getElementById('addImageBtn').addEventListener('click', () => {
+  document.getElementById('imgGalleryPopup').style.display = 'flex';
 });
 
 document.getElementById('bgLocalInput').addEventListener('change', function(e) {
@@ -763,17 +813,39 @@ document.getElementById('bgLocalInput').addEventListener('change', function(e) {
   const file = e.target.files[0];
   const reader = new FileReader();
   reader.onload = function(event) {
-    canvas.setBackgroundImage(event.target.result, canvas.renderAll.bind(canvas));
-    document.getElementById('removeBgBtn').style.display = 'block';
+    const imgElement = new Image();
+    imgElement.crossOrigin = 'anonymous';
+    imgElement.src = event.target.result;
+    
+    imgElement.onload = () => {
+      const img = new fabric.Image(imgElement);
+      const maxWidth = canvas.width * 0.6;
+      const maxHeight = canvas.height * 0.6;
+      const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
+      
+      img.scale(scale);
+      img.set({
+        left: canvas.width / 2,
+        top: canvas.height / 2,
+        originX: "center",
+        originY: "center",
+        hasControls: true,
+        lockRotation: false,
+        lockScalingX: false,
+        lockScalingY: false,
+        lockMovementX: false,
+        lockMovementY: false
+      });
+      canvas.add(img);
+      canvas.setActiveObject(img);
+      canvas.renderAll();
+      showHelpMessage("Imagen agregada. Puedes moverla, rotarla y escalarla libremente.");
+    };
   };
   reader.readAsDataURL(file);
   e.target.value = "";
 });
 
-document.getElementById('removeBgBtn').addEventListener('click', () => {
-  canvas.setBackgroundImage(null, canvas.renderAll.bind(canvas));
-  document.getElementById('removeBgBtn').style.display = 'none';
-});
 
 document.getElementById('bgColorBtn').addEventListener('click', () => {
   const colorPicker = document.createElement('input');
@@ -812,67 +884,6 @@ document.getElementById('addTextBtn').addEventListener('click', () => {
     canvas.renderAll();
     showHelpMessage("Texto agregado. Puedes moverlo, rotarlo y escalarlo libremente.");
   }
-});
-
-document.getElementById('fontBtn').addEventListener('click', () => {
-  renderFontOptions();
-  document.getElementById('fontPopup').style.display = 'flex';
-});
-
-document.getElementById('textColorBtn').addEventListener('click', () => {
-  const colorPicker = document.createElement('input');
-  colorPicker.type = 'color';
-  colorPicker.value = '#000000';
-  colorPicker.click();
-  
-  colorPicker.addEventListener('input', function() {
-    const active = canvas.getActiveObject();
-    if (active && active.type === "textbox") {
-      active.set("fill", this.value);
-      canvas.renderAll();
-    }
-  });
-});
-
-document.getElementById('addImageBtn').addEventListener('click', () => {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.click();
-  
-  input.addEventListener('change', function(e) {
-    if (!e.target.files || !e.target.files[0]) return;
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = function(event) {
-      fabric.Image.fromURL(event.target.result, (img) => {
-        // Scale image to fit canvas
-        const maxWidth = canvas.width * 0.6;
-        const maxHeight = canvas.height * 0.6;
-        const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
-        
-        img.scale(scale);
-        img.set({
-          left: canvas.width / 2,
-          top: canvas.height / 2,
-          originX: "center",
-          originY: "center",
-          hasControls: true,
-          lockRotation: false,
-          lockScalingX: false,
-          lockScalingY: false,
-          lockMovementX: false,
-          lockMovementY: false
-        });
-        
-        canvas.add(img);
-        canvas.setActiveObject(img);
-        canvas.renderAll();
-        showHelpMessage("Imagen agregada. Puedes moverla, rotarla y escalarla libremente.");
-      });
-    };
-    reader.readAsDataURL(file);
-  });
 });
 
 document.getElementById('generateQrBtn').addEventListener('click', () => {
@@ -917,7 +928,6 @@ document.getElementById('exportBtn').addEventListener('click', () => {
 
 document.getElementById('whatsappBtn').addEventListener('click', shareWhatsApp);
 
-// Layer controls
 document.getElementById('btnSubirCapa').addEventListener('click', () => {
   const obj = canvas.getActiveObject();
   if (obj) canvas.bringForward(obj);
@@ -928,19 +938,22 @@ document.getElementById('btnBajarCapa').addEventListener('click', () => {
   if (obj) canvas.sendBackwards(obj);
 });
 
+document.getElementById('btnEnviarFondo').addEventListener('click', () => {
+  const obj = canvas.getActiveObject();
+  if (obj) canvas.sendToBack(obj);
+});
+
 document.getElementById('btnEliminar').addEventListener('click', () => {
   const obj = canvas.getActiveObject();
   if (obj) canvas.remove(obj);
 });
 
-// Close popups
 document.querySelectorAll('.popup-close').forEach(btn => {
   btn.addEventListener('click', function() {
     this.closest('.popup').style.display = 'none';
   });
 });
 
-// Render font options
 function renderFontOptions() {
   const container = document.getElementById("customFontSelector");
   container.innerHTML = "";
@@ -964,7 +977,6 @@ function renderFontOptions() {
   });
 }
 
-// Download functions
 document.getElementById('btnDescargarJPG').addEventListener('click', () => {
   const url = canvas.toDataURL({ 
     format: "jpeg", 
@@ -1001,7 +1013,6 @@ document.getElementById('btnDescargarPDF').addEventListener('click', async () =>
   document.getElementById('exportPopup').style.display = 'none';
 });
 
-// Share via WhatsApp
 async function shareWhatsApp() {
   const fileName = "flyer.jpg";
   const dataUrl = canvas.toDataURL({ 
@@ -1013,20 +1024,17 @@ async function shareWhatsApp() {
   const mensaje = encodeURIComponent("¡Mirá este flyer que acabo de crear con Haceloquesea!");
   const waUrl = `https://wa.me/?text=${mensaje}`;
   
-  // Download image
   const link = document.createElement("a");
   link.href = dataUrl;
   link.download = fileName;
   link.click();
   
-  // Open WhatsApp
   setTimeout(() => {
-    window.open(waUrl, "_blank");
-    alert("Se descargó tu flyer y se abrió WhatsApp. Adjuntá la imagen desde tu galería para compartirla.");
+      alert("Se descargó tu flyer y se abrió WhatsApp. Adjuntá la imagen desde tu galería para compartirla.");
+      window.open(waUrl, "_blank");
   }, 500);
 }
 
-// Show help message
 function showHelpMessage(message) {
   const helpElement = document.getElementById('helpMessage');
   helpElement.textContent = message;
@@ -1041,77 +1049,155 @@ function showHelpMessage(message) {
   }, 3000);
 }
 
-// Floating tools drag functionality
+const generalTools = document.getElementById('generalTools');
+const textTools = document.getElementById('textTools');
+const imageTools = document.getElementById('imageTools');
 const floatingTools = document.getElementById('floatingTools');
-let isDragging = false;
-let offsetX, offsetY;
 
-floatingTools.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  offsetX = e.clientX - floatingTools.getBoundingClientRect().left;
-  offsetY = e.clientY - floatingTools.getBoundingClientRect().top;
-  floatingTools.style.cursor = 'grabbing';
-});
-
-document.addEventListener('mousemove', (e) => {
-  if (isDragging) {
-    const x = e.clientX - offsetX;
-    const y = e.clientY - offsetY;
-    
-    // Keep within canvas boundaries
-    const container = document.querySelector('.canvas-container');
-    const containerRect = container.getBoundingClientRect();
-    const maxX = containerRect.width - floatingTools.offsetWidth;
-    const maxY = containerRect.height - floatingTools.offsetHeight;
-    
-    floatingTools.style.left = Math.min(Math.max(0, x), maxX) + 'px';
-    floatingTools.style.top = Math.min(Math.max(0, y), maxY) + 'px';
+canvas.on('selection:created', (e) => {
+  const activeObject = e.selected[0];
+  floatingTools.style.display = 'flex';
+  
+  if (activeObject && activeObject.type === 'textbox') {
+    textTools.style.display = 'flex';
+    imageTools.style.display = 'none';
+  } else if (activeObject && activeObject.type === 'image') {
+    imageTools.style.display = 'flex';
+    textTools.style.display = 'none';
+  } else {
+    textTools.style.display = 'none';
+    imageTools.style.display = 'none';
   }
 });
 
-document.addEventListener('mouseup', () => {
-  isDragging = false;
-  floatingTools.style.cursor = 'grab';
-});
-
-// Touch events for mobile
-floatingTools.addEventListener('touchstart', (e) => {
-  isDragging = true;
-  const touch = e.touches[0];
-  offsetX = touch.clientX - floatingTools.getBoundingClientRect().left;
-  offsetY = touch.clientY - floatingTools.getBoundingClientRect().top;
-  e.preventDefault();
-});
-
-document.addEventListener('touchmove', (e) => {
-  if (isDragging) {
-    const touch = e.touches[0];
-    const x = touch.clientX - offsetX;
-    const y = touch.clientY - offsetY;
-    
-    // Keep within canvas boundaries
-    const container = document.querySelector('.canvas-container');
-    const containerRect = container.getBoundingClientRect();
-    const maxX = containerRect.width - floatingTools.offsetWidth;
-    const maxY = containerRect.height - floatingTools.offsetHeight;
-    
-    floatingTools.style.left = Math.min(Math.max(0, x), maxX) + 'px';
-    floatingTools.style.top = Math.min(Math.max(0, y), maxY) + 'px';
-    e.preventDefault();
+canvas.on('selection:updated', (e) => {
+  const activeObject = e.selected[0];
+  if (activeObject && activeObject.type === 'textbox') {
+    textTools.style.display = 'flex';
+    imageTools.style.display = 'none';
+  } else if (activeObject && activeObject.type === 'image') {
+    imageTools.style.display = 'flex';
+    textTools.style.display = 'none';
+  } else {
+    textTools.style.display = 'none';
+    imageTools.style.display = 'none';
   }
 });
 
-document.addEventListener('touchend', () => {
-  isDragging = false;
+canvas.on('selection:cleared', () => {
+  textTools.style.display = 'none';
+  imageTools.style.display = 'none';
 });
 
-// Initialize font options
-renderFontOptions();
+document.getElementById('btnAlinIzq').addEventListener('click', () => {
+  const active = canvas.getActiveObject();
+  if (active && active.type === "textbox") {
+    active.set("textAlign", "left");
+    canvas.renderAll();
+  }
+});
 
-// Show initial help message
-setTimeout(() => {
-  showHelpMessage("¡Puedes mover, rotar y escalar los objetos con el ratón!");
-}, 1500);
+document.getElementById('btnAlinCen').addEventListener('click', () => {
+  const active = canvas.getActiveObject();
+  if (active && active.type === "textbox") {
+    active.set("textAlign", "center");
+    canvas.renderAll();
+  }
+});
+
+document.getElementById('btnAlinDer').addEventListener('click', () => {
+  const active = canvas.getActiveObject();
+  if (active && active.type === "textbox") {
+    active.set("textAlign", "right");
+    canvas.renderAll();
+  }
+});
+
+document.getElementById('btnOpenFontPopup').addEventListener('click', () => {
+  renderFontOptions();
+  document.getElementById('fontPopup').style.display = 'flex';
+});
+
+document.getElementById('btnOpenTextColorPopup').addEventListener('click', () => {
+  const active = canvas.getActiveObject();
+  if (active && active.type === "textbox") {
+    const colorPicker = document.createElement('input');
+    colorPicker.type = 'color';
+    colorPicker.value = active.fill;
+    colorPicker.click();
+    
+    colorPicker.addEventListener('input', function() {
+      active.set("fill", this.value);
+      canvas.renderAll();
+    });
+  }
+});
+
+const filters = [
+  new fabric.Image.filters.Grayscale(),
+  new fabric.Image.filters.Sepia(),
+  new fabric.Image.filters.Invert(),
+  new fabric.Image.filters.Blur({ blur: 0.5 }),
+  new fabric.Image.filters.Brightness({ brightness: 0.2 }),
+  new fabric.Image.filters.Contrast({ contrast: 0.2 }),
+  new fabric.Image.filters.Saturation({ saturation: 0.5 }),
+  new fabric.Image.filters.HueRotation({ rotation: 0.5 }),
+  new fabric.Image.filters.Vintage(),
+  new fabric.Image.filters.Kodachrome(),
+  new fabric.Image.filters.Technicolor(),
+  new fabric.Image.filters.Brownie(),
+  new fabric.Image.filters.Polaroid()
+];
+let currentFilterIndex = 0;
+
+document.getElementById('btnApplyFilter').addEventListener('click', () => {
+  const activeObject = canvas.getActiveObject();
+  if (!activeObject || activeObject.type !== 'image') {
+    showHelpMessage("Selecciona una imagen para aplicar filtros.");
+    return;
+  }
+  
+  if (currentFilterIndex >= filters.length) {
+    currentFilterIndex = 0;
+  }
+  
+  activeObject.filters = [filters[currentFilterIndex]];
+  activeObject.applyFilters();
+  canvas.renderAll();
+  
+  const filterNames = Object.keys({
+    'Grayscale': new fabric.Image.filters.Grayscale(),
+    'Sepia': new fabric.Image.filters.Sepia(),
+    'Invert': new fabric.Image.filters.Invert(),
+    'Blur': new fabric.Image.filters.Blur({ blur: 0.5 }),
+    'Brightness': new fabric.Image.filters.Brightness({ brightness: 0.2 }),
+    'Contrast': new fabric.Image.filters.Contrast({ contrast: 0.2 }),
+    'Saturation': new fabric.Image.filters.Saturation({ saturation: 0.5 }),
+    'Hue Rotation': new fabric.Image.filters.HueRotation({ rotation: 0.5 }),
+    'Vintage': new fabric.Image.filters.Vintage(),
+    'Kodachrome': new fabric.Image.filters.Kodachrome(),
+    'Technicolor': new fabric.Image.filters.Technicolor(),
+    'Brownie': new fabric.Image.filters.Brownie(),
+    'Polaroid': new fabric.Image.filters.Polaroid()
+  });
+
+  showHelpMessage(`Filtro aplicado: ${filterNames[currentFilterIndex]}`);
+  
+  currentFilterIndex++;
+});
+
+document.getElementById('btnRemoveFilters').addEventListener('click', () => {
+  const activeObject = canvas.getActiveObject();
+  if (activeObject && activeObject.type === 'image') {
+    activeObject.filters = [];
+    activeObject.applyFilters();
+    canvas.renderAll();
+    showHelpMessage("Filtros removidos.");
+    currentFilterIndex = 0;
+  } else {
+    showHelpMessage("Selecciona una imagen primero.");
+  }
+});
 </script>
 </body>
 </html>
