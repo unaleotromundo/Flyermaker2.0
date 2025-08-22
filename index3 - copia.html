@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flyermaker 2.0</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* --- Estilos del tutorial --- */
+    #tutorialOverlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      z-index: 9999;
+      flex-direction: column;
+    }
+
+    #tutorialOverlay h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #ffdd57;
+    }
+
+    #tutorialOverlay p {
+      font-size: 18px;
+      margin-bottom: 15px;
+      max-width: 400px;
+    }
+
+    #closeTutorial {
+      background: #ffdd57;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    /* Botón fijo para volver a abrir tutorial */
+    #openTutorialBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      z-index: 10000;
+    }
+  </style>
+</head>
+<body>
+  <!-- Contenido normal de la página -->
+  <h2 style="padding:20px;">Bienvenido a Flyermaker 2.0</h2>
+  <p style="padding:20px;">Aquí irá tu app.</p>
+
+  <!-- Overlay del tutorial -->
+  <div id="tutorialOverlay">
+    <h1>🚀 Bienvenido a Flyermaker 2.0</h1>
+    <p>1️⃣ Sube tus imágenes o usa nuestras plantillas.</p>
+    <p>2️⃣ Personaliza el texto, colores y estilos.</p>
+    <p>3️⃣ Descarga tu flyer listo para compartir.</p>
+    <button id="closeTutorial">¡Entendido!</button>
+  </div>
+
+  <!-- Botón para reabrir tutorial -->
+  <button id="openTutorialBtn">📖 Tutorial</button>
+
+  <script>
+    const tutorialOverlay = document.getElementById("tutorialOverlay");
+    const closeTutorial = document.getElementById("closeTutorial");
+    const openTutorialBtn = document.getElementById("openTutorialBtn");
+
+    // Cerrar tutorial
+    closeTutorial.addEventListener("click", () => {
+      tutorialOverlay.style.display = "none";
+      localStorage.setItem("tutorialSeen", "true"); // Marcar como visto
+    });
+
+    // Abrir tutorial manualmente
+    openTutorialBtn.addEventListener("click", () => {
+      tutorialOverlay.style.display = "flex";
+    });
+
+    // Mostrar solo la primera vez que entra
+    window.addEventListener("load", () => {
+      if (localStorage.getItem("tutorialSeen") === "true") {
+        tutorialOverlay.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
