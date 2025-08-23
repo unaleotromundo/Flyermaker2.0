@@ -1,50 +1,9 @@
-
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Editor Canvas Pro v2.0</title>
-<!-- 1. OPTIMIZACIÓN: Se elimina la carga masiva de fuentes para cargarlas bajo demanda -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Bebas+Neue&family=Anton&family=Lobster&family=Oswald&family=Poppins&family=Playfair+Display:wght@700&family=Permanent+Marker&family=Rock+Salt&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&family=Archivo+Black&family=Quicksand:wght@700&family=Arizonia&family=Bangers&family=Covered+By+Your+Grace&family=Fredericka+the+Great&family=Indie+Flower&family=Pacifico&family=Press+Start+2P&family=Gloria+Hallelujah&family=Rammetto+One&family=Monoton&family=Rubik+Moonrocks&family=Special+Elite&family=Amatic+SC:wght@700&family=VT323&family=Chewy&family=Black+Ops+One&family=Faster+One&family=Acme&family=Rye&family=Rubik+80s+Fade&family=Sigmar+One&family=UnifrakturCook&family=Sacramento&family=Chango&family=Major+Mono+Display&family=IBM+Plex+Mono:wght@700&family=Poiret+One&family=Unbounded:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
@@ -115,10 +74,24 @@ header::-webkit-scrollbar {
     inset 0 -2px 0 rgba(0,0,0,0.05),
     inset 0 0 10px rgba(255,255,255,0.5);
   cursor: pointer;
-  border: none;
+  border: 1px solid transparent; /* Borde para el estado activo */
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+}
+
+.icon-btn.active {
+    border-color: var(--c-cyan);
+    box-shadow: 0 0 0 2px var(--c-cyan), inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#zoomModeBtn svg path {
+    fill: #333;
+    stroke: #333;
+}
+body.dark #zoomModeBtn svg path {
+    fill: #f1f5f9;
+    stroke: #f1f5f9;
 }
 
 /* Colores de fondo CMYK */
@@ -126,9 +99,8 @@ header::-webkit-scrollbar {
 #addTextBtn { background: var(--c-magenta); }
 #addImageBtn { background: var(--c-yellow); }
 #generateQrBtn { background: var(--c-key); }
-#exportBtn { background: #E9ECEF; } /* Un color neutral para que los de CMYK destaquen */
-#clearCanvasBtn { background: #3db52d; } /* Novedad: Botón para limpiar */
-
+#exportBtn { background: #E9ECEF; }
+#clearCanvasBtn { background: #3db52d; }
 
 .icon-btn::after {
   content: '';
@@ -187,7 +159,7 @@ main {
   top: 70px;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 38px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -395,7 +367,6 @@ footer {
   background: var(--panel-bg);
   backdrop-filter: blur(12px);
   padding: 8px 20px;
-  text-align: center;
   font-size: 12px;
   color: var(--text-secondary);
   border-top: 1px solid var(--border);
@@ -403,6 +374,7 @@ footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 38px;
 }
 
 .footer-links { display: flex; gap: 12px; }
@@ -411,7 +383,7 @@ footer {
 
 .help-message {
   position: absolute;
-  bottom: 40px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.7);
@@ -437,6 +409,7 @@ footer {
   .font-selector { max-height: 200px; }
   .floating-tools { top: 10px; right: 10px; transform: scale(0.9); }
   .icon-label { font-size: 8px; }
+  footer { flex-direction: column; gap: 4px; padding: 6px; height: auto; }
 }
 
 @media (max-width: 480px) {
@@ -475,7 +448,6 @@ footer {
   color: #334155;
 }
 
-/* 2. MEJORA API: Estilos para el buscador de imágenes */
 .search-wrapper {
     display: flex;
     gap: 8px;
@@ -504,7 +476,6 @@ footer {
     background: #0096b2;
 }
 
-/* Modo día/noche */
 body.dark {
   --surface: rgba(15, 23, 42, 0.92);
   --border: rgba(255, 255, 255, 0.1);
@@ -535,41 +506,37 @@ body.dark #flyerCanvas { border: 1px solid #334155; }
 body.dark .popup-content, body.dark .font-selector, body.dark .font-option { background: #1e293b; color: #f1f5f9; border-color: var(--border); }
 body.dark .upload-card { background: #334155; border-color: #475569; color: #cbd5e1; }
 body.dark .search-wrapper input { background: #334155; color: #f1f5f9; border-color: var(--border); }
-/* Modo claro: botón oscuro */
+
 #themeToggleBtn {
-  background: linear-gradient(145deg, #0f172a, #1e293b); /* Fondo oscuro en modo claro */
+  background: linear-gradient(145deg, #0f172a, #1e293b);
   box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 -2px 0 rgba(0,0,0,0.1), inset 0 0 10px rgba(255,255,255,0.1);
 }
 #themeToggleBtn svg path {
-  fill: #f1f5f9; /* Icono claro */
+  fill: #f1f5f9;
   stroke: #f1f5f9;
 }
 #themeToggleBtn .icon-label {
-  color: #f1f5f9; /* Texto claro */
+  color: #f1f5f9;
 }
 
-/* Modo oscuro: botón claro */
 body.dark #themeToggleBtn {
-  background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Fondo claro en modo oscuro */
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
   box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 -2px 0 rgba(0,0,0,0.05), inset 0 0 10px rgba(255,255,255,0.5);
 }
 body.dark #themeToggleBtn svg path {
-  fill: #0f172a; /* Icono oscuro */
+  fill: #0f172a;
   stroke: #0f172a;
 }
 body.dark #themeToggleBtn .icon-label {
-  color: #0f172a; /* Texto oscuro */
+  color: #0f172a;
 }
-/* Botón de exportar siempre con ícono y texto negro */
 #exportBtn svg path {
-  fill: #000000; /* Negro para el ícono */
+  fill: #000000;
   stroke: #000000;
 }
 #exportBtn .icon-label {
-  color: #000000; /* Negro para el texto */
+  color: #000000;
 }
-
-/* Asegurar que el modo oscuro no lo cambie */
 body.dark #exportBtn svg path {
   fill: #000000;
   stroke: #000000;
@@ -577,10 +544,38 @@ body.dark #exportBtn svg path {
 body.dark #exportBtn .icon-label {
   color: #000000;
 }
+
+#resetViewBtn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 101;
+    background: var(--panel-bg);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    box-shadow: var(--shadow-active);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    display: none; /* Oculto por defecto */
+    transition: opacity 0.3s, transform 0.3s;
+}
+#resetViewBtn:hover {
+    transform: scale(1.05);
+}
+
 </style>
 </head>
 <body>
 <header>
+  <button class="icon-btn" title="Zoom" id="zoomModeBtn">
+      <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+      <span class="icon-label">Zoom</span>
+  </button>
+
   <button class="icon-btn" title="Color de fondo" id="bgColorBtn">
     <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path></svg>
     <span class="icon-label">Fondo</span>
@@ -640,25 +635,24 @@ body.dark #exportBtn .icon-label {
       </div>
     </div>
     <div class="help-message" id="helpMessage">¡Puedes mover, rotar y escalar los objetos!</div>
+    
+    <button id="resetViewBtn">Restaurar Vista</button>
+
   </div>
 </main>
 
 <div class="popup" id="imgGalleryPopup">
   <div class="popup-content">
     <div class="popup-title">Galería de Imágenes</div>
-    
-    <!-- 2. MEJORA API: Buscador de imágenes -->
     <div class="search-wrapper">
         <input type="text" id="imageSearchInput" placeholder="Busca por palabra (ej: 'fiesta', 'comidas', 'tecnologia')">
         <button id="imageSearchBtn">Buscar</button>
     </div>
-
     <label for="bgLocalInput" class="upload-card">
       <span>⬆️</span>
       Subir tu propia imagen
     </label>
     <input type="file" id="bgLocalInput" accept="image/*" class="hidden-input">
-    
     <div class="image-grid" id="imgFondoGrid"></div>
     <button class="popup-close">Cerrar</button>
   </div>
@@ -693,55 +687,16 @@ body.dark #exportBtn .icon-label {
 const UNSPLASH_ACCESS_KEY = 'Xj3SNeQvEW2iW-s3L0vLZgBGrve7ZUFVUGPF_hXLjFI'; 
 
 const fontFamilies = {
-  "Montserrat": "'Montserrat', Arial, sans-serif",
-  "Bebas Neue": "'Bebas Neue', Arial, sans-serif",
-  "Anton": "'Anton', Arial, sans-serif",
-  "Archivo Black": "'Archivo Black', Arial, sans-serif",
-  "Oswald": "'Oswald', Arial, sans-serif",
-  "Poppins": "'Poppins', Arial, sans-serif",
-  "Lobster": "'Lobster', cursive",
-  "Playfair Display": "'Playfair Display', serif",
-  "Permanent Marker": "'Permanent Marker', cursive",
-  "Rock Salt": "'Rock Salt', cursive",
-  "Luckiest Guy": "'Luckiest Guy', cursive",
-  "Shadows Into Light": "'Shadows Into Light', cursive",
-  "Orbitron": "'Orbitron', sans-serif",
-  "Quicksand": "'Quicksand', Arial, sans-serif",
-  "Arizonia": "'Arizonia', cursive",
-  "Bangers": "'Bangers', cursive",
-  "Covered By Your Grace": "'Covered By Your Grace', cursive",
-  "Fredericka the Great": "'Fredericka the Great', cursive",
-  "Indie Flower": "'Indie Flower', cursive",
-  "Pacifico": "'Pacifico', cursive",
-  "Press Start 2P": "'Press Start 2P', monospace",
-  "Gloria Hallelujah": "'Gloria Hallelujah', cursive",
-  "Rammetto One": "'Rammetto One', cursive",
-  "Monoton": "'Monoton', cursive",
-  "Rubik Moonrocks": "'Rubik Moonrocks', cursive",
-  "Special Elite": "'Special Elite', monospace",
-  "Amatic SC": "'Amatic SC', cursive",
-  "VT323": "'VT323', monospace",
-  "Chewy": "'Chewy', cursive",
-  "Black Ops One": "'Black Ops One', cursive",
-  "Faster One": "'Faster One', cursive",
-  "Acme": "'Acme', sans-serif",
-  "Rye": "'Rye', cursive",
-  "Rubik 80s Fade": "'Rubik 80s Fade', cursive",
-  "Sigmar One": "'Sigmar One', cursive",
-  "UnifrakturCook": "'UnifrakturCook', cursive",
-  "Sacramento": "'Sacramento', cursive",
-  "Chango": "'Chango', cursive",
-  "Major Mono Display": "'Major Mono Display', monospace",
-  "IBM Plex Mono": "'IBM Plex Mono', monospace",
-  "Poiret One": "'Poiret One', cursive",
-  "Unbounded": "'Unbounded', sans-serif"
+  "Montserrat": "'Montserrat', Arial, sans-serif", "Bebas Neue": "'Bebas Neue', Arial, sans-serif", "Anton": "'Anton', Arial, sans-serif", "Archivo Black": "'Archivo Black', Arial, sans-serif", "Oswald": "'Oswald', Arial, sans-serif", "Poppins": "'Poppins', Arial, sans-serif", "Lobster": "'Lobster', cursive", "Playfair Display": "'Playfair Display', serif", "Permanent Marker": "'Permanent Marker', cursive", "Rock Salt": "'Rock Salt', cursive", "Luckiest Guy": "'Luckiest Guy', cursive", "Shadows Into Light": "'Shadows Into Light', cursive", "Orbitron": "'Orbitron', sans-serif", "Quicksand": "'Quicksand', Arial, sans-serif", "Arizonia": "'Arizonia', cursive", "Bangers": "'Bangers', cursive", "Covered By Your Grace": "'Covered By Your Grace', cursive", "Fredericka the Great": "'Fredericka the Great', cursive", "Indie Flower": "'Indie Flower', cursive", "Pacifico": "'Pacifico', cursive", "Press Start 2P": "'Press Start 2P', monospace", "Gloria Hallelujah": "'Gloria Hallelujah', cursive", "Rammetto One": "'Rammetto One', cursive", "Monoton": "'Monoton', cursive", "Rubik Moonrocks": "'Rubik Moonrocks', cursive", "Special Elite": "'Special Elite', monospace", "Amatic SC": "'Amatic SC', cursive", "VT323": "'VT323', monospace", "Chewy": "'Chewy', cursive", "Black Ops One": "'Black Ops One', cursive", "Faster One": "'Faster One', cursive", "Acme": "'Acme', sans-serif", "Rye": "'Rye', cursive", "Rubik 80s Fade": "'Rubik 80s Fade', cursive", "Sigmar One": "'Sigmar One', cursive", "UnifrakturCook": "'UnifrakturCook', cursive", "Sacramento": "'Sacramento', cursive", "Chango": "'Chango', cursive", "Major Mono Display": "'Major Mono Display', monospace", "IBM Plex Mono": "'IBM Plex Mono', monospace", "Poiret One": "'Poiret One', cursive", "Unbounded": "'Unbounded', sans-serif"
 };
 
-const canvas = new fabric.Canvas('flyerCanvas', { preserveObjectStacking: true, selection: true, allowTouchScrolling: true, enableRetinaScaling: true, devicePixelRatio: window.devicePixelRatio || 1 });
+const canvas = new fabric.Canvas('flyerCanvas', { 
+    preserveObjectStacking: true, selection: true, allowTouchScrolling: true, enableRetinaScaling: true, devicePixelRatio: window.devicePixelRatio || 1, selectionColor: 'rgba(0, 180, 216, 0.3)', selectionBorderColor: 'rgba(0, 180, 216, 0.8)', selectionLineWidth: 2, hoverCursor: 'move', defaultCursor: 'default'
+});
 canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
 fabric.Textbox.prototype.textBaseline = 'alphabetic';
 
-// --- FUNCIONES MEJORADAS Y NUEVAS ---
+// --- FUNCIONES BÁSICAS ---
 
 function saveCanvasState() {
   try {
@@ -789,22 +744,14 @@ async function searchUnsplashImages(query) {
   }
 }
 
-// MEJORA TIPOGRAFÍA: Sistema de carga de fuentes rediseñado para máxima fiabilidad.
 async function loadAndApplyFont(fontName, fontFamily) {
-  // 1. Comprueba si la fuente ya está disponible en el navegador. Si es así, la aplica y termina.
   if (document.fonts.check(`1em "${fontName}"`)) {
     applyFont(fontFamily, fontName);
     return;
   }
-
-  // 2. Si no está cargada, muestra un mensaje al usuario.
   showHelpMessage(`Cargando fuente: ${fontName}...`, 1500);
-
-  // 3. Inyecta el <link> de Google Fonts en el <head> para que el navegador sepa dónde buscar la fuente.
   const link = document.createElement('link');
   const formattedFontName = fontName.replace(/ /g, '+');
-  // Se piden varios pesos para dar más flexibilidad a futuro.
-  // La URL ahora se construye correctamente en una sola línea.
   link.href = `https://fonts.googleapis.com/css2?family=${formattedFontName}:wght@400;700&display=swap`;
   link.rel = 'stylesheet';
   document.head.appendChild(link);
@@ -847,14 +794,14 @@ function showHelpMessage(message, duration = 4000) {
   const helpElement = document.getElementById('helpMessage');
   helpElement.textContent = message;
   helpElement.style.display = 'block';
-  helpElement.style.animation = 'none'; // Reset animation
-  void helpElement.offsetWidth; // Trigger reflow
+  helpElement.style.animation = 'none';
+  void helpElement.offsetWidth;
   helpElement.style.animation = `fadeInOut ${duration / 1000}s forwards`;
 }
 
 function renderFontOptions() {
   const container = document.getElementById("customFontSelector");
-  if (container.children.length > 0) return; // Render only once
+  if (container.children.length > 0) return;
   
   Object.keys(fontFamilies).forEach(fontName => {
     const div = document.createElement("div");
@@ -870,22 +817,19 @@ function renderFontOptions() {
   });
 }
 
-// --- EVENT LISTENERS ---
+// --- EVENT LISTENERS GENERALES ---
 window.addEventListener('load', () => {
   adjustCanvasSize();
   loadCanvasState();
+  enterSelectMode();
 });
 window.addEventListener('resize', adjustCanvasSize);
 
-// Guardado automático
 canvas.on({ 'object:modified': saveCanvasState, 'object:added': saveCanvasState, 'object:removed': saveCanvasState });
 
-// Botones del Header
 document.getElementById('addImageBtn').addEventListener('click', () => {
   document.getElementById('imgGalleryPopup').style.display = 'flex';
-  if (document.getElementById('imgFondoGrid').innerHTML === '') {
-      searchUnsplashImages('abstract background'); // Carga inicial
-  }
+  if (document.getElementById('imgFondoGrid').innerHTML === '') searchUnsplashImages('abstract background');
 });
 
 document.getElementById('bgLocalInput').addEventListener('change', function(e) {
@@ -901,7 +845,7 @@ document.getElementById('bgColorBtn').addEventListener('click', () => {
   picker.type = 'color';
   picker.value = canvas.backgroundColor;
   picker.oninput = () => canvas.setBackgroundColor(picker.value, canvas.renderAll.bind(canvas));
-  picker.onchange = saveCanvasState; // Guardar estado al confirmar color
+  picker.onchange = saveCanvasState;
   picker.click();
 });
 
@@ -926,10 +870,10 @@ document.getElementById('clearCanvasBtn').addEventListener('click', () => {
         canvas.clear();
         canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
         localStorage.removeItem('savedCanvas');
+        resetCanvasView();
     }
 });
 
-// Botones de exportación y popups
 document.getElementById('exportBtn').addEventListener('click', () => document.getElementById('exportPopup').style.display = 'flex');
 document.querySelectorAll('.popup-close').forEach(btn => btn.addEventListener('click', () => btn.closest('.popup').style.display = 'none'));
 document.getElementById('btnDescargarJPG').addEventListener('click', () => {
@@ -946,21 +890,19 @@ document.getElementById('btnDescargarPDF').addEventListener('click', () => {
   pdf.save("flyer.pdf");
 });
 
-// Lógica de herramientas flotantes
 const floatingTools = document.getElementById('floatingTools');
 const textTools = document.getElementById('textTools');
 const imageTools = document.getElementById('imageTools');
 const updateTools = (e) => {
-    const target = e.selected[0];
-    floatingTools.style.display = 'flex';
-    textTools.style.display = target.type === 'textbox' ? 'flex' : 'none';
-    imageTools.style.display = target.type === 'image' ? 'flex' : 'none';
+    const target = e?.selected?.[0];
+    floatingTools.style.display = target ? 'flex' : 'none';
+    if (target) {
+        textTools.style.display = target.type === 'textbox' ? 'flex' : 'none';
+        imageTools.style.display = target.type === 'image' ? 'flex' : 'none';
+    }
 };
-canvas.on('selection:created', updateTools);
-canvas.on('selection:updated', updateTools);
-canvas.on('selection:cleared', () => floatingTools.style.display = 'none');
+canvas.on({'selection:created': updateTools, 'selection:updated': updateTools, 'selection:cleared': updateTools});
 
-// Acciones de las herramientas flotantes
 document.getElementById('btnSubirCapa').addEventListener('click', () => canvas.getActiveObject() && canvas.bringForward(canvas.getActiveObject()));
 document.getElementById('btnBajarCapa').addEventListener('click', () => canvas.getActiveObject() && canvas.sendBackwards(canvas.getActiveObject()));
 document.getElementById('btnEnviarFondo').addEventListener('click', () => canvas.getActiveObject() && canvas.sendToBack(canvas.getActiveObject()));
@@ -984,7 +926,6 @@ document.getElementById('btnOpenTextColorPopup').addEventListener('click', () =>
   }
 });
 
-// Lógica de búsqueda de imágenes
 document.getElementById('imageSearchBtn').addEventListener('click', () => {
     const query = document.getElementById('imageSearchInput').value;
     if(query.trim()) searchUnsplashImages(query);
@@ -993,7 +934,6 @@ document.getElementById('imageSearchInput').addEventListener('keyup', (e) => {
     if (e.key === 'Enter') searchUnsplashImages(e.target.value);
 });
 
-// Filtros de imagen
 const filters = [ new fabric.Image.filters.Grayscale(), new fabric.Image.filters.Sepia(), new fabric.Image.filters.Invert(), new fabric.Image.filters.Vintage(), new fabric.Image.filters.Kodachrome(), new fabric.Image.filters.Technicolor(), new fabric.Image.filters.Brownie(), new fabric.Image.filters.Polaroid(), new fabric.Image.filters.Brightness({ brightness: 0.2 }), new fabric.Image.filters.Contrast({ contrast: 0.2 }) ];
 let currentFilterIndex = 0;
 document.getElementById('btnApplyFilter').addEventListener('click', () => {
@@ -1016,7 +956,6 @@ document.getElementById('btnRemoveFilters').addEventListener('click', () => {
   }
 });
 
-// Modo día/noche
 function updateToggleIcon() {
   const icon = document.getElementById('themeIcon');
   if (document.body.classList.contains('dark')) {
@@ -1040,6 +979,105 @@ if (savedTheme === 'dark') {
 updateToggleIcon();
 
 document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+
+
+// --- INICIO: NUEVO SISTEMA DE ZOOM ---
+
+let currentMode = 'select'; // 'select' o 'zoom'
+let zoomRect = null;
+
+const zoomModeBtn = document.getElementById('zoomModeBtn');
+const resetViewBtn = document.getElementById('resetViewBtn');
+
+function enterSelectMode() {
+    currentMode = 'select';
+    canvas.selection = true;
+    canvas.defaultCursor = 'default';
+    canvas.hoverCursor = 'move';
+    canvas.getObjects().forEach(obj => obj.selectable = true);
+    zoomModeBtn.classList.remove('active');
+    canvas.renderAll();
+}
+
+function enterZoomMode() {
+    currentMode = 'zoom';
+    canvas.selection = false;
+    canvas.defaultCursor = 'crosshair';
+    canvas.hoverCursor = 'crosshair';
+    canvas.getObjects().forEach(obj => obj.selectable = false);
+    zoomModeBtn.classList.add('active');
+    canvas.discardActiveObject().renderAll();
+}
+
+function resetCanvasView() {
+    canvas.setViewportTransform([1, 0, 0, 1, 0, 0]); // Matriz de transformación identidad
+    resetViewBtn.style.display = 'none'; // Ocultar el botón al restaurar
+    canvas.renderAll();
+}
+
+zoomModeBtn.addEventListener('click', () => {
+    if (currentMode === 'zoom') {
+        enterSelectMode();
+    } else {
+        enterZoomMode();
+    }
+});
+resetViewBtn.addEventListener('click', resetCanvasView);
+
+
+canvas.on('mouse:down', function(opt) {
+    const evt = opt.e;
+    if (currentMode === 'zoom') {
+        const pointer = canvas.getPointer(evt);
+        zoomRect = new fabric.Rect({
+            left: pointer.x,
+            top: pointer.y,
+            width: 0,
+            height: 0,
+            fill: 'rgba(0, 180, 216, 0.2)',
+            stroke: 'rgba(0, 180, 216, 1)',
+            strokeWidth: 1,
+            selectable: false,
+            evented: false,
+        });
+        canvas.add(zoomRect);
+    }
+});
+
+canvas.on('mouse:move', function(opt) {
+    if (currentMode === 'zoom' && zoomRect) {
+        const pointer = canvas.getPointer(opt.e);
+        const startX = zoomRect.left;
+        const startY = zoomRect.top;
+        let width = pointer.x - startX;
+        let height = pointer.y - startY;
+
+        if (width < 0) zoomRect.set('left', pointer.x);
+        if (height < 0) zoomRect.set('top', pointer.y);
+        zoomRect.set({ width: Math.abs(width), height: Math.abs(height) });
+        canvas.renderAll();
+    }
+});
+
+canvas.on('mouse:up', function(opt) {
+    if (currentMode === 'zoom' && zoomRect) {
+        if (zoomRect.width > 10 && zoomRect.height > 10) { // Evitar zoom en un simple clic
+            const zoom = Math.min(
+                canvas.width / zoomRect.width,
+                canvas.height / zoomRect.height
+            ) * 0.95; // 5% de margen
+            
+            canvas.zoomToPoint({ x: zoomRect.left + zoomRect.width / 2, y: zoomRect.top + zoomRect.height / 2 }, zoom);
+            resetViewBtn.style.display = 'block'; // Mostrar el botón para restaurar
+        }
+        canvas.remove(zoomRect);
+        zoomRect = null;
+        enterSelectMode(); // Volver al modo selección automáticamente
+    }
+});
+
+// --- FIN: NUEVO SISTEMA DE ZOOM ---
+
 </script>
 </body>
 </html>
