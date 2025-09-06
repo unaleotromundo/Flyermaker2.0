@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Editor Canvas Pro v2.0</title>
-<!-- 🔙 VOLVEMOS A CARGAR TODAS LAS FUENTES (como estaba originalmente) -->
+<!-- 1. OPTIMIZACIÓN: Se elimina la carga masiva de fuentes para cargarlas bajo demanda -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Bebas+Neue&family=Anton&family=Lobster&family=Oswald&family=Poppins&family=Playfair+Display:wght@700&family=Permanent+Marker&family=Rock+Salt&family=Luckiest+Guy&family=Shadows+Into+Light&family=Orbitron:wght@900&family=Archivo+Black&family=Quicksand:wght@700&family=Arizonia&family=Bangers&family=Covered+By+Your+Grace&family=Fredericka+the+Great&family=Indie+Flower&family=Pacifico&family=Press+Start+2P&family=Gloria+Hallelujah&family=Rammetto+One&family=Monoton&family=Rubik+Moonrocks&family=Special+Elite&family=Amatic+SC:wght@700&family=VT323&family=Chewy&family=Black+Ops+One&family=Faster+One&family=Acme&family=Rye&family=Rubik+80s+Fade&family=Sigmar+One&family=UnifrakturCook&family=Sacramento&family=Chango&family=Major+Mono+Display&family=IBM+Plex+Mono:wght@700&family=Poiret+One&family=Unbounded:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
@@ -24,11 +24,13 @@
   --shadow-active: 0 6px 32px rgba(0,0,0,0.12);
   --panel-bg: rgba(255, 255, 255, 0.85);
 }
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   font-family: 'Montserrat', sans-serif;
   background: linear-gradient(135deg, #fbfcfd 0%, #f6f9fb 100%);
@@ -37,6 +39,7 @@ body {
   overflow: hidden;
   touch-action: none;
 }
+
 header {
   display: flex;
   overflow-x: auto;
@@ -52,9 +55,11 @@ header {
   left: 0;
   right: 0;
 }
+
 header::-webkit-scrollbar {
   display: none;
 }
+
 .icon-btn {
   flex: 0 0 auto;
   width: 54px;
@@ -75,6 +80,7 @@ header::-webkit-scrollbar {
   position: relative;
   overflow: hidden;
 }
+
 /* Colores de fondo CMYK */
 #bgColorBtn { background: var(--c-cyan); }
 #addTextBtn { background: var(--c-magenta); }
@@ -82,6 +88,8 @@ header::-webkit-scrollbar {
 #generateQrBtn { background: var(--c-key); }
 #exportBtn { background: #E9ECEF; } /* Un color neutral para que los de CMYK destaquen */
 #clearCanvasBtn { background: #3db52d; } /* Novedad: Botón para limpiar */
+
+
 .icon-btn::after {
   content: '';
   position: absolute;
@@ -92,6 +100,7 @@ header::-webkit-scrollbar {
   background: linear-gradient(rgba(255,255,255,0.2), transparent);
   pointer-events: none;
 }
+
 .icon-btn:hover {
   transform: translateY(-3px);
   box-shadow: 
@@ -99,6 +108,7 @@ header::-webkit-scrollbar {
     inset 0 -2px 0 rgba(0,0,0,0.05),
     inset 0 0 10px rgba(255,255,255,0.5);
 }
+
 .icon-btn:active {
   transform: translateY(1px);
   box-shadow: 
@@ -106,19 +116,23 @@ header::-webkit-scrollbar {
     inset 0 -2px 0 rgba(0,0,0,0.05),
     inset 0 0 10px rgba(255,255,255,0.5);
 }
+
 .icon-btn svg {
   width: 24px;
   height: 24px;
   filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1));
 }
+
 .icon-btn svg path, .icon-btn svg rect, .icon-btn svg circle {
   fill: #fff;
   stroke: #fff;
 }
+
 #exportBtn .icon-label, #clearCanvasBtn .icon-label {
     color: var(--text);
     text-shadow: none;
 }
+
 .icon-label {
   font-size: 9px;
   font-weight: 600;
@@ -127,6 +141,7 @@ header::-webkit-scrollbar {
   color: #fff;
   text-shadow: 0 1px 1px rgba(0,0,0,0.3);
 }
+
 main {
   position: fixed;
   top: 70px;
@@ -138,6 +153,7 @@ main {
   align-items: center;
   background: #f0f4f8;
 }
+
 .canvas-container {
   position: relative;
   width: 100%;
@@ -147,6 +163,7 @@ main {
   align-items: center;
   overflow: hidden;
 }
+
 #flyerCanvas {
   background: #fff;
   border: 1px solid #e2e8f0;
@@ -155,6 +172,7 @@ main {
   max-height: 100%;
   touch-action: none;
 }
+
 .floating-tools {
   position: absolute;
   top: 20px;
@@ -173,6 +191,7 @@ main {
   user-select: none;
   flex-wrap: wrap; 
 }
+
 .floating-tools button {
   width: 36px;
   height: 36px;
@@ -187,9 +206,11 @@ main {
   font-size: 16px;
   transition: all 0.2s ease;
 }
+
 .floating-tools button:hover {
   background: #f1f5f9;
 }
+
 #generalTools, #textTools, #imageTools {
   display: flex;
   gap: 6px;
@@ -198,6 +219,7 @@ main {
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
+
 .popup {
   display: none;
   position: fixed;
@@ -208,6 +230,7 @@ main {
   justify-content: center;
   padding: 16px;
 }
+
 .popup-content {
   background: var(--panel-bg);
   padding: 24px;
@@ -222,6 +245,7 @@ main {
   display: flex;
   flex-direction: column;
 }
+
 .popup-title {
   font-size: 20px;
   font-weight: 600;
@@ -231,6 +255,7 @@ main {
   position: relative;
   padding-bottom: 12px;
 }
+
 .popup-title::after {
   content: '';
   position: absolute;
@@ -242,6 +267,7 @@ main {
   background: linear-gradient(90deg, var(--c-cyan), var(--c-magenta));
   border-radius: 3px;
 }
+
 .image-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -250,6 +276,7 @@ main {
   flex-grow: 1;
   min-height: 200px;
 }
+
 .image-thumb {
   width: 100%;
   height: 100px;
@@ -260,10 +287,12 @@ main {
   transition: all 0.2s ease;
   background-color: #e2e8f0;
 }
+
 .image-thumb:hover {
   transform: scale(1.05);
   box-shadow: 0 6px 16px rgba(0,0,0,0.1);
 }
+
 .popup-close {
   width: 100%;
   padding: 14px;
@@ -277,9 +306,11 @@ main {
   transition: background 0.2s;
   margin-top: 10px;
 }
+
 .popup-close:hover {
   background: #052a39;
 }
+
 .font-selector {
   max-height: 300px;
   overflow-y: auto;
@@ -291,6 +322,7 @@ main {
   gap: 8px;
   margin-bottom: 16px;
 }
+
 .font-option {
   padding: 12px;
   border-radius: 8px;
@@ -302,16 +334,19 @@ main {
   text-align: center;
   font-weight: 500;
 }
+
 .font-option:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0,0,0,0.06);
 }
+
 .font-option.selected {
   background: var(--c-cyan);
   color: #fff;
   border-color: rgba(0,0,0,0.06);
   box-shadow: 0 4px 12px rgba(0, 180, 216, 0.3);
 }
+
 footer {
   position: fixed;
   bottom: 0;
@@ -329,9 +364,11 @@ footer {
   justify-content: space-between;
   align-items: center;
 }
+
 .footer-links { display: flex; gap: 12px; }
 .footer-links a { color: var(--text); text-decoration: none; transition: color 0.2s; font-weight: 500; font-size: 12px; }
 .footer-links a:hover { color: var(--c-cyan); }
+
 .help-message {
   position: absolute;
   bottom: 40px;
@@ -346,13 +383,16 @@ footer {
   animation: fadeInOut 4s forwards;
   display: none;
 }
+
 @keyframes fadeInOut {
   0% { opacity: 0; }
   10% { opacity: 1; }
   90% { opacity: 1; }
   100% { opacity: 0; display: none; }
 }
+
 .hidden-input { display: none; }
+
 .upload-card {
   width: 100%;
   height: 100px;
@@ -371,17 +411,20 @@ footer {
   transition: all 0.2s ease;
   margin-bottom: 20px;
 }
+
 .upload-card:hover {
   background-color: #e2e8f0;
   border-color: #334155;
   color: #334155;
 }
+
 /* 2. MEJORA API: Estilos para el buscador de imágenes */
 .search-wrapper {
     display: flex;
     gap: 8px;
     margin-bottom: 20px;
 }
+
 #imageSearchInput {
     flex-grow: 1;
     padding: 12px;
@@ -390,6 +433,7 @@ footer {
     font-size: 16px;
     background: #999393;
 }
+
 #imageSearchBtn {
     padding: 0 20px;
     background: var(--c-cyan);
@@ -402,6 +446,7 @@ footer {
 #imageSearchBtn:hover {
     background: #0096b2;
 }
+
 /* Modo día/noche */
 body.dark {
   --surface: rgba(15, 23, 42, 0.92);
@@ -413,17 +458,21 @@ body.dark {
   --panel-bg: rgba(15, 23, 42, 0.85);
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
 }
+
 body.dark .icon-btn {
   background: linear-gradient(145deg, #1e293b, #0f172a);
   box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 -2px 0 rgba(0,0,0,0.1), inset 0 0 10px rgba(255,255,255,0.1);
 }
+
 body.dark .icon-btn svg path, body.dark .icon-btn svg rect, body.dark .icon-btn svg circle {
   fill: #f1f5f9;
   stroke: #f1f5f9;
 }
+
 body.dark .icon-label, body.dark #exportBtn .icon-label, body.dark , body.dark #clearCanvasBtn .icon-label {
   color: #f1f5f9;
 }
+
 body.dark .canvas-container { background: #1e293b; }
 body.dark #flyerCanvas { border: 1px solid #334155; }
 body.dark .popup-content, body.dark .font-selector, body.dark .font-option { background: #1e293b; color: #f1f5f9; border-color: var(--border); }
@@ -441,6 +490,7 @@ body.dark .search-wrapper input { background: #334155; color: #f1f5f9; border-co
 #themeToggleBtn .icon-label {
   color: #f1f5f9; /* Texto claro */
 }
+
 /* Modo oscuro: botón claro */
 body.dark #themeToggleBtn {
   background: linear-gradient(145deg, #ffffff, #f0f0f0); /* Fondo claro en modo oscuro */
@@ -461,6 +511,7 @@ body.dark #themeToggleBtn .icon-label {
 #exportBtn .icon-label {
   color: #000000; /* Negro para el texto */
 }
+
 /* Asegurar que el modo oscuro no lo cambie */
 body.dark #exportBtn svg path {
   fill: #000000;
@@ -469,6 +520,7 @@ body.dark #exportBtn svg path {
 body.dark #exportBtn .icon-label {
   color: #000000;
 }
+
 /* --- ESTILOS DEL TUTORIAL DE BIENVENIDA --- */
 #tutorial-overlay {
   position: fixed;
@@ -481,6 +533,7 @@ body.dark #exportBtn .icon-label {
   transition: opacity 0.4s ease-in-out;
   opacity: 0;
 }
+
 #tutorial-box {
   position: absolute;
   background: var(--panel-bg);
@@ -496,6 +549,7 @@ body.dark #exportBtn .icon-label {
   border: 1px solid var(--border);
   backdrop-filter: blur(12px);
 }
+
 #tutorial-box::after { /* La flecha que apunta al elemento */
   content: '';
   position: absolute;
@@ -504,22 +558,26 @@ body.dark #exportBtn .icon-label {
   border-width: 10px;
   border-color: transparent;
 }
+
 /* Posiciones de la flecha */
 #tutorial-box.arrow-top::after {
   top: -20px; left: 50%;
   transform: translateX(-50%);
   border-bottom-color: var(--panel-bg);
 }
+
 #tutorial-text {
   font-size: 15px;
   line-height: 1.6;
   margin-bottom: 20px;
 }
+
 #tutorial-nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 #tutorial-nav button {
   padding: 8px 16px;
   border: none;
@@ -530,6 +588,7 @@ body.dark #exportBtn .icon-label {
   background: var(--c-cyan);
   color: #fff;
 }
+
 #tutorial-nav button#tutorial-skip {
   background: transparent;
   color: var(--text-secondary);
@@ -537,6 +596,7 @@ body.dark #exportBtn .icon-label {
 #tutorial-nav button#tutorial-skip:hover {
     color: var(--text);
 }
+
 #tutorial-nav button#tutorial-prev {
   background: #e2e8f0;
   color: var(--text);
@@ -545,166 +605,6 @@ body.dark #tutorial-nav button#tutorial-prev {
   background: #334155;
   color: #fff;
 }
-/* === BOTÓN FLOTANTE DE AYUDA === */
-#helpButton {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--c-magenta);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(208, 0, 111, 0.4);
-  z-index: 1000;
-  transition: transform 0.2s, box-shadow 0.2s;
-  animation: pulse 2s infinite;
-}
-
-#helpButton:hover {
-  transform: scale(1.1);
-  box-shadow: 0 8px 20px rgba(208, 0, 111, 0.5);
-}
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(208, 0, 111, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(208, 0, 111, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(208, 0, 111, 0); }
-}
-
-/* === MODAL DE AYUDA === */
-.help-modal {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(4px);
-}
-
-.help-modal-content {
-  background: var(--panel-bg);
-  width: 90%;
-  max-width: 640px;
-  max-height: 80vh;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-  display: flex;
-  flex-direction: column;
-}
-
-.help-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  background: #f8fafc;
-  border-bottom: 1px solid var(--border);
-}
-
-.help-tabs {
-  display: flex;
-  gap: 8px;
-}
-
-.help-tab {
-  padding: 8px 16px;
-  border: none;
-  background: transparent;
-  font-weight: 600;
-  color: var(--text-secondary);
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.2s;
-}
-
-.help-tab.active {
-  background: var(--c-cyan);
-  color: white;
-}
-
-.help-close {
-  background: none;
-  border: none;
-  font-size: 28px;
-  color: var(--text);
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-}
-
-.help-close:hover {
-  background: #e2e8f0;
-}
-
-.help-modal-body {
-  padding: 20px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-.help-step {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  align-items: flex-start;
-  background: #f8fafc;
-  padding: 12px;
-  border-radius: 10px;
-}
-
-.help-icon {
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-.help-step p {
-  margin: 4px 0 0 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-/* === IDEAS DE USO === */
-.help-ideas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-}
-
-.idea-card {
-  background: #f8fafc;
-  padding: 12px;
-  border-radius: 10px;
-  font-size: 14px;
-  text-align: center;
-  line-height: 1.4;
-}
-
-.idea-card span {
-  font-size: 24px;
-  display: block;
-  margin-bottom: 6px;
-}
-
-/* === PESTAÑAS === */
-.help-tab-content {
-  display: none;
-}
-
-.help-tab-content.active {
-  display: block;
-}
 
 @media (max-width: 768px) {
   .icon-btn { width: 48px; height: 48px; }
@@ -712,8 +612,6 @@ body.dark #tutorial-nav button#tutorial-prev {
   .font-selector { max-height: 200px; }
   .floating-tools { top: 10px; right: 10px; transform: scale(0.9); }
   .icon-label { font-size: 8px; }
-  #helpButton { width: 50px; height: 50px; bottom: 15px; left: 15px; }
-  .help-modal-content { width: 95%; margin: 10px; }
 }
 
 @media (max-width: 480px) {
@@ -723,13 +621,6 @@ body.dark #tutorial-nav button#tutorial-prev {
   footer { flex-direction: column; gap: 4px; padding: 6px; }
   .footer-links { gap: 8px; }
   .icon-label { font-size: 7px; }
-  .help-ideas-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .help-step {
-    flex-direction: column;
-    text-align: center;
-  }
 }
 </style>
 </head>
@@ -739,31 +630,38 @@ body.dark #tutorial-nav button#tutorial-prev {
     <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path></svg>
     <span class="icon-label">Fondo</span>
   </button>
+  
   <button class="icon-btn" title="Agregar texto" id="addTextBtn">
     <svg viewBox="0 0 24 24"><path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z"></path></svg>
     <span class="icon-label">Texto</span>
   </button>
+  
   <button class="icon-btn" title="Agregar imagen" id="addImageBtn">
     <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM12 5c-3.86 0-7 3.14-7 7s3.14 7 7 7V5z"></path></svg>
     <span class="icon-label">Imagen</span>
   </button>
+  
   <button class="icon-btn" title="Generar QR" id="generateQrBtn">
     <svg viewBox="0 0 24 24"><path d="M3 11h8V3H3v8zm2-6h4v4H5V5zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm8-12v8h8V3h-8zm6 6h-4V5h4v4zm-6 8h8v-8h-8v8zm2-6h4v4h-4v-4z"></path></svg>
     <span class="icon-label">QR</span>
   </button>
+  
   <button class="icon-btn" title="Exportar" id="exportBtn">
     <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path></svg>
     <span class="icon-label">Exportar</span>
   </button>
+  
   <button class="icon-btn" title="Limpiar todo" id="clearCanvasBtn">
     <svg viewBox="0 0 24 24"><path d="M19 4h-3.5l-1-1h-5l-1 1H5v2h14V4zM6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12z"></path></svg>
     <span class="icon-label">Limpiar</span>
   </button>
+  
   <button class="icon-btn" title="Cambiar tema" id="themeToggleBtn">
     <svg id="themeIcon" viewBox="0 0 24 24"></svg>
     <span class="icon-label">Tema</span>
   </button>
 </header>
+
 <main>
   <div class="canvas-container">
     <canvas id="flyerCanvas" width="800" height="1066"></canvas>
@@ -790,137 +688,27 @@ body.dark #tutorial-nav button#tutorial-prev {
   </div>
 </main>
 
-<!-- BOTÓN FLOTANTE DE AYUDA -->
-<div id="helpButton" title="¿Necesitas ayuda?">
-  <svg viewBox="0 0 24 24" width="24" height="24">
-    <circle cx="12" cy="12" r="10" fill="white"></circle>
-    <path d="M12 16v-2m0-4v2m0 2h.01M12 8a2 2 0 110 4 2 2 0 010-4z" stroke="var(--c-magenta)" stroke-width="2" fill="none" stroke-linecap="round"></path>
-  </svg>
-</div>
-
-<!-- MODAL DE AYUDA -->
-<div id="helpModal" class="help-modal" style="display: none;">
-  <div class="help-modal-content">
-    <div class="help-modal-header">
-      <div class="help-tabs">
-        <button class="help-tab active" data-tab="guide">📌 Guía Rápida</button>
-        <button class="help-tab" data-tab="ideas">💡 Ideas de Uso</button>
-      </div>
-      <button id="closeHelpModal" class="help-close">&times;</button>
-    </div>
-    <div class="help-modal-body">
-      <!-- GUÍA RÁPIDA -->
-      <div id="helpGuide" class="help-tab-content active">
-        <div class="help-step">
-          <img src="https://cdn-icons-png.flaticon.com/512/5999/5999105.png" alt="Color de fondo" class="help-icon" width="80" height="80">
-          <div>
-            <strong>🎨 Color de fondo</strong>
-            <p>Cambia el color del fondo del flyer con un selector de colores.</p>
-          </div>
-        </div>
-        <div class="help-step">
-          <img src="https://cdn-icons-png.flaticon.com/512/2594/2594812.png" alt="Agregar texto" class="help-icon" width="80" height="80">
-          <div>
-            <strong>🔤 Agregar texto</strong>
-            <p>Haz clic para escribir títulos, descripciones o frases. Edita la fuente después.</p>
-          </div>
-        </div>
-        <div class="help-step">
-          <img src="https://cdn-icons-png.flaticon.com/512/2748/2748695.png" alt="Agregar imagen" class="help-icon" width="80" height="80">
-          <div>
-            <strong>🖼️ Agregar imagen</strong>
-            <p>Añade fotos de galerías o sube las tuyas propias. Perfecto para logos o fondos.</p>
-          </div>
-        </div>
-        <div class="help-step">
-          <img src="https://cdn-icons-png.flaticon.com/512/10944/10944897.png" alt="Generar QR" class="help-icon" width="80" height="80">
-          <div>
-            <strong>🔗 Generar QR</strong>
-            <p>Crea un código QR que lleve a tu WhatsApp. Ideal para promociones.</p>
-          </div>
-        </div>
-        <div class="help-step">
-          <img src="https://cdn-icons-png.flaticon.com/512/3662/3662166.png" alt="Exportar" class="help-icon" width="80" height="80">
-          <div>
-            <strong>📤 Exportar</strong>
-            <p>Descarga tu diseño como JPG (imagen) o PDF (para imprimir).</p>
-          </div>
-        </div>
-        <div class="help-step">
-          <img src="https://cdn-icons-png.flaticon.com/512/1828/1828776.png" alt="Limpiar" class="help-icon" width="80" height="80">
-          <div>
-            <strong>🗑️ Limpiar todo</strong>
-            <p>Borra todo el lienzo si quieres empezar de nuevo.</p>
-          </div>
-        </div>
-        <div class="help-step">
-          <img src="https://cdn-icons-png.flaticon.com/512/2548/2548773.png" alt="Capas" class="help-icon" width="80" height="80">
-          <div>
-            <strong>🔁 Subir/Bajar capa</strong>
-            <p>Si una imagen está sobre el texto, usa ↑ para subirlo o ↓ para bajarlo.</p>
-          </div>
-        </div>
-        <div class="help-step">
-          <img src="https://cdn-icons-png.flaticon.com/512/3662/3662199.png" alt="Fuente" class="help-icon" width="80" height="80">
-          <div>
-            <strong>🅰️ Cambiar fuente</strong>
-            <p>Selecciona el texto y haz clic en "Aa" para elegir entre más de 50 estilos.</p>
-          </div>
-        </div>
-        <div class="help-step">
-          <img src="https://cdn-icons-png.flaticon.com/512/2548/2548836.png" alt="Color" class="help-icon" width="80" height="80">
-          <div>
-            <strong>🎨 Cambiar color del texto</strong>
-            <p>Selecciona el texto y haz clic en la paleta para cambiar su color.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- IDEAS DE USO -->
-      <div id="helpIdeas" class="help-tab-content">
-        <div class="help-ideas-grid">
-          <div class="idea-card"><span>🎪</span> Anuncios de eventos locales</div>
-          <div class="idea-card"><span>🎓</span> Flyers para clases o talleres</div>
-          <div class="idea-card"><span>💰</span> Promociones de negocios</div>
-          <div class="idea-card"><span>💼</span> Servicios profesionales</div>
-          <div class="idea-card"><span>🐾</span> Búsqueda de mascotas</div>
-          <div class="idea-card"><span>🎉</span> Invitaciones de eventos</div>
-          <div class="idea-card"><span>🎵</span> Anuncios de conciertos</div>
-          <div class="idea-card"><span>🏷️</span> Promociones de productos</div>
-          <div class="idea-card"><span>🎨</span> Talleres de arte</div>
-          <div class="idea-card"><span>❤️</span> Recaudación de fondos</div>
-          <div class="idea-card"><span>🧘</span> Clases de yoga o deporte</div>
-          <div class="idea-card"><span>🍽️</span> Catering o comida a domicilio</div>
-          <div class="idea-card"><span>🧖</span> Spas y bienestar</div>
-          <div class="idea-card"><span>🛍️</span> Ofertas en tiendas</div>
-          <div class="idea-card"><span>🤝</span> Eventos de networking</div>
-          <div class="idea-card"><span>📚</span> Clases de idiomas</div>
-          <div class="idea-card"><span>📸</span> Servicios de fotografía</div>
-          <div class="idea-card"><span>🎄</span> Eventos de temporada</div>
-          <div class="idea-card"><span>🧹</span> Servicios de limpieza</div>
-          <div class="idea-card"><span>📢</span> Campañas de concientización</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="popup" id="imgGalleryPopup">
   <div class="popup-content">
     <div class="popup-title">Galería de Imágenes</div>
+    
+    <!-- 2. MEJORA API: Buscador de imágenes -->
     <div class="search-wrapper">
         <input type="text" id="imageSearchInput" placeholder="Busca por palabra (ej: 'fiesta', 'comidas', 'tecnologia')">
         <button id="imageSearchBtn">Buscar</button>
     </div>
+
     <label for="bgLocalInput" class="upload-card">
       <span>⬆️</span>
       Subir tu propia imagen
     </label>
     <input type="file" id="bgLocalInput" accept="image/*" class="hidden-input">
+    
     <div class="image-grid" id="imgFondoGrid"></div>
     <button class="popup-close">Cerrar</button>
   </div>
 </div>
+
 <div class="popup" id="fontPopup">
   <div class="popup-content">
     <div class="popup-title">Seleccionar fuente</div>
@@ -928,6 +716,7 @@ body.dark #tutorial-nav button#tutorial-prev {
     <button class="popup-close">Aplicar</button>
   </div>
 </div>
+
 <div class="popup" id="exportPopup">
   <div class="popup-content">
     <div class="popup-title">Exportar Flyer</div>
@@ -935,6 +724,7 @@ body.dark #tutorial-nav button#tutorial-prev {
     <button class="popup-close" id="btnDescargarPDF" style="margin-top: 10px;">Descargar como PDF</button>
   </div>
 </div>
+
 <footer>
   <div>Hecho con 💜 por OtroMundo</div>
   <div class="footer-links">
@@ -943,56 +733,49 @@ body.dark #tutorial-nav button#tutorial-prev {
   </div>
 </footer>
 
-<!-- INICIO: Estructura del Tutorial de Bienvenida -->
-<div id="tutorial-overlay" style="display: none;">
-  <div id="tutorial-box">
-    <div id="tutorial-text"></div>
-    <div id="tutorial-nav">
-      <button id="tutorial-skip">Saltar Tour</button>
-      <div>
-        <button id="tutorial-prev" style="display: none;">Anterior</button>
-        <button id="tutorial-next">Siguiente</button>
-      </div>
-    </div>
-  </div>
-</div>
-<!-- FIN: Estructura del Tutorial de Bienvenida -->
-
 <script type="text/javascript">
-  var gk_isXlsx = false;
-  var gk_xlsxFileLookup = {};
-  var gk_fileData = {};
-  function filledCell(cell) {
-    return cell !== '' && cell != null;
-  }
-  function loadFileData(filename) {
-    if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-        try {
-            var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-            var firstSheetName = workbook.SheetNames[0];
-            var worksheet = workbook.Sheets[firstSheetName];
-            var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-            var filteredData = jsonData.filter(row => row.some(filledCell));
-            var headerRowIndex = filteredData.findIndex((row, index) =>
-              row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-            );
-            if (headerRowIndex === -1 || headerRowIndex > 25) {
-              headerRowIndex = 0;
-            }
-            var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
-            csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-            return csv;
-        } catch (e) {
-            console.error(e);
-            return "";
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
         }
-    }
-    return gk_fileData[filename] || "";
-  }
-</script>
-<script>
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><script>
 // --- CONFIGURACIÓN ---
 const UNSPLASH_ACCESS_KEY = 'Xj3SNeQvEW2iW-s3L0vLZgBGrve7ZUFVUGPF_hXLjFI'; 
+
 const fontFamilies = {
   "Montserrat": "'Montserrat', Arial, sans-serif",
   "Bebas Neue": "'Bebas Neue', Arial, sans-serif",
@@ -1037,11 +820,13 @@ const fontFamilies = {
   "Poiret One": "'Poiret One', cursive",
   "Unbounded": "'Unbounded', sans-serif"
 };
+
 const canvas = new fabric.Canvas('flyerCanvas', { preserveObjectStacking: true, selection: true, allowTouchScrolling: true, enableRetinaScaling: true, devicePixelRatio: window.devicePixelRatio || 1 });
 canvas.setBackgroundColor('#ffffff', canvas.renderAll.bind(canvas));
 fabric.Textbox.prototype.textBaseline = 'alphabetic';
 
 // --- FUNCIONES MEJORADAS Y NUEVAS ---
+
 function saveCanvasState() {
   try {
     const json = canvas.toJSON();
@@ -1049,6 +834,7 @@ function saveCanvasState() {
     showHelpMessage("Progreso guardado automáticamente.", 1500);
   } catch (error) { console.error('No se pudo guardar el estado del canvas:', error); }
 }
+
 function loadCanvasState() {
   const savedState = localStorage.getItem('savedCanvas');
   if (savedState) {
@@ -1056,6 +842,7 @@ function loadCanvasState() {
     showHelpMessage("¡Bienvenido de vuelta! Se cargó tu último diseño.", 3000);
   }
 }
+
 async function searchUnsplashImages(query) {
   if (!UNSPLASH_ACCESS_KEY || UNSPLASH_ACCESS_KEY === 'TU_CLAVE_DE_API_DE_UNSPLASH') {
     alert('Por favor, configura tu clave de API de Unsplash en el script.');
@@ -1085,7 +872,29 @@ async function searchUnsplashImages(query) {
     imgGrid.innerHTML = `<p>Error al cargar imágenes. Revisa la consola.</p>`;
   }
 }
-// 🔙 NO MODIFICAMOS LA FUNCIÓN DE FUENTES: Se usa el CSS cargado
+
+// MEJORA TIPOGRAFÍA: Sistema de carga de fuentes rediseñado para máxima fiabilidad.
+async function loadAndApplyFont(fontName, fontFamily) {
+  // 1. Comprueba si la fuente ya está disponible en el navegador. Si es así, la aplica y termina.
+  if (document.fonts.check(`1em "${fontName}"`)) {
+    applyFont(fontFamily, fontName);
+    return;
+  }
+
+  // 2. Si no está cargada, muestra un mensaje al usuario.
+  showHelpMessage(`Cargando fuente: ${fontName}...`, 1500);
+
+  // 3. Inyecta el <link> de Google Fonts en el <head> para que el navegador sepa dónde buscar la fuente.
+  const link = document.createElement('link');
+  const formattedFontName = fontName.replace(/ /g, '+');
+  // Se piden varios pesos para dar más flexibilidad a futuro.
+  // La URL ahora se construye correctamente en una sola línea.
+  link.href = `https://fonts.googleapis.com/css2?family=${formattedFontName}:wght@400;700&display=swap`;
+  link.rel = 'stylesheet';
+  document.head.appendChild(link);
+  link.onload = () => applyFont(fontFamily);
+}
+
 function applyFont(fontFamily) {
   const active = canvas.getActiveObject();
   if (active && active.type === "textbox") {
@@ -1093,6 +902,7 @@ function applyFont(fontFamily) {
     canvas.renderAll();
   }
 }
+
 function addImageToCanvas(url) {
   fabric.Image.fromURL(url, (img) => {
     const scale = Math.min((canvas.width * 0.6) / img.width, (canvas.height * 0.6) / img.height);
@@ -1102,28 +912,34 @@ function addImageToCanvas(url) {
     document.getElementById('imgGalleryPopup').style.display = 'none';
   }, { crossOrigin: 'anonymous' });
 }
+
 function adjustCanvasSize() {
   const container = document.querySelector('.canvas-container');
   const aspectRatio = 800 / 1066;
   let newWidth = container.clientWidth * 0.95;
   let newHeight = newWidth / aspectRatio;
+  
   if (newHeight > container.clientHeight * 0.95) {
     newHeight = container.clientHeight * 0.95;
     newWidth = newHeight * aspectRatio;
   }
+  
   canvas.setWidth(newWidth).setHeight(newHeight).renderAll();
 }
+
 function showHelpMessage(message, duration = 4000) {
   const helpElement = document.getElementById('helpMessage');
   helpElement.textContent = message;
   helpElement.style.display = 'block';
-  helpElement.style.animation = 'none';
-  void helpElement.offsetWidth;
+  helpElement.style.animation = 'none'; // Reset animation
+  void helpElement.offsetWidth; // Trigger reflow
   helpElement.style.animation = `fadeInOut ${duration / 1000}s forwards`;
 }
+
 function renderFontOptions() {
   const container = document.getElementById("customFontSelector");
-  if (container.children.length > 0) return;
+  if (container.children.length > 0) return; // Render only once
+  
   Object.keys(fontFamilies).forEach(fontName => {
     const div = document.createElement("div");
     div.className = "font-option";
@@ -1132,7 +948,7 @@ function renderFontOptions() {
     div.addEventListener("click", () => {
       document.querySelectorAll('.font-option').forEach(o => o.classList.remove('selected'));
       div.classList.add('selected');
-      applyFont(fontFamilies[fontName] || fontName);
+      loadAndApplyFont(fontName, fontFamilies[fontName] || fontName);
     });
     container.appendChild(div);
   });
@@ -1144,15 +960,18 @@ window.addEventListener('load', () => {
   loadCanvasState();
 });
 window.addEventListener('resize', adjustCanvasSize);
+
+// Guardado automático
 canvas.on({ 'object:modified': saveCanvasState, 'object:added': saveCanvasState, 'object:removed': saveCanvasState });
 
 // Botones del Header
 document.getElementById('addImageBtn').addEventListener('click', () => {
   document.getElementById('imgGalleryPopup').style.display = 'flex';
   if (document.getElementById('imgFondoGrid').innerHTML === '') {
-      searchUnsplashImages('abstract background');
+      searchUnsplashImages('abstract background'); // Carga inicial
   }
 });
+
 document.getElementById('bgLocalInput').addEventListener('change', function(e) {
   if (!e.target.files || !e.target.files[0]) return;
   const reader = new FileReader();
@@ -1160,18 +979,21 @@ document.getElementById('bgLocalInput').addEventListener('change', function(e) {
   reader.readAsDataURL(e.target.files[0]);
   e.target.value = "";
 });
+
 document.getElementById('bgColorBtn').addEventListener('click', () => {
   const picker = document.createElement('input');
   picker.type = 'color';
   picker.value = canvas.backgroundColor;
   picker.oninput = () => canvas.setBackgroundColor(picker.value, canvas.renderAll.bind(canvas));
-  picker.onchange = saveCanvasState;
+  picker.onchange = saveCanvasState; // Guardar estado al confirmar color
   picker.click();
 });
+
 document.getElementById('addTextBtn').addEventListener('click', () => {
   const textObj = new fabric.Textbox("Tu texto aquí", { left: canvas.width / 2, top: canvas.height / 2, fontSize: 40, fill: '#333', fontFamily: fontFamilies["Montserrat"], originX: "center", originY: "center", editable: true, width: canvas.width * 0.8, textAlign: 'center' });
   canvas.add(textObj).setActiveObject(textObj).renderAll();
 });
+
 document.getElementById('generateQrBtn').addEventListener('click', () => {
   const tel = prompt("Ingresa número de WhatsApp (ej: 094123456):", "");
   if (tel && tel.match(/^\d{6,}$/)) {
@@ -1182,6 +1004,7 @@ document.getElementById('generateQrBtn').addEventListener('click', () => {
     alert("Por favor, ingresa un número de WhatsApp válido.");
   }
 });
+
 document.getElementById('clearCanvasBtn').addEventListener('click', () => {
     if(confirm('¿Estás seguro de que quieres borrar todo el diseño? Esta acción no se puede deshacer.')) {
         canvas.clear();
@@ -1286,51 +1109,25 @@ function updateToggleIcon() {
     icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>';
   }
 }
+
 function toggleTheme() {
   document.body.classList.toggle('dark');
   localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
   updateToggleIcon();
   canvas.renderAll();
 }
+
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'dark') {
   document.body.classList.add('dark');
 }
 updateToggleIcon();
+
 document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
 
-// --- LÓGICA DEL BOTÓN DE AYUDA ---
-const helpButton = document.getElementById('helpButton');
-const helpModal = document.getElementById('helpModal');
-const closeHelpModal = document.getElementById('closeHelpModal');
-const helpTabs = document.querySelectorAll('.help-tab');
-const helpTabContents = document.querySelectorAll('.help-tab-content');
-
-helpButton.addEventListener('click', () => {
-  helpModal.style.display = 'flex';
-});
-
-closeHelpModal.addEventListener('click', () => {
-  helpModal.style.display = 'none';
-});
-
-helpModal.addEventListener('click', (e) => {
-  if (e.target === helpModal) {
-    helpModal.style.display = 'none';
-  }
-});
-
-helpTabs.forEach(tab => {
-  tab.addEventListener('click', () => {
-    const tabId = tab.dataset.tab;
-    helpTabs.forEach(t => t.classList.remove('active'));
-    helpTabContents.forEach(c => c.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById(`help${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`).classList.add('active');
-  });
-});
 
 // --- INICIO: LÓGICA DEL TUTORIAL DE BIENVENIDA ---
+
 const tourSteps = [
   {
     elementId: 'bgColorBtn',
@@ -1365,7 +1162,7 @@ const tourSteps = [
   {
     elementId: 'floatingTools',
     text: 'Cuando selecciones un objeto en el lienzo, aparecerá esta <strong>barra de herramientas contextual</strong> para editarlo.',
-    isDummy: true
+    isDummy: true // Es un paso "ficticio" para mostrar el texto en el centro
   },
   {
     elementId: 'flyerCanvas',
@@ -1373,77 +1170,124 @@ const tourSteps = [
     arrow: 'top'
   }
 ];
+
 let currentStep = 0;
 const overlay = document.getElementById('tutorial-overlay');
 const tutorialBox = document.getElementById('tutorial-box');
+
 function showStep(index) {
   if (index >= tourSteps.length) {
     endTour();
     return;
   }
+  
   const step = tourSteps[index];
   const targetElement = document.getElementById(step.elementId);
+
+  // Texto y navegación
   document.getElementById('tutorial-text').innerHTML = step.text;
   document.getElementById('tutorial-prev').style.display = index > 0 ? 'inline-block' : 'none';
   const nextBtn = document.getElementById('tutorial-next');
   nextBtn.textContent = index === tourSteps.length - 1 ? 'Finalizar' : 'Siguiente';
+
   if (!targetElement) { endTour(); return; }
+
+  // Lógica de posicionamiento del "Spotlight" y el cuadro de texto
   if (step.isDummy) {
+      // Para pasos que solo muestran texto en el centro
       overlay.style.clipPath = 'none';
       tutorialBox.style.top = '50%';
       tutorialBox.style.left = '50%';
       tutorialBox.style.transform = 'translate(-50%, -50%)';
       tutorialBox.className = '';
+      // Mostramos el panel de herramientas para el ejemplo
       targetElement.style.display = 'flex';
       return;
   }
+  
   if(document.getElementById('floatingTools').style.display !== 'none') {
       document.getElementById('floatingTools').style.display = 'none';
   }
+
   const rect = targetElement.getBoundingClientRect();
-  const gap = 15;
+  const gap = 15; // Espacio entre el elemento y el cuadro de texto
+
+  // Creamos el "agujero" en el overlay usando clip-path
   const padding = 5;
   overlay.style.clipPath = `polygon(0% 0%, 0% 100%, ${rect.left - padding}px 100%, ${rect.left - padding}px ${rect.top - padding}px, ${rect.right + padding}px ${rect.top - padding}px, ${rect.right + padding}px ${rect.bottom + padding}px, ${rect.left - padding}px ${rect.bottom + padding}px, ${rect.left - padding}px 100%, 100% 100%, 100% 0%)`;
+  
+  // Posicionamos el cuadro de texto
   tutorialBox.style.top = `${rect.bottom + gap}px`;
   tutorialBox.style.left = `${Math.max(10, rect.left + (rect.width / 2) - (tutorialBox.offsetWidth / 2))}px`;
   tutorialBox.style.transform = 'none';
+
+  // Añadimos la clase para la flecha
   tutorialBox.className = `arrow-${step.arrow}`;
+
+  // Ajustar si se sale de la pantalla
   const boxRect = tutorialBox.getBoundingClientRect();
   if(boxRect.right > window.innerWidth - 10) {
       tutorialBox.style.left = `${window.innerWidth - boxRect.width - 10}px`;
   }
 }
+
 function startTour() {
   overlay.style.display = 'block';
+  // Pequeño delay para que la transición CSS se aplique
   setTimeout(() => {
     overlay.style.opacity = '1';
     showStep(currentStep);
   }, 50);
 }
+
 function endTour() {
   overlay.style.opacity = '0';
   setTimeout(() => {
     overlay.style.display = 'none';
+    // Ocultar de nuevo el panel de herramientas si lo mostramos para el ejemplo
     document.getElementById('floatingTools').style.display = 'none';
   }, 400);
   localStorage.setItem('editorCanvasProTutorialSeen', 'true');
 }
+
+// Event Listeners para la navegación del tour
 document.getElementById('tutorial-next').addEventListener('click', () => {
   currentStep++;
   showStep(currentStep);
 });
+
 document.getElementById('tutorial-prev').addEventListener('click', () => {
   if (currentStep > 0) {
     currentStep--;
     showStep(currentStep);
   }
 });
+
 document.getElementById('tutorial-skip').addEventListener('click', endTour);
+
+// Iniciar el tour si es la primera vez
 window.addEventListener('load', () => {
   if (!localStorage.getItem('editorCanvasProTutorialSeen')) {
     startTour();
   }
 });
 </script>
+
+
+<!-- INICIO: Estructura del Tutorial de Bienvenida -->
+<div id="tutorial-overlay" style="display: none;">
+  <div id="tutorial-box">
+    <div id="tutorial-text"></div>
+    <div id="tutorial-nav">
+      <button id="tutorial-skip">Saltar Tour</button>
+      <div>
+        <button id="tutorial-prev" style="display: none;">Anterior</button>
+        <button id="tutorial-next">Siguiente</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- FIN: Estructura del Tutorial de Bienvenida -->
+
 </body>
 </html>
